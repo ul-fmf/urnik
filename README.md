@@ -13,20 +13,23 @@ Program bo podpiral:
 - prikaz urnikov za posamezen letnik/predavalnico/predavatelja
 - urejanje urnikov
 - izračun morebitnih prekrivanj
+- uvoz starih urnikov
 
 Program ne bo podpiral:
 
 - avtomatičnega ustvarjanja urnikov iz omejitev
 - urnikov, ki se znotraj semestra spreminjajo
 
+Na kaj je treba paziti
+----------------------
 
-Želje študentov
----------------
+Ista skupina je lahko na več smereh in letnikih.
 
-Tako kot zdaj.
+Želje uporabnikov urnika
+------------------------
 
-Želje učiteljev
----------------
+Povezave med urniki (če klikneš na osebo, dobiš njegov urnik, če klikneš na
+predmet, greš na spletno učilnico, če klikneš na predavalnico, dobiš njen urnik)
 
 Želje sestavljalcev urnika
 --------------------------
@@ -35,13 +38,16 @@ Tako kot zdaj.
 vendar naj prekrivanje vseeno dopusti (npr. če nekdo včasih uporablja običajno,
 včasih pa računalniško učilnico). Prav tako naj program omogoča označevanje
 neškodljivih prekrivanj (po 20 učiteljev ima na urniku hkrati isti seminar).
+Dobro bi bilo, če bi imel urnik tudi neko odlagalno površino, na katero se
+da skupine brez določene ure.
 
 2. Običajno se urnik sestavi s spreminjanjem obstoječega urnika. Pri tem
 običajno prihaja do sledečih sprememb:
 
 - sprememba izvajalca:
   to bi bilo najbolj enostavno tako, da dobiš spustni meni in tam izbereš
-  novega. Izvajalcev je veliko, zato je treba izbor smiselno zožati.
+  novega. Izvajalcev je veliko, zato je treba izbor smiselno zožati. Dobro bi
+  bilo tudi, če bi večino sprememb izvajalcev program ugotovil že sam
 - sprememba predavalnice:
   tudi tu bi dobil spustni meni, vendar verjetno samo prostih predavalnic
 - sprememba termina:
