@@ -2,6 +2,7 @@ import sqlite3
 
 con = sqlite3.connect('urnik.sqlite3')
 
+
 def seznam_ucilnic(velikost=0):
     seznam = []
     for ucilnica in con.execute('''
@@ -12,5 +13,3 @@ def seznam_ucilnic(velikost=0):
         ''', [velikost]):
         seznam.append(ucilnica)
     return seznam
-
-print(seznam_ucilnic(50))
