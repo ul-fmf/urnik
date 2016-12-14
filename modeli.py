@@ -5,12 +5,30 @@ con = sqlite3.connect('urnik.sqlite3')
 
 def seznam_ucilnic(velikost=0):
     sql = '''
-        SELECT oznaka, velikost
+        SELECT id, oznaka, velikost, racunalniska
         FROM ucilnica
         WHERE velikost >= ?
-        ORDER BY velikost DESC
+        ORDER BY oznaka
     '''
     return list(con.execute(sql, [velikost]))
+
+
+def seznam_oseb():
+    sql = '''
+        SELECT id, ime, priimek, email
+        FROM oseba
+        ORDER BY priimek, ime
+    '''
+    return list(con.execute(sql))
+
+
+def seznam_letnikov():
+    sql = '''
+        SELECT id, smer, letnik
+        FROM letnik
+        ORDER BY smer, letnik
+    '''
+    return list(con.execute(sql))
 
 
 def prekrivanje_ucilnic():
