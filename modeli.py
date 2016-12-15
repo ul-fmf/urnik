@@ -32,6 +32,58 @@ def seznam_letnikov():
     return list(con.execute(sql))
 
 
+def urnik(srecanja):
+    sql = '''
+        SELECT srecanje.id,
+               dan,
+               ura,
+               trajanje,
+               tip,
+               oseba.ime,
+               oseba.priimek,
+               ucilnica.oznaka
+          FROM srecanje
+               INNER JOIN
+               oseba ON srecanje.ucitelj = oseba.id
+               INNER JOIN
+               ucilnica ON srecanje.ucilnica = ucilnica.id
+         WHERE srecanje.id IN ({})
+         ORDER BY dan,
+                  ura;
+    '''.format(','.join(str(srecanje['id']) for srecanje in srecanja))
+    print(sql)
+    return list(con.execute(sql))
+
+
+def urnik_ucilnice(ucilnica):
+    sql = '''
+        SELECT id
+          FROM srecanje
+         WHERE ucilnica = ?;
+    '''
+    return urnik(con.execute(sql, [ucilnica]))
+
+
+def urnik_osebe(oseba):
+    sql = '''
+        SELECT id
+          FROM srecanje
+         WHERE ucitelj = ?;
+    '''
+    return urnik(con.execute(sql, [oseba]))
+
+
+def urnik_letnika(letnik):
+    sql = '''
+        SELECT id
+          FROM srecanje
+               INNER JOIN
+               letnik_srecanje ON srecanje.id = letnik_srecanje.srecanje
+         WHERE letnik_srecanje.letnik = ?;
+    '''
+    return urnik(con.execute(sql, [letnik]))
+
+
 def prekrivanje_ucilnic():
     '''Vrne podatke o prekrivanju srečanj po učilnicah.
 

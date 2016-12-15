@@ -10,7 +10,7 @@
             <tbody>
                 %for letnik in letniki:
                 <tr>
-                    <td><a href="/letnik/{{letnik['id']}}">{{letnik['smer']}}, {{letnik['letnik']}}. letnik</a></td>
+                    <td><a href="/letnik/{{letnik['id']}}/urnik">{{letnik['smer']}}, {{letnik['letnik']}}. letnik</a></td>
                 </tr>
                 %end
             </tbody>
@@ -26,7 +26,7 @@
             <tbody>
                 %for oseba in osebe:
                 <tr>
-                    <td><a href="/oseba/{{oseba['id']}}">{{oseba['ime']}} {{oseba['priimek']}}</a></td>
+                    <td><a href="/oseba/{{oseba['id']}}/urnik">{{oseba['ime']}} {{oseba['priimek']}}</a></td>
                 </tr>
                 %end
             </tbody>
@@ -43,7 +43,7 @@
                 %for ucilnica in ucilnice:
                 <tr>
                     <td>
-                        <a href="/ucilnica/{{ucilnica['id']}}">
+                        <a href="/ucilnica/{{ucilnica['id']}}/urnik">
                             {{ucilnica['oznaka']}}
                         </a>
                         %if ucilnica['racunalniska']:

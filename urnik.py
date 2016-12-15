@@ -12,6 +12,30 @@ def domaca_stran():
     )
 
 
+@route('/letnik/<letnik>/urnik')
+def urnik_letnika(letnik):
+    return template(
+        'urnik',
+        srecanja=modeli.urnik_letnika(letnik)
+    )
+
+
+@route('/oseba/<oseba>/urnik')
+def urnik_osebe(oseba):
+    return template(
+        'urnik',
+        srecanja=modeli.urnik_osebe(oseba)
+    )
+
+
+@route('/ucilnica/<ucilnica>/urnik')
+def urnik_ucilnice(ucilnica):
+    return template(
+        'urnik',
+        srecanja=modeli.urnik_ucilnice(ucilnica)
+    )
+
+
 @route('/static/<filepath:path>')
 def server_static(filepath):
     return static_file(filepath, root='static')
