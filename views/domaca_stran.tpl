@@ -8,9 +8,9 @@
                 </tr>
             </thead>
             <tbody>
-                %for id, smer, letnik in letniki:
+                %for letnik in letniki:
                 <tr>
-                    <td><a href="/letnik/{{id}}">{{smer}}, {{letnik}}. letnik</a></td>
+                    <td><a href="/letnik/{{letnik['id']}}">{{letnik['smer']}}, {{letnik['letnik']}}. letnik</a></td>
                 </tr>
                 %end
             </tbody>
@@ -24,9 +24,9 @@
                 </tr>
             </thead>
             <tbody>
-                %for id, ime, priimek, _ in osebe:
+                %for oseba in osebe:
                 <tr>
-                    <td><a href="/oseba/{{id}}">{{ime}} {{priimek}}</a></td>
+                    <td><a href="/oseba/{{oseba['id']}}">{{oseba['ime']}} {{oseba['priimek']}}</a></td>
                 </tr>
                 %end
             </tbody>
@@ -40,13 +40,13 @@
                 </tr>
             </thead>
             <tbody>
-                %for id, oznaka, velikost, racunalniska in ucilnice:
+                %for ucilnica in ucilnice:
                 <tr>
                     <td>
-                        <a href="/ucilnica/{{id}}">
-                            {{oznaka}}
+                        <a href="/ucilnica/{{ucilnica['id']}}">
+                            {{ucilnica['oznaka']}}
                         </a>
-                        %if racunalniska:
+                        %if ucilnica['racunalniska']:
                         <i class="tiny material-icons">computer</i>
                         %end
                     </td>

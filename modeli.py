@@ -1,6 +1,7 @@
 import sqlite3
 
 con = sqlite3.connect('urnik.sqlite3')
+con.row_factory = sqlite3.Row
 
 
 def seznam_ucilnic(velikost=0):
@@ -24,7 +25,7 @@ def seznam_oseb():
 
 def seznam_letnikov():
     sql = '''
-        SELECT id, smer, letnik
+        SELECT id, smer, letnik, stevilo_studentov
         FROM letnik
         ORDER BY smer, letnik
     '''
