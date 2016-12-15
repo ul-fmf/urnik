@@ -1,4 +1,4 @@
-from bottle import route, run, template, static_file
+from bottle import route, run, template
 import modeli
 
 
@@ -35,9 +35,5 @@ def urnik_ucilnice(ucilnica):
         srecanja=modeli.urnik_ucilnice(ucilnica)
     )
 
-
-@route('/static/<filepath:path>')
-def server_static(filepath):
-    return static_file(filepath, root='static')
 
 run(debug=True, reloader=True)
