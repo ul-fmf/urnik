@@ -10,7 +10,14 @@
             <tbody>
                 %for letnik in letniki:
                 <tr>
-                    <td><a href="/letnik/{{letnik['id']}}/urnik">{{letnik['smer']}}, {{letnik['letnik']}}. letnik</a></td>
+                    <td>
+                        <a href="/letnik/{{letnik['id']}}/urnik">
+                            {{letnik['smer']}}, {{letnik['letnik']}}. letnik
+                        </a>
+                        <a href="/letnik/{{letnik['id']}}/uredi">
+                            <i class="tiny material-icons">edit</i>
+                        </a>
+                    </td>
                 </tr>
                 %end
             </tbody>
@@ -26,7 +33,14 @@
             <tbody>
                 %for oseba in osebe:
                 <tr>
-                    <td><a href="/oseba/{{oseba['id']}}/urnik">{{oseba['ime']}} {{oseba['priimek']}}</a></td>
+                    <td>
+                        <a href="/oseba/{{oseba['id']}}/urnik">
+                            {{oseba['ime']}} {{oseba['priimek']}}
+                        </a>
+                        <a href="/oseba/{{oseba['id']}}/uredi">
+                            <i class="tiny material-icons">edit</i>
+                        </a>
+                    </td>
                 </tr>
                 %end
             </tbody>
@@ -49,6 +63,9 @@
                         %if ucilnica['racunalniska']:
                         <i class="tiny material-icons">computer</i>
                         %end
+                        <a href="/ucilnica/{{ucilnica['id']}}/uredi">
+                            <i class="tiny material-icons">edit</i>
+                        </a>
                     </td>
                 </tr>
                 %end

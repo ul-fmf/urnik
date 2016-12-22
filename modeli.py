@@ -32,6 +32,44 @@ def seznam_letnikov():
     return list(con.execute(sql))
 
 
+def oseba(oseba):
+    sql = '''
+        SELECT id, ime, priimek, email
+        FROM oseba
+        WHERE id = ?
+    '''
+    return con.execute(sql, [oseba]).fetchone()
+
+
+def uredi_osebo(oseba, ime, priimek, email):
+    sql = '''
+        UPDATE oseba
+        SET ime = ?, priimek = ?, email = ?
+        WHERE id = ?
+    '''
+    con.execute(sql, [ime, priimek, email, oseba])
+    con.commit()
+
+
+def ucilnica(ucilnica):
+    sql = '''
+        SELECT id, oznaka, velikost, racunalniska
+        FROM ucilnica
+        WHERE id = ?
+    '''
+    return con.execute(sql, [ucilnica]).fetchone()
+
+
+def uredi_ucilnico(ucilnica, oznaka, velikost, racunalniska):
+    sql = '''
+        UPDATE ucilnica
+        SET oznaka = ?, velikost = ?, racunalniska = ?
+        WHERE id = ?
+    '''
+    con.execute(sql, [oznaka, velikost, racunalniska, ucilnica])
+    con.commit()
+
+
 def urnik(srecanja):
     sql = '''
         SELECT srecanje.id,
