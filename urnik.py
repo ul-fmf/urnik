@@ -53,14 +53,16 @@ def uredi_letnik(letnik):
         letnik=modeli.letnik(letnik)
     )
 
+
 @post('/letnik/<letnik>/uredi')
-def uredi_letnik(letnik):
-    letnik = request.forms.get('letnik')
-    ime = request.forms.get('ime')
-    priimek = request.forms.get('priimek')
-    email = request.forms.get('email')
-    modeli.uredi_letnik(letnik, ime, priimek, email)
+def uredi_letnik_post(letnik):
+    letnik = request.forms.letnik
+    leto = int(request.forms.leto)
+    smer = request.forms.smer
+    stevilo_studentov = int(request.forms.stevilo_studentov)
+    modeli.uredi_letnik(letnik, leto, smer, stevilo_studentov)
     redirect('/')
+
 
 @get('/oseba/<oseba>/uredi')
 def uredi_osebo(oseba):
@@ -69,14 +71,16 @@ def uredi_osebo(oseba):
         oseba=modeli.oseba(oseba)
     )
 
+
 @post('/oseba/<oseba>/uredi')
-def uredi_osebo_submit(oseba):
-    oseba = request.forms.get('oseba')
-    ime = request.forms.get('ime')
-    priimek = request.forms.get('priimek')
-    email = request.forms.get('email')
+def uredi_osebo_post(oseba):
+    oseba = request.forms.oseba
+    ime = request.forms.ime
+    priimek = request.forms.priimek
+    email = request.forms.email
     modeli.uredi_osebo(oseba, ime, priimek, email)
     redirect('/')
+
 
 @get('/ucilnica/<ucilnica>/uredi')
 def uredi_ucilnico(ucilnica):
@@ -85,17 +89,18 @@ def uredi_ucilnico(ucilnica):
         ucilnica=modeli.ucilnica(ucilnica)
     )
 
+
 @post('/ucilnica/<ucilnica>/uredi')
-def uredi_ucilnico(ucilnica):
-    ucilnica = request.forms.get('ucilnica')
-    oznaka = request.forms.get('oznaka')
-    velikost = request.forms.get('velikost')
-    racunalniska = request.forms.get('racunalniska', 0)
-    print(racunalniska)
+def uredi_ucilnico_post(ucilnica):
+    ucilnica = request.forms.ucilnica
+    oznaka = request.forms.oznaka
+    velikost = request.forms.velikost
+    racunalniska = request.forms.racunalniska
     modeli.uredi_ucilnico(ucilnica, oznaka, velikost, racunalniska)
     redirect('/')
 
-
-
+################################################################################
+# ZAGON APLIKACIJE
+################################################################################
 
 run(debug=True, reloader=True)

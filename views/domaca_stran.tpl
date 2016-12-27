@@ -12,7 +12,7 @@
                 <tr>
                     <td>
                         <a href="/letnik/{{letnik['id']}}/urnik">
-                            {{letnik['smer']}}, {{letnik['letnik']}}. letnik
+                            {{letnik['smer']}}, {{letnik['leto']}}. letnik
                         </a>
                         <a href="/letnik/{{letnik['id']}}/uredi">
                             <i class="tiny material-icons">edit</i>

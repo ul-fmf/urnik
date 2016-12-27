@@ -25,9 +25,9 @@ def seznam_oseb():
 
 def seznam_letnikov():
     sql = '''
-        SELECT id, smer, letnik, stevilo_studentov
+        SELECT id, smer, leto, stevilo_studentov
         FROM letnik
-        ORDER BY smer, letnik
+        ORDER BY smer, leto
     '''
     return list(con.execute(sql))
 
@@ -67,6 +67,25 @@ def uredi_ucilnico(ucilnica, oznaka, velikost, racunalniska):
         WHERE id = ?
     '''
     con.execute(sql, [oznaka, velikost, racunalniska, ucilnica])
+    con.commit()
+
+
+def letnik(letnik):
+    sql = '''
+        SELECT id, smer, leto, stevilo_studentov
+        FROM letnik
+        WHERE id = ?
+    '''
+    return con.execute(sql, [letnik]).fetchone()
+
+
+def uredi_letnik(letnik, smer, leto, stevilo_studentov):
+    sql = '''
+        UPDATE letnik
+        SET smer = ?, leto = ?, stevilo_studentov = ?
+        WHERE id = ?
+    '''
+    con.execute(sql, [smer, leto, stevilo_studentov, letnik])
     con.commit()
 
 
