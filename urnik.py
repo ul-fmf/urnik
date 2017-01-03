@@ -19,27 +19,15 @@ def domaca_stran():
 # URNIKI LETNIKOV, OSEB IN UČILNIC
 ################################################################################
 
-@route('/letnik/<letnik>/urnik')
-def urnik_letnika(letnik):
+@route('/urnik')
+def urnik():
     return template(
         'urnik',
-        srecanja=modeli.urnik_letnika(letnik)
-    )
-
-
-@route('/oseba/<oseba>/urnik')
-def urnik_osebe(oseba):
-    return template(
-        'urnik',
-        srecanja=modeli.urnik_osebe(oseba)
-    )
-
-
-@route('/ucilnica/<ucilnica>/urnik')
-def urnik_ucilnice(ucilnica):
-    return template(
-        'urnik',
-        srecanja=modeli.urnik_ucilnice(ucilnica)
+        srecanja=modeli.urnik(
+            letniki=[int(letnik) for letnik in request.query.getall('letnik')],
+            osebe=[int(oseba) for oseba in request.query.getall('oseba')],
+            ucilnice=[int(ucilnica) for ucilnica in request.query.getall('ucilnica')],
+        )
     )
 
 ################################################################################

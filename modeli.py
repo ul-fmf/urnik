@@ -89,8 +89,7 @@ def uredi_letnik(letnik, smer, leto, stevilo_studentov):
     con.commit()
 
 
-def urnik(srecanja):
-    srecanja = list(srecanja)
+def urnik(letniki, osebe, ucilnice):
     sql = '''
         SELECT dan,
                ura,
@@ -104,38 +103,17 @@ def urnik(srecanja):
                oseba ON srecanje.ucitelj = oseba.id
                INNER JOIN
                ucilnica ON srecanje.ucilnica = ucilnica.id
-         WHERE srecanje.id IN ({})
-    '''.format(', '.join('?' for _ in srecanja))
-    return con.execute(sql, [srecanje['id'] for srecanje in srecanja])
-
-
-def urnik_ucilnice(ucilnica):
-    sql = '''
-        SELECT id
-          FROM srecanje
-         WHERE ucilnica = ?;
-    '''
-    return urnik(con.execute(sql, [ucilnica]))
-
-
-def urnik_osebe(oseba):
-    sql = '''
-        SELECT id
-          FROM srecanje
-         WHERE ucitelj = ?;
-    '''
-    return urnik(con.execute(sql, [oseba]))
-
-
-def urnik_letnika(letnik):
-    sql = '''
-        SELECT id
-          FROM srecanje
                INNER JOIN
                letnik_srecanje ON srecanje.id = letnik_srecanje.srecanje
-         WHERE letnik_srecanje.letnik = ?;
-    '''
-    return urnik(con.execute(sql, [letnik]))
+         WHERE letnik_srecanje.letnik IN ({})
+            OR srecanje.ucitelj IN ({})
+            OR srecanje.ucilnica IN ({})
+    '''.format(
+      ', '.join('?' for _ in letniki),
+      ', '.join('?' for _ in osebe),
+      ', '.join('?' for _ in ucilnice),
+    )
+    return con.execute(sql, letniki + osebe + ucilnice)
 
 
 def prekrivanje_ucilnic():

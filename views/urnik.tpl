@@ -36,12 +36,12 @@
             Ime predmeta
         </div>
         <div class="ucitelj">
-            <a href="/oseba/{{srecanje['ucitelj']}}/urnik">
+            <a href="/urnik?oseba={{srecanje['ucitelj']}}">
                 {{srecanje['priimek_ucitelja']}}
             </a>
         </div>
         <div class="ucilnica">
-            <a href="/ucilnica/{{srecanje['ucilnica']}}/urnik">
+            <a href="/urnik?ucilnica={{srecanje['ucilnica']}}">
                 {{srecanje['oznaka_ucilnice']}}
             </a>
         </div>
