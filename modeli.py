@@ -90,6 +90,7 @@ def uredi_letnik(letnik, smer, leto, stevilo_studentov):
 
 
 def urnik(srecanja):
+    srecanja = list(srecanja)
     sql = '''
         SELECT srecanje.id,
                dan,
@@ -107,9 +108,8 @@ def urnik(srecanja):
          WHERE srecanje.id IN ({})
          ORDER BY dan,
                   ura;
-    '''.format(','.join(str(srecanje['id']) for srecanje in srecanja))
-    print(sql)
-    return list(con.execute(sql))
+    '''.format(','.join('?' for _ in srecanja))
+    return list(con.execute(sql, [srecanje['id'] for srecanje in srecanja]))
 
 
 def urnik_ucilnice(ucilnica):
