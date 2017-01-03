@@ -26,10 +26,10 @@
 </div>
 <div id="srecanja">
     % for srecanje in srecanja:
-    % left = (srecanje['dan'] - 1) * enota_sirine
+    % left = (srecanje['dan'] - 1 + srecanje['zamik']) * enota_sirine
     % top = (srecanje['ura'] - min_ura) * enota_visine
     % height = srecanje['trajanje'] * enota_visine
-    % width = enota_sirine
+    % width = srecanje['sirina'] * enota_sirine
     % style = 'left: {:.2%}; width: {:.2%}; top: {:.2%}; height: {:.2%}'.format(left, width, top, height)
     <div class="srecanje" style="{{ style }};">
         <div class="predmet">

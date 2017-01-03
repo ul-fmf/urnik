@@ -113,8 +113,8 @@ def urnik(letniki, osebe, ucilnice):
       ', '.join('?' for _ in osebe),
       ', '.join('?' for _ in ucilnice),
     )
-    return con.execute(sql, letniki + osebe + ucilnice)
-
+    srecanja = [dict(srecanje) for srecanje in con.execute(sql, letniki + osebe + ucilnice)]
+    return nastavi_sirine_srecanj(srecanja)
 
 def prekrivanje_ucilnic():
     '''Vrne podatke o prekrivanju srečanj po učilnicah.
@@ -156,3 +156,49 @@ def proste_ucilnice():
         (1, 10): [6],
         (3, 8): [1, 2, 3]
     }
+
+
+def razdeli_srecanja_po_dneh(srecanja):
+    dnevi = {}
+    for srecanje in srecanja:
+        dan = srecanje['dan']
+        if dan not in dnevi:
+            dnevi[dan] = []
+        dnevi[dan].append(srecanje)
+    return dnevi.values()
+
+
+def razdeli_dan_na_skupine(srecanja):
+    skupina, konec_zadnjega_srecanja = [], None
+
+    for srecanje in srecanja:
+        # Če se naslednje srečanje začne za koncem vseh prejšnjih, zaključimo skupino.
+        if konec_zadnjega_srecanja is not None and srecanje['ura'] >= konec_zadnjega_srecanja:
+            yield skupina
+            skupina, konec_zadnjega_srecanja = [], None
+
+        # Vstavimo v prvi stolpec, kjer je prostor. Če ga ni, dodamo novega.
+        for stolpec in skupina:
+            if stolpec[-1]['ura'] + stolpec[-1]['trajanje'] <= srecanje['ura']:
+                stolpec.append(srecanje)
+                break
+        else:
+            skupina.append([srecanje])
+
+        # Popravimo konec zadnjega srečanja.
+        konec = srecanje['ura'] + srecanje['trajanje']
+        if konec_zadnjega_srecanja is None or konec > konec_zadnjega_srecanja:
+            konec_zadnjega_srecanja = konec
+
+    if skupina:
+        yield skupina
+
+
+def nastavi_sirine_srecanj(srecanja):
+    for srecanja_dneva in razdeli_srecanja_po_dneh(srecanja):
+        for skupina in razdeli_dan_na_skupine(srecanja_dneva):
+            for i, stolpec in enumerate(skupina):
+                for srecanje in stolpec:
+                    srecanje['sirina'] = 1 / len(skupina)
+                    srecanje['zamik'] = i / len(skupina)
+    return srecanja
