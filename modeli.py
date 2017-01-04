@@ -4,6 +4,9 @@ con = sqlite3.connect('urnik.sqlite3')
 con.row_factory = sqlite3.Row
 
 
+def vprasaji(seznam):
+    return ', '.join('?' for _ in seznam)
+
 def seznam_ucilnic(velikost=0):
     sql = '''
         SELECT id, oznaka, velikost, racunalniska
@@ -108,11 +111,7 @@ def urnik(letniki, osebe, ucilnice):
          WHERE letnik_srecanje.letnik IN ({})
             OR srecanje.ucitelj IN ({})
             OR srecanje.ucilnica IN ({})
-    '''.format(
-      ', '.join('?' for _ in letniki),
-      ', '.join('?' for _ in osebe),
-      ', '.join('?' for _ in ucilnice),
-    )
+    '''.format(vprasaji(letniki), vprasaji(osebe), vprasaji(ucilnice))
     srecanja = [dict(srecanje) for srecanje in con.execute(sql, letniki + osebe + ucilnice)]
     return nastavi_sirine_srecanj(srecanja)
 
@@ -123,18 +122,18 @@ def prekrivanje_ucilnic():
     priredi seznam ID-jev srečanj, ki tam in takrat potekajo hkrati.
     '''
     sql = '''
-    SELECT prvo.ucilnica AS ucilnica,
-           prvo.dan AS dan,
-           drugo.ura AS ura,
-           prvo.id AS prvo,
-           drugo.id AS drugo
-      FROM srecanje AS prvo
-           INNER JOIN
-           srecanje AS drugo ON prvo.ucilnica = drugo.ucilnica AND 
-                                prvo.dan = drugo.dan
-     WHERE prvo.id != drugo.id AND 
-           prvo.ura <= drugo.ura AND 
-           drugo.ura < prvo.ura + prvo.trajanje
+        SELECT prvo.ucilnica AS ucilnica,
+               prvo.dan AS dan,
+               drugo.ura AS ura,
+               prvo.id AS prvo,
+               drugo.id AS drugo
+          FROM srecanje AS prvo
+               INNER JOIN
+               srecanje AS drugo ON prvo.ucilnica = drugo.ucilnica AND 
+                                    prvo.dan = drugo.dan
+         WHERE prvo.id != drugo.id AND 
+               prvo.ura <= drugo.ura AND 
+               drugo.ura < prvo.ura + prvo.trajanje
     '''
     prekrivanja = {}
     for ucilnica, dan, ura, prvo, drugo in con.execute(sql):
@@ -161,10 +160,7 @@ def proste_ucilnice():
 def razdeli_srecanja_po_dneh(srecanja):
     dnevi = {}
     for srecanje in srecanja:
-        dan = srecanje['dan']
-        if dan not in dnevi:
-            dnevi[dan] = []
-        dnevi[dan].append(srecanje)
+        dnevi.setdefault(srecanje['dan'], []).append(srecanje)
     return dnevi.values()
 
 
