@@ -65,6 +65,42 @@
         .ucilnica {
             right: 4pt;
         }
+        .termin {
+            position: absolute;
+            opacity: 0.6;
+        }
+        .termin button {
+            border-style: none;
+            width: 100%;
+            height: 100%;
+        }
+        .termin button.prosto {
+            background: green;
+        }
+        .termin button.alternative {
+            background: orange;
+        }
+        .termin button {
+            background: red;
+        }
+        .termin button.deloma {
+            background: repeating-linear-gradient(
+              -45deg,
+              red,
+              red 5px,
+              green 5px,
+              green 10px
+            );
+        }
+        .termin button.deloma.alternative {
+            background: repeating-linear-gradient(
+              -45deg,
+              orange,
+              orange 5px,
+              green 5px,
+              green 10px
+            );
+        }
     </style>
 </head>
 

@@ -30,6 +30,14 @@ def urnik():
         )
     )
 
+@get('/srecanje/<srecanje>/premakni')
+def premakni_srecanje(srecanje):
+    return template(
+        'urnik',
+        srecanja=modeli.povezana_srecanja(srecanje),
+        prosti_termini=modeli.prosti_termini(),
+    )
+
 ################################################################################
 # UREJANJE LETNIKOV, OSEB IN UČILNIC
 ################################################################################

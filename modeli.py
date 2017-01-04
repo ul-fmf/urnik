@@ -115,6 +115,18 @@ def urnik(letniki, osebe, ucilnice):
     srecanja = [dict(srecanje) for srecanje in con.execute(sql, letniki + osebe + ucilnice)]
     return nastavi_sirine_srecanj(srecanja)
 
+def povezana_srecanja(srecanje):
+    sql_letniki = '''
+        SELECT letnik FROM letnik_srecanje WHERE srecanje = ?
+    '''
+    letniki = [row['letnik'] for row in con.execute(sql_letniki, [srecanje])]
+    sql_ucitelj = '''
+        SELECT ucitelj FROM srecanje WHERE id = ?
+    '''
+    ucitelj = con.execute(sql_ucitelj, [srecanje]).fetchone()['ucitelj']
+    return urnik(letniki, [ucitelj], [])
+
+
 def prekrivanje_ucilnic():
     '''Vrne podatke o prekrivanju srečanj po učilnicah.
 
@@ -144,17 +156,55 @@ def prekrivanje_ucilnic():
     return prekrivanja
 
 
-def proste_ucilnice():
-    '''Vrne podatke o vseh prostih učilnicah.
+def prosti_termini(ustrezne=[1,2,7], alternative=[1], trajanje=3):
+    zasedene = {}
+    ucilnice = ustrezne + alternative
+    sql = '''
+        SELECT dan,
+               ura,
+               trajanje,
+               ucilnica
+          FROM srecanje
+         WHERE ucilnica IN ({})
+    '''.format(vprasaji(ucilnice))
+    for srecanje in con.execute(sql, ucilnice):
+        dan = srecanje['dan']
+        for ura in range(srecanje['ura'], srecanje['ura'] + srecanje['trajanje']):
+            zasedene.setdefault((dan, ura), set()).add(srecanje['ucilnica'])
 
-    Funkcija vrne slovar, ki paru (dan, ura) priredi seznam ID-jev
-    učilnic, ki so takrat proste. Če prostih učilnic ni, se par (dan, ura)
-    v slovarju ne pojavi.
-    '''
-    return {
-        (1, 10): [6],
-        (3, 8): [1, 2, 3]
-    }
+    def prosta(ucilnica, dan, ura):
+        return ucilnica not in zasedene.get((dan, ura), [])
+
+    termini = {}
+    for dan in range(1, 6):
+        for zacetek in range(7, 20 - trajanje + 1):
+            termin = termini.setdefault((dan, zacetek), {
+                'proste': set(),
+                'deloma_proste': set(),
+                'proste_alternative': set(),
+            })
+            ure = range(zacetek, zacetek + trajanje)
+            for ucilnica in ustrezne:
+                if all(prosta(ucilnica, dan, ura) for ura in ure):
+                    termin['proste'].add(ucilnica)
+                elif any(prosta(ucilnica, dan, ura) for ura in ure):
+                    termin['deloma_proste'].add(ucilnica)
+            for ucilnica in alternative:
+                if all(prosta(ucilnica, dan, ura) for ura in ure):
+                    termin['proste_alternative'].add(ucilnica)
+
+    for termin in termini.values():
+        if termin['proste']:
+            termin['zasedenost'] = 'prosto'
+        elif termin['deloma_proste'] and termin['proste_alternative']:
+            termin['zasedenost'] = 'deloma alternative'
+        elif termin['deloma_proste']:
+            termin['zasedenost'] = 'deloma'
+        elif termin['proste_alternative']:
+            termin['zasedenost'] = 'alternative'
+        else:
+            termin['zasedenost'] = ''
+    return termini
 
 
 def razdeli_srecanja_po_dneh(srecanja):

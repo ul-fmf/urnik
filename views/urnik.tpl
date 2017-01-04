@@ -47,4 +47,14 @@
         </div>
     </div>
     % end
+    % for (dan, ura), termin in get('prosti_termini', {}).items():
+    % left = (dan - 1) * enota_sirine
+    % top = (ura - min_ura) * enota_visine
+    % height = enota_visine
+    % width = enota_sirine
+    % style = 'position: absolute; left: {:.2%}; width: {:.2%}; top: {:.2%}; height: {:.2%}'.format(left, width, top, height)
+    <form action="/" method="post" class="termin" style="{{style}}">
+        <button class="{{termin['zasedenost']}}"></button>
+    </form>
+    % end
 </div>
