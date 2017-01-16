@@ -12,6 +12,5 @@
         <input value="{{letnik['stevilo_studentov']}}" name="stevilo_studentov" type="text" class="validate" />
         <label for="stevilo_studentov">Število študentov</label>
     </div>
-    <input value="{{letnik['id']}}" name="letnik" type="hidden">
     <button class="btn waves-effect waves-light" type="submit">Spremeni</button>
 </form>

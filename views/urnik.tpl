@@ -16,11 +16,11 @@
     % end
 </div>
 <div id="ure">
-    % for ura in range(min_ura - 1, max_ura + 1):
+    % for ura in range(min_ura, max_ura + 1):
     % bottom = (max_ura - ura) * enota_visine
     % style = 'bottom: {:.2%}'.format(bottom)
     <div class="ura" style="{{ style }}">
-        {{ura if ura >= min_ura else ''}}
+        <span>{{ura if ura >= min_ura else ''}}</span>
     </div>
     % end
 </div>
@@ -45,16 +45,64 @@
                 {{srecanje['oznaka_ucilnice']}}
             </a>
         </div>
+        <div class="urejanje">
+            <div class="right">
+                <a href="/srecanje/{{srecanje['id']}}/premakni">
+                    <i class="tiny material-icons">open_with</i>
+                </a>
+                <form method="post" action="/srecanje/{{srecanje['id']}}/izbrisi">
+                    <button>
+                        <i class="tiny material-icons">delete</i>
+                    </button>
+                </form>
+                <form method="post" action="/srecanje/{{srecanje['id']}}/podvoji">
+                    <button>
+                        <i class="tiny material-icons">content_copy</i>
+                    </button>
+                </form>
+            </div>
+            <div class="podaljsevanje">
+                % if srecanje['trajanje'] > 1:
+                <form method="post" action="/srecanje/{{srecanje['id']}}/trajanje">
+                    <input type="hidden" name="next" value="{{next}}">
+                    <input type="hidden" name="trajanje" value="{{srecanje['trajanje'] - 1}}">
+                    <button>
+                        <i class="tiny material-icons">file_upload</i>
+                    </button>
+                </form>
+                % end
+                % if srecanje['ura'] + srecanje['trajanje'] < max_ura:
+                <form method="post" action="/srecanje/{{srecanje['id']}}/trajanje">
+                    <input type="hidden" name="next" value="{{next}}">
+                    <input type="hidden" name="trajanje" value="{{srecanje['trajanje'] + 1}}">
+                    <button>
+                        <i class="tiny material-icons">file_download</i>
+                    </button>
+                </form>
+                % end
+            </div>
+        </div>
     </div>
     % end
+    % import modeli
     % for (dan, ura), termin in get('prosti_termini', {}).items():
     % left = (dan - 1) * enota_sirine
     % top = (ura - min_ura) * enota_visine
     % height = enota_visine
     % width = enota_sirine
     % style = 'position: absolute; left: {:.2%}; width: {:.2%}; top: {:.2%}; height: {:.2%}'.format(left, width, top, height)
-    <form action="/" method="post" class="termin" style="{{style}}">
-        <button class="{{termin['zasedenost']}}"></button>
-    </form>
+    <div class="termin {{termin['zasedenost']}}" style="{{style}}">
+        <div class="izbira_ucilnice">
+        % for ucilnica, zasedenost in termin['ucilnice']:
+            <form method="post" class="izbrana_ucilnica {{zasedenost}}">
+                <input type="hidden" name="next" value="{{next}}">
+                <input value="{{dan}}" name="dan" type="hidden">
+                <input value="{{ura}}" name="ura" type="hidden">
+                <input value="{{ucilnica}}" name="ucilnica" type="hidden">
+                <button class="">{{modeli.ucilnica(ucilnica)['oznaka']}}</button>
+            </form>
+        % end
+        </div>
+    </div>
     % end
 </div>

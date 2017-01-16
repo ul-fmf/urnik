@@ -7,6 +7,7 @@ con.row_factory = sqlite3.Row
 def vprasaji(seznam):
     return ', '.join('?' for _ in seznam)
 
+
 def seznam_ucilnic(velikost=0):
     sql = '''
         SELECT id, oznaka, velikost, racunalniska
@@ -82,6 +83,24 @@ def letnik(letnik):
     return con.execute(sql, [letnik]).fetchone()
 
 
+def nalozi_srecanje(srecanje_id):
+    sql_srecanje = '''
+        SELECT id, ucitelj, ucilnica, ura, dan, trajanje, tip
+        FROM srecanje
+        WHERE id = ?
+    '''
+    srecanje = dict(con.execute(sql_srecanje, [srecanje_id]).fetchone())
+    sql_letniki = '''
+        SELECT letnik
+        FROM letnik_srecanje
+        WHERE srecanje = ?
+    '''
+    srecanje['letniki'] = [
+        row['letnik'] for row in con.execute(sql_letniki, [srecanje_id]).fetchall()
+    ]
+    return srecanje
+
+
 def uredi_letnik(letnik, smer, leto, stevilo_studentov):
     sql = '''
         UPDATE letnik
@@ -92,9 +111,41 @@ def uredi_letnik(letnik, smer, leto, stevilo_studentov):
     con.commit()
 
 
+def nastavi_trajanje(srecanje, trajanje):
+    sql = '''
+        UPDATE srecanje
+        SET trajanje = ?
+        WHERE id = ?
+    '''
+    con.execute(sql, [trajanje, srecanje])
+    con.commit()
+
+def izbrisi_srecanje(srecanje):
+    sql = '''
+        DELETE FROM srecanje
+        WHERE id = ?
+    '''
+    con.execute(sql, [srecanje])
+    con.commit()
+
+def podvoji_srecanje(id_srecanja):
+    srecanje = nalozi_srecanje(id_srecanja)
+    sql = '''
+        INSERT INTO srecanje
+        (ucitelj, ucilnica, ura, dan, trajanje, tip)
+        VALUES
+        (?, ?, ?, ?, ?, ?)'''
+    cur = con.execute(sql, [srecanje['ucitelj'], srecanje['ucilnica'], srecanje['ura'],
+                            srecanje['dan'], srecanje['trajanje'], srecanje['tip']])
+    nov_id = cur.lastrowid
+    for letnik in srecanje['letniki']:
+        sql = '''INSERT INTO letnik_srecanje (letnik, srecanje) VALUES (?, ?)'''
+        con.execute(sql, [letnik, nov_id])
+
 def urnik(letniki, osebe, ucilnice):
     sql = '''
-        SELECT dan,
+        SELECT srecanje.id as id,
+               dan,
                ura,
                trajanje,
                srecanje.ucitelj as ucitelj,
@@ -111,9 +162,21 @@ def urnik(letniki, osebe, ucilnice):
          WHERE letnik_srecanje.letnik IN ({})
             OR srecanje.ucitelj IN ({})
             OR srecanje.ucilnica IN ({})
+         ORDER BY dan, ura, trajanje
     '''.format(vprasaji(letniki), vprasaji(osebe), vprasaji(ucilnice))
     srecanja = [dict(srecanje) for srecanje in con.execute(sql, letniki + osebe + ucilnice)]
     return nastavi_sirine_srecanj(srecanja)
+
+
+def premakni_srecanje(srecanje, dan, ura, ucilnica):
+    sql = '''
+        UPDATE srecanje
+        SET dan = ?, ura = ?, ucilnica = ?
+        WHERE id = ?
+    '''
+    con.execute(sql, [dan, ura, ucilnica, srecanje])
+    con.commit()
+
 
 def povezana_srecanja(srecanje):
     sql_letniki = '''
@@ -156,7 +219,7 @@ def prekrivanje_ucilnic():
     return prekrivanja
 
 
-def prosti_termini(ustrezne=[1,2,7], alternative=[1], trajanje=3):
+def prosti_termini(id_srecanja, ustrezne=[9, 10], alternative=[6, 7, 8]):
     zasedene = {}
     ucilnice = ustrezne + alternative
     sql = '''
@@ -175,15 +238,17 @@ def prosti_termini(ustrezne=[1,2,7], alternative=[1], trajanje=3):
     def prosta(ucilnica, dan, ura):
         return ucilnica not in zasedene.get((dan, ura), [])
 
+    izbrano_srecanje = nalozi_srecanje(id_srecanja)
+
     termini = {}
     for dan in range(1, 6):
-        for zacetek in range(7, 20 - trajanje + 1):
+        for zacetek in range(7, 20 - izbrano_srecanje['trajanje'] + 1):
             termin = termini.setdefault((dan, zacetek), {
                 'proste': set(),
                 'deloma_proste': set(),
                 'proste_alternative': set(),
             })
-            ure = range(zacetek, zacetek + trajanje)
+            ure = range(zacetek, zacetek + izbrano_srecanje['trajanje'])
             for ucilnica in ustrezne:
                 if all(prosta(ucilnica, dan, ura) for ura in ure):
                     termin['proste'].add(ucilnica)
@@ -204,6 +269,14 @@ def prosti_termini(ustrezne=[1,2,7], alternative=[1], trajanje=3):
             termin['zasedenost'] = 'alternative'
         else:
             termin['zasedenost'] = ''
+        termin['ucilnice'] = [
+            (ucilnica, 'prosta') for ucilnica in termin['proste']
+        ] + [
+            (ucilnica, 'prosta_alternativa') for ucilnica in termin['proste_alternative']
+        ] + [
+            (ucilnica, 'deloma_prosta') for ucilnica in termin['deloma_proste']
+        ]
+
     return termini
 
 

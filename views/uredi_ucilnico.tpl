@@ -12,6 +12,5 @@
         <input id="racunalniska" name="racunalniska" type="checkbox" {{'checked="checked"' if ucilnica['racunalniska'] else ''}} />
         <label for="racunalniska">Računalniška učilnica</label>
     </p>
-    <input value="{{ucilnica['id']}}" name="ucilnica" type="hidden">
     <button class="btn waves-effect waves-light" type="submit">Spremeni</button>
 </form>
