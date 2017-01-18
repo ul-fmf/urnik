@@ -12,6 +12,10 @@ con.row_factory = sqlite3.Row
 def vprasaji(seznam):
     return ', '.join('?' for _ in seznam)
 
+
+def seznam_slovarjev(vrstice):
+    return [dict(vrstica) for vrstica in vrstice]
+
 ################################################################################
 # NALAGANJE SEZNAMA
 ################################################################################
@@ -23,7 +27,7 @@ def seznam_letnikov():
         FROM letnik
         ORDER BY smer, leto
     '''
-    return list(con.execute(sql))
+    return seznam_slovarjev(con.execute(sql))
 
 
 def seznam_oseb():
@@ -32,7 +36,7 @@ def seznam_oseb():
         FROM oseba
         ORDER BY priimek, ime
     '''
-    return list(con.execute(sql))
+    return seznam_slovarjev(con.execute(sql))
 
 
 def seznam_ucilnic(velikost=0):
@@ -42,7 +46,7 @@ def seznam_ucilnic(velikost=0):
         WHERE velikost >= ?
         ORDER BY oznaka
     '''
-    return list(con.execute(sql, [velikost]))
+    return seznam_slovarjev(con.execute(sql, [velikost]))
 
 ################################################################################
 # UREJANJE
@@ -89,7 +93,7 @@ def letnik(letnik):
         FROM letnik
         WHERE id = ?
     '''
-    return con.execute(sql, [letnik]).fetchone()
+    return dict(con.execute(sql, [letnik]).fetchone())
 
 
 def oseba(oseba):
@@ -98,7 +102,7 @@ def oseba(oseba):
         FROM oseba
         WHERE id = ?
     '''
-    return con.execute(sql, [oseba]).fetchone()
+    return dict(con.execute(sql, [oseba]).fetchone())
 
 
 def ucilnica(ucilnica):
@@ -107,7 +111,7 @@ def ucilnica(ucilnica):
         FROM ucilnica
         WHERE id = ?
     '''
-    return con.execute(sql, [ucilnica]).fetchone()
+    return dict(con.execute(sql, [ucilnica]).fetchone())
 
 
 def nalozi_srecanje(srecanje_id):
@@ -164,6 +168,7 @@ def podvoji_srecanje(id_srecanja):
     for letnik in srecanje['letniki']:
         sql = '''INSERT INTO letnik_srecanje (letnik, srecanje) VALUES (?, ?)'''
         con.execute(sql, [letnik, nov_id])
+    con.commit()
 
 
 def premakni_srecanje(srecanje, dan, ura, ucilnica):
@@ -202,7 +207,7 @@ def urnik(letniki, osebe, ucilnice):
             OR srecanje.ucilnica IN ({})
          ORDER BY dan, ura, trajanje
     '''.format(vprasaji(letniki), vprasaji(osebe), vprasaji(ucilnice))
-    srecanja = [dict(srecanje) for srecanje in con.execute(sql, letniki + osebe + ucilnice)]
+    srecanja = seznam_slovarjev(con.execute(sql, letniki + osebe + ucilnice))
     return nastavi_sirine_srecanj(srecanja)
 
 
