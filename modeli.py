@@ -1,5 +1,10 @@
 import sqlite3
 
+
+################################################################################
+# POMOŽNE DEFINICIJE
+################################################################################
+
 con = sqlite3.connect('urnik.sqlite3')
 con.row_factory = sqlite3.Row
 
@@ -7,24 +12,9 @@ con.row_factory = sqlite3.Row
 def vprasaji(seznam):
     return ', '.join('?' for _ in seznam)
 
-
-def seznam_ucilnic(velikost=0):
-    sql = '''
-        SELECT id, oznaka, velikost, racunalniska
-        FROM ucilnica
-        WHERE velikost >= ?
-        ORDER BY oznaka
-    '''
-    return list(con.execute(sql, [velikost]))
-
-
-def seznam_oseb():
-    sql = '''
-        SELECT id, ime, priimek, email
-        FROM oseba
-        ORDER BY priimek, ime
-    '''
-    return list(con.execute(sql))
+################################################################################
+# NALAGANJE SEZNAMA
+################################################################################
 
 
 def seznam_letnikov():
@@ -36,13 +26,37 @@ def seznam_letnikov():
     return list(con.execute(sql))
 
 
-def oseba(oseba):
+def seznam_oseb():
     sql = '''
         SELECT id, ime, priimek, email
         FROM oseba
+        ORDER BY priimek, ime
+    '''
+    return list(con.execute(sql))
+
+
+def seznam_ucilnic(velikost=0):
+    sql = '''
+        SELECT id, oznaka, velikost, racunalniska
+        FROM ucilnica
+        WHERE velikost >= ?
+        ORDER BY oznaka
+    '''
+    return list(con.execute(sql, [velikost]))
+
+################################################################################
+# UREJANJE
+################################################################################
+
+
+def uredi_letnik(letnik, smer, leto, stevilo_studentov):
+    sql = '''
+        UPDATE letnik
+        SET smer = ?, leto = ?, stevilo_studentov = ?
         WHERE id = ?
     '''
-    return con.execute(sql, [oseba]).fetchone()
+    con.execute(sql, [smer, leto, stevilo_studentov, letnik])
+    con.commit()
 
 
 def uredi_osebo(oseba, ime, priimek, email):
@@ -55,15 +69,6 @@ def uredi_osebo(oseba, ime, priimek, email):
     con.commit()
 
 
-def ucilnica(ucilnica):
-    sql = '''
-        SELECT id, oznaka, velikost, racunalniska
-        FROM ucilnica
-        WHERE id = ?
-    '''
-    return con.execute(sql, [ucilnica]).fetchone()
-
-
 def uredi_ucilnico(ucilnica, oznaka, velikost, racunalniska):
     sql = '''
         UPDATE ucilnica
@@ -73,6 +78,10 @@ def uredi_ucilnico(ucilnica, oznaka, velikost, racunalniska):
     con.execute(sql, [oznaka, velikost, racunalniska, ucilnica])
     con.commit()
 
+################################################################################
+# NALAGANJE POSAMEZNE ENTITETE
+################################################################################
+
 
 def letnik(letnik):
     sql = '''
@@ -81,6 +90,24 @@ def letnik(letnik):
         WHERE id = ?
     '''
     return con.execute(sql, [letnik]).fetchone()
+
+
+def oseba(oseba):
+    sql = '''
+        SELECT id, ime, priimek, email
+        FROM oseba
+        WHERE id = ?
+    '''
+    return con.execute(sql, [oseba]).fetchone()
+
+
+def ucilnica(ucilnica):
+    sql = '''
+        SELECT id, oznaka, velikost, racunalniska
+        FROM ucilnica
+        WHERE id = ?
+    '''
+    return con.execute(sql, [ucilnica]).fetchone()
 
 
 def nalozi_srecanje(srecanje_id):
@@ -101,15 +128,9 @@ def nalozi_srecanje(srecanje_id):
     return srecanje
 
 
-def uredi_letnik(letnik, smer, leto, stevilo_studentov):
-    sql = '''
-        UPDATE letnik
-        SET smer = ?, leto = ?, stevilo_studentov = ?
-        WHERE id = ?
-    '''
-    con.execute(sql, [smer, leto, stevilo_studentov, letnik])
-    con.commit()
-
+################################################################################
+# UREJANJE SREČANJ
+################################################################################
 
 def nastavi_trajanje(srecanje, trajanje):
     sql = '''
@@ -120,6 +141,7 @@ def nastavi_trajanje(srecanje, trajanje):
     con.execute(sql, [trajanje, srecanje])
     con.commit()
 
+
 def izbrisi_srecanje(srecanje):
     sql = '''
         DELETE FROM srecanje
@@ -127,6 +149,7 @@ def izbrisi_srecanje(srecanje):
     '''
     con.execute(sql, [srecanje])
     con.commit()
+
 
 def podvoji_srecanje(id_srecanja):
     srecanje = nalozi_srecanje(id_srecanja)
@@ -141,6 +164,21 @@ def podvoji_srecanje(id_srecanja):
     for letnik in srecanje['letniki']:
         sql = '''INSERT INTO letnik_srecanje (letnik, srecanje) VALUES (?, ?)'''
         con.execute(sql, [letnik, nov_id])
+
+
+def premakni_srecanje(srecanje, dan, ura, ucilnica):
+    sql = '''
+        UPDATE srecanje
+        SET dan = ?, ura = ?, ucilnica = ?
+        WHERE id = ?
+    '''
+    con.execute(sql, [dan, ura, ucilnica, srecanje])
+    con.commit()
+
+
+################################################################################
+# PRIKAZ URNIKA
+################################################################################
 
 def urnik(letniki, osebe, ucilnice):
     sql = '''
@@ -168,16 +206,6 @@ def urnik(letniki, osebe, ucilnice):
     return nastavi_sirine_srecanj(srecanja)
 
 
-def premakni_srecanje(srecanje, dan, ura, ucilnica):
-    sql = '''
-        UPDATE srecanje
-        SET dan = ?, ura = ?, ucilnica = ?
-        WHERE id = ?
-    '''
-    con.execute(sql, [dan, ura, ucilnica, srecanje])
-    con.commit()
-
-
 def povezana_srecanja(srecanje):
     sql_letniki = '''
         SELECT letnik FROM letnik_srecanje WHERE srecanje = ?
@@ -188,35 +216,6 @@ def povezana_srecanja(srecanje):
     '''
     ucitelj = con.execute(sql_ucitelj, [srecanje]).fetchone()['ucitelj']
     return urnik(letniki, [ucitelj], [])
-
-
-def prekrivanje_ucilnic():
-    '''Vrne podatke o prekrivanju srečanj po učilnicah.
-
-    Funkcija vrne slovar, ki trojici (ID učilnice, dan, ura)
-    priredi seznam ID-jev srečanj, ki tam in takrat potekajo hkrati.
-    '''
-    sql = '''
-        SELECT prvo.ucilnica AS ucilnica,
-               prvo.dan AS dan,
-               drugo.ura AS ura,
-               prvo.id AS prvo,
-               drugo.id AS drugo
-          FROM srecanje AS prvo
-               INNER JOIN
-               srecanje AS drugo ON prvo.ucilnica = drugo.ucilnica AND 
-                                    prvo.dan = drugo.dan
-         WHERE prvo.id != drugo.id AND 
-               prvo.ura <= drugo.ura AND 
-               drugo.ura < prvo.ura + prvo.trajanje
-    '''
-    prekrivanja = {}
-    for ucilnica, dan, ura, prvo, drugo in con.execute(sql):
-        prekrivanja_v_terminu = prekrivanja.get((ucilnica, dan, ura), [])
-        prekrivanja_v_terminu.append(prvo)
-        prekrivanja_v_terminu.append(drugo)
-        prekrivanja[(ucilnica, dan, ura)] = prekrivanja_v_terminu
-    return prekrivanja
 
 
 def prosti_termini(id_srecanja, ustrezne=[9, 10], alternative=[6, 7, 8]):
