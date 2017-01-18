@@ -1,4 +1,6 @@
 % rebase('osnova.tpl')
+% urejanje = defined('ucilnica')
+% ucilnica = get('ucilnica', {'oznaka': '', 'velikost': '', 'racunalniska': False})
 <form method="post">
     <div class="input-field">
         <input value="{{ucilnica['oznaka']}}" placeholder="1.01" name="oznaka" type="text" class="validate" />
@@ -12,5 +14,7 @@
         <input id="racunalniska" name="racunalniska" type="checkbox" {{'checked="checked"' if ucilnica['racunalniska'] else ''}} />
         <label for="racunalniska">Računalniška učilnica</label>
     </p>
-    <button class="btn waves-effect waves-light" type="submit">Spremeni</button>
+    <button class="btn waves-effect waves-light" type="submit">
+        {{ 'Spremeni' if urejanje else 'Ustvari' }}
+    </button>
 </form>

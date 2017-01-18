@@ -1,4 +1,6 @@
 % rebase('osnova.tpl')
+% urejanje = defined('letnik')
+% letnik = get('letnik', {'smer': '', 'leto': '', 'stevilo_studentov': ''})
 <form method="post">
     <div class="input-field">
         <input value="{{letnik['smer']}}" placeholder="1Mate" name="smer" type="text" class="validate" />
@@ -12,5 +14,7 @@
         <input value="{{letnik['stevilo_studentov']}}" name="stevilo_studentov" type="text" class="validate" />
         <label for="stevilo_studentov">Število študentov</label>
     </div>
-    <button class="btn waves-effect waves-light" type="submit">Spremeni</button>
+    <button class="btn waves-effect waves-light" type="submit">
+        {{ 'Spremeni' if urejanje else 'Ustvari' }}
+    </button>
 </form>

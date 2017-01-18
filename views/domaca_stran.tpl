@@ -20,6 +20,14 @@
                     </td>
                 </tr>
                 %end
+                <tr>
+                    <td>
+                        <a href="/letnik/ustvari">
+                            <i class="tiny material-icons">add</i>
+                            ustvari nov letnik
+                        </a>
+                    </td>
+                </tr>
             </tbody>
         </table>
     </div>
@@ -43,6 +51,14 @@
                     </td>
                 </tr>
                 %end
+                <tr>
+                    <td>
+                        <a href="/oseba/ustvari">
+                            <i class="tiny material-icons">add</i>
+                            ustvari novo osebo
+                        </a>
+                    </td>
+                </tr>
             </tbody>
         </table>
     </div>
@@ -69,6 +85,14 @@
                     </td>
                 </tr>
                 %end
+                <tr>
+                    <td>
+                        <a href="/ucilnica/ustvari">
+                            <i class="tiny material-icons">add</i>
+                            ustvari novo učilnico
+                        </a>
+                    </td>
+                </tr>
             </tbody>
         </table>
     </div>

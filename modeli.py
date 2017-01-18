@@ -39,14 +39,13 @@ def seznam_oseb():
     return seznam_slovarjev(con.execute(sql))
 
 
-def seznam_ucilnic(velikost=0):
+def seznam_ucilnic():
     sql = '''
         SELECT id, oznaka, velikost, racunalniska
         FROM ucilnica
-        WHERE velikost >= ?
         ORDER BY oznaka
     '''
-    return seznam_slovarjev(con.execute(sql, [velikost]))
+    return seznam_slovarjev(con.execute(sql))
 
 ################################################################################
 # UREJANJE
@@ -80,6 +79,43 @@ def uredi_ucilnico(ucilnica, oznaka, velikost, racunalniska):
         WHERE id = ?
     '''
     con.execute(sql, [oznaka, velikost, racunalniska, ucilnica])
+    con.commit()
+
+################################################################################
+# USTVARJANJE
+################################################################################
+
+
+def ustvari_letnik(smer, leto, stevilo_studentov):
+    sql = '''
+        INSERT INTO letnik
+        (smer, leto, stevilo_studentov)
+        VALUES
+        (?, ?, ?)
+    '''
+    con.execute(sql, [smer, leto, stevilo_studentov])
+    con.commit()
+
+
+def ustvari_osebo(ime, priimek, email):
+    sql = '''
+        INSERT INTO oseba
+        (ime , priimek, email)
+        VALUES
+        (?, ?, ?)
+    '''
+    con.execute(sql, [ime, priimek, email])
+    con.commit()
+
+
+def ustvari_ucilnico(oznaka, velikost, racunalniska):
+    sql = '''
+        INSERT INTO ucilnica
+        (oznaka, velikost, racunalniska)
+        VALUES
+        (?, ?, ?)
+    '''
+    con.execute(sql, [oznaka, velikost, racunalniska])
     con.commit()
 
 ################################################################################

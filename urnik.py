@@ -72,6 +72,59 @@ def uredi_ucilnico_post(ucilnica):
 
 
 ################################################################################
+# USTVARJANJE
+################################################################################
+
+
+@get('/letnik/ustvari')
+def ustvari_letnik():
+    return template(
+        'uredi_letnik'
+    )
+
+
+@post('/letnik/ustvari')
+def ustvari_letnik_post():
+    smer = request.forms.smer
+    leto = int(request.forms.leto)
+    stevilo_studentov = int(request.forms.stevilo_studentov)
+    modeli.ustvari_letnik(smer, leto, stevilo_studentov)
+    redirect('/')
+
+
+@get('/oseba/ustvari')
+def ustvari_osebo():
+    return template(
+        'uredi_osebo'
+    )
+
+
+@post('/oseba/ustvari')
+def ustvari_osebo_post():
+    ime = request.forms.ime
+    priimek = request.forms.priimek
+    email = request.forms.email
+    modeli.ustvari_osebo(ime, priimek, email)
+    redirect('/')
+
+
+@get('/ucilnica/ustvari')
+def ustvari_ucilnico():
+    return template(
+        'uredi_ucilnico'
+    )
+
+
+@post('/ucilnica/ustvari')
+def ustvari_ucilnico_post():
+    oznaka = request.forms.oznaka
+    velikost = int(request.forms.velikost)
+    racunalniska = request.forms.racunalniska
+    modeli.uredi_ucilnico(oznaka, velikost, racunalniska)
+    redirect('/')
+
+
+################################################################################
 # UREJANJE SREČANJ
 ################################################################################
 
