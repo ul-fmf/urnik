@@ -7,6 +7,7 @@ import sqlite3
 
 con = sqlite3.connect('urnik.sqlite3')
 con.row_factory = sqlite3.Row
+con.execute("PRAGMA foreign_keys = ON")
 
 
 def vprasaji(seznam):
@@ -17,7 +18,7 @@ def seznam_slovarjev(vrstice):
     return [dict(vrstica) for vrstica in vrstice]
 
 ################################################################################
-# NALAGANJE SEZNAMA
+# SEZNAMI ENTITET
 ################################################################################
 
 
