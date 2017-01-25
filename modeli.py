@@ -23,29 +23,17 @@ def seznam_slovarjev(vrstice):
 
 
 def seznam_letnikov():
-    sql = '''
-        SELECT id, smer, leto, stevilo_studentov
-        FROM letnik
-        ORDER BY smer, leto
-    '''
+    sql = '''SELECT * FROM letnik ORDER BY smer, leto'''
     return seznam_slovarjev(con.execute(sql))
 
 
 def seznam_oseb():
-    sql = '''
-        SELECT id, ime, priimek, email
-        FROM oseba
-        ORDER BY priimek, ime
-    '''
+    sql = '''SELECT * FROM oseba ORDER BY priimek, ime'''
     return seznam_slovarjev(con.execute(sql))
 
 
 def seznam_ucilnic():
-    sql = '''
-        SELECT id, oznaka, velikost, racunalniska
-        FROM ucilnica
-        ORDER BY oznaka
-    '''
+    sql = '''SELECT * FROM ucilnica ORDER BY oznaka'''
     return seznam_slovarjev(con.execute(sql))
 
 ################################################################################
@@ -53,13 +41,13 @@ def seznam_ucilnic():
 ################################################################################
 
 
-def uredi_letnik(letnik, smer, leto, stevilo_studentov):
+def uredi_letnik(letnik, smer, leto):
     sql = '''
         UPDATE letnik
-        SET smer = ?, leto = ?, stevilo_studentov = ?
+        SET smer = ?, leto = ?
         WHERE id = ?
     '''
-    con.execute(sql, [smer, leto, stevilo_studentov, letnik])
+    con.execute(sql, [smer, leto, letnik])
     con.commit()
 
 
@@ -87,14 +75,14 @@ def uredi_ucilnico(ucilnica, oznaka, velikost, racunalniska):
 ################################################################################
 
 
-def ustvari_letnik(smer, leto, stevilo_studentov):
+def ustvari_letnik(smer, leto):
     sql = '''
         INSERT INTO letnik
-        (smer, leto, stevilo_studentov)
+        (smer, leto)
         VALUES
-        (?, ?, ?)
+        (?, ?)
     '''
-    con.execute(sql, [smer, leto, stevilo_studentov])
+    con.execute(sql, [smer, leto])
     con.commit()
 
 
@@ -125,29 +113,17 @@ def ustvari_ucilnico(oznaka, velikost, racunalniska):
 
 
 def letnik(letnik):
-    sql = '''
-        SELECT id, smer, leto, stevilo_studentov
-        FROM letnik
-        WHERE id = ?
-    '''
+    sql = '''SELECT * FROM letnik WHERE id = ?'''
     return dict(con.execute(sql, [letnik]).fetchone())
 
 
 def oseba(oseba):
-    sql = '''
-        SELECT id, ime, priimek, email
-        FROM oseba
-        WHERE id = ?
-    '''
+    sql = '''SELECT * FROM oseba WHERE id = ?'''
     return dict(con.execute(sql, [oseba]).fetchone())
 
 
 def ucilnica(ucilnica):
-    sql = '''
-        SELECT id, oznaka, velikost, racunalniska
-        FROM ucilnica
-        WHERE id = ?
-    '''
+    sql = '''SELECT * FROM ucilnica WHERE id = ?'''
     return dict(con.execute(sql, [ucilnica]).fetchone())
 
 

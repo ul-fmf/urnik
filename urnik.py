@@ -32,8 +32,7 @@ def uredi_letnik(letnik):
 def uredi_letnik_post(letnik):
     smer = request.forms.smer
     leto = int(request.forms.leto)
-    stevilo_studentov = int(request.forms.stevilo_studentov)
-    modeli.uredi_letnik(letnik, smer, leto, stevilo_studentov)
+    modeli.uredi_letnik(letnik, smer, leto)
     redirect('/')
 
 
@@ -87,8 +86,7 @@ def ustvari_letnik():
 def ustvari_letnik_post():
     smer = request.forms.smer
     leto = int(request.forms.leto)
-    stevilo_studentov = int(request.forms.stevilo_studentov)
-    modeli.ustvari_letnik(smer, leto, stevilo_studentov)
+    modeli.ustvari_letnik(smer, leto)
     redirect('/')
 
 
