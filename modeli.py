@@ -153,18 +153,18 @@ def ucilnica(ucilnica):
 
 def nalozi_srecanje(srecanje_id):
     sql_srecanje = '''
-        SELECT id, ucitelj, ucilnica, ura, dan, trajanje, tip
+        SELECT id, predmet, ucitelj, ucilnica, ura, dan, trajanje, tip
         FROM srecanje
         WHERE id = ?
     '''
     srecanje = dict(con.execute(sql_srecanje, [srecanje_id]).fetchone())
     sql_letniki = '''
         SELECT letnik
-        FROM letnik_srecanje
-        WHERE srecanje = ?
+        FROM predmet_letnik
+        WHERE predmet = ?
     '''
     srecanje['letniki'] = [
-        row['letnik'] for row in con.execute(sql_letniki, [srecanje_id]).fetchall()
+        row['letnik'] for row in con.execute(sql_letniki, [srecanje['predmet']]).fetchall()
     ]
     return srecanje
 
@@ -196,15 +196,11 @@ def podvoji_srecanje(id_srecanja):
     srecanje = nalozi_srecanje(id_srecanja)
     sql = '''
         INSERT INTO srecanje
-        (ucitelj, ucilnica, ura, dan, trajanje, tip)
+        (ucitelj, ucilnica, predmet, ura, dan, trajanje, tip)
         VALUES
-        (?, ?, ?, ?, ?, ?)'''
-    cur = con.execute(sql, [srecanje['ucitelj'], srecanje['ucilnica'], srecanje['ura'],
-                            srecanje['dan'], srecanje['trajanje'], srecanje['tip']])
-    nov_id = cur.lastrowid
-    for letnik in srecanje['letniki']:
-        sql = '''INSERT INTO letnik_srecanje (letnik, srecanje) VALUES (?, ?)'''
-        con.execute(sql, [letnik, nov_id])
+        (?, ?, ?, ?, ?, ?, ?)'''
+    con.execute(sql, [srecanje['ucitelj'], srecanje['ucilnica'], srecanje['predmet'],
+                      srecanje['ura'], srecanje['dan'], srecanje['trajanje'], srecanje['tip']])
     con.commit()
 
 
@@ -231,15 +227,18 @@ def urnik(letniki, osebe, ucilnice):
                srecanje.ucitelj as ucitelj,
                oseba.priimek as priimek_ucitelja,
                srecanje.ucilnica as ucilnica,
-               ucilnica.oznaka as oznaka_ucilnice
+               ucilnica.oznaka as oznaka_ucilnice,
+               predmet.ime as ime_predmeta
           FROM srecanje
                INNER JOIN
                oseba ON srecanje.ucitelj = oseba.id
                INNER JOIN
                ucilnica ON srecanje.ucilnica = ucilnica.id
                INNER JOIN
-               letnik_srecanje ON srecanje.id = letnik_srecanje.srecanje
-         WHERE letnik_srecanje.letnik IN ({})
+               predmet_letnik ON srecanje.predmet = predmet_letnik.predmet
+               INNER JOIN
+               predmet ON srecanje.predmet = predmet.id
+         WHERE predmet_letnik.letnik IN ({})
             OR srecanje.ucitelj IN ({})
             OR srecanje.ucilnica IN ({})
          ORDER BY dan, ura, trajanje
@@ -250,7 +249,11 @@ def urnik(letniki, osebe, ucilnice):
 
 def povezana_srecanja(srecanje):
     sql_letniki = '''
-        SELECT letnik FROM letnik_srecanje WHERE srecanje = ?
+        SELECT letnik
+          FROM predmet_letnik
+               INNER JOIN
+               srecanje ON predmet_letnik.predmet = srecanje.predmet
+         WHERE srecanje.id = ?
     '''
     letniki = [row['letnik'] for row in con.execute(sql_letniki, [srecanje])]
     sql_ucitelj = '''
