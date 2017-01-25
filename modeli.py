@@ -263,11 +263,11 @@ def prosti_termini(id_srecanja, ustrezne=[9, 10], alternative=[6, 7, 8]):
     termini = {}
     for dan in range(1, 6):
         for zacetek in range(7, 20 - izbrano_srecanje['trajanje'] + 1):
-            termin = termini.setdefault((dan, zacetek), {
+            termin = {
                 'proste': set(),
                 'deloma_proste': set(),
                 'proste_alternative': set(),
-            })
+            }
             ure = range(zacetek, zacetek + izbrano_srecanje['trajanje'])
             for ucilnica in ustrezne:
                 if all(prosta(ucilnica, dan, ura) for ura in ure):
@@ -277,6 +277,8 @@ def prosti_termini(id_srecanja, ustrezne=[9, 10], alternative=[6, 7, 8]):
             for ucilnica in alternative:
                 if all(prosta(ucilnica, dan, ura) for ura in ure):
                     termin['proste_alternative'].add(ucilnica)
+            if termin['proste'] or termin['deloma_proste'] or termin['proste_alternative']:
+                termini[(dan, zacetek)] = termin
 
     for termin in termini.values():
         if termin['proste']:
@@ -287,8 +289,6 @@ def prosti_termini(id_srecanja, ustrezne=[9, 10], alternative=[6, 7, 8]):
             termin['zasedenost'] = 'deloma'
         elif termin['proste_alternative']:
             termin['zasedenost'] = 'alternative'
-        else:
-            termin['zasedenost'] = ''
         termin['ucilnice'] = [
             (ucilnica, 'prosta') for ucilnica in termin['proste']
         ] + [

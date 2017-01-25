@@ -89,30 +89,21 @@
             height: 100%;
         }
         .termin.prosto {
-            background: rgba(0, 128, 0, 0.8);
+            background: rgba(0, 128, 0, 0.5);
         }
         .termin.alternative {
-            background: rgba(255, 165, 0, 0.8);
-        }
-        .termin {
-            background: rgba(255, 0, 0, 0.8);
+            background: rgba(255, 165, 0, 0.5);
         }
         .termin.deloma {
-            background: repeating-linear-gradient(
-              -45deg,
-              rgba(255, 0, 0, 0.8),
-              rgba(255, 0, 0, 0.8) 5px,
-              rgba(0, 128, 0, 0.8) 5px,
-              rgba(0, 128, 0, 0.8) 10px
-            );
+            background: rgba(255, 0, 0, 0.5);
         }
         .termin.deloma.alternative {
             background: repeating-linear-gradient(
               -45deg,
-              rgba(255, 165, 0, 0.8),
-              rgba(255, 165, 0, 0.8) 5px,
-              rgba(0, 128, 0, 0.8) 5px,
-              rgba(0, 128, 0, 0.8) 10px
+              rgba(255, 165, 0, 0.5),
+              rgba(255, 165, 0, 0.5) 5px,
+              rgba(255, 0, 0, 0.5) 5px,
+              rgba(255, 0, 0, 0.5) 10px
             );
         }
         .urejanje {
@@ -162,13 +153,7 @@
             background: orange;
         }
         .izbrana_ucilnica.deloma_prosta button {
-            background: repeating-linear-gradient(
-              -45deg,
-              red,
-              red 5px,
-              green 5px,
-              green 10px
-            );
+            background: red;
         }
     </style>
 </head>
