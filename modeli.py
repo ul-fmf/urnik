@@ -38,7 +38,26 @@ def seznam_ucilnic():
 
 def seznam_predmetov():
     sql = '''SELECT * FROM predmet ORDER BY ime'''
-    return seznam_slovarjev(con.execute(sql))
+    predmeti = seznam_slovarjev(con.execute(sql))
+    sql = '''
+        SELECT predmet, smer, leto
+          FROM letnik
+               INNER JOIN
+               predmet_letnik ON predmet_letnik.letnik = letnik.id
+    '''
+    letniki_predmeta = {}
+    for id_predmeta, smer, leto in con.execute(sql):
+        letniki_predmeta.setdefault(id_predmeta, []).append((smer, leto))
+    for predmet in predmeti:
+        letniki = '; '.join(
+            '{}, {}. letnik'.format(smer, leto)
+            for
+            smer, leto
+            in
+            letniki_predmeta.get(predmet['id'], [])
+        )
+        predmet['opis'] = '{} ({})'.format(predmet['ime'], letniki) if letniki else predmet['ime']
+    return predmeti
 
 ################################################################################
 # UREJANJE
