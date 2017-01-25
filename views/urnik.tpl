@@ -50,6 +50,9 @@
                 <a href="/srecanje/{{srecanje['id']}}/premakni">
                     <i class="tiny material-icons">open_with</i>
                 </a>
+                <a href="/srecanje/{{srecanje['id']}}/uredi">
+                    <i class="tiny material-icons">edit</i>
+                </a>
                 <form method="post" action="/srecanje/{{srecanje['id']}}/izbrisi">
                     <button>
                         <i class="tiny material-icons">delete</i>

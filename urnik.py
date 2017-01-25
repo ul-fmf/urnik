@@ -170,19 +170,21 @@ def trajanje_srecanja(srecanje):
 def uredi_srecanje(srecanje):
     return template(
         'uredi_srecanje',
-        srecanje=modeli.srecanje(srecanje),
+        srecanje=modeli.nalozi_srecanje(srecanje),
         ucitelji=modeli.seznam_oseb(),
-        letniki=modeli.seznam_letnikov(),
+        predmeti=modeli.seznam_predmetov(),
+        next=request.headers.get('referer') or '/',
     )
 
 
 @post('/srecanje/<srecanje:int>/uredi')
 def uredi_srecanje_post(srecanje):
+    print(dict(request.forms))
     ucitelj = int(request.forms.ucitelj)
-    ucilnica = int(request.forms.ucilnica)
+    predmet = int(request.forms.predmet)
     tip = request.forms.tip
-    modeli.uredi_srecanje(srecanje, ucitelj, ucilnica, tip)
-    redirect('/')
+    modeli.uredi_srecanje(srecanje, ucitelj, predmet, tip)
+    redirect(request.forms.next)
 
 ################################################################################
 # PRIKAZ URNIKA

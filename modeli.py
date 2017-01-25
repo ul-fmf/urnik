@@ -36,6 +36,10 @@ def seznam_ucilnic():
     sql = '''SELECT * FROM ucilnica ORDER BY oznaka'''
     return seznam_slovarjev(con.execute(sql))
 
+def seznam_predmetov():
+    sql = '''SELECT * FROM predmet ORDER BY ime'''
+    return seznam_slovarjev(con.execute(sql))
+
 ################################################################################
 # UREJANJE
 ################################################################################
@@ -68,6 +72,15 @@ def uredi_ucilnico(ucilnica, oznaka, velikost, racunalniska):
         WHERE id = ?
     '''
     con.execute(sql, [oznaka, velikost, racunalniska, ucilnica])
+    con.commit()
+
+def uredi_srecanje(srecanje, ucitelj, predmet, tip):
+    sql = '''
+        UPDATE srecanje
+        SET ucitelj = ?, predmet = ?, tip = ?
+        WHERE id = ?
+    '''
+    con.execute(sql, [ucitelj, predmet, tip, srecanje])
     con.commit()
 
 ################################################################################
