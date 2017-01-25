@@ -218,6 +218,7 @@ def urnik(letniki, osebe, ucilnice):
                dan,
                ura,
                trajanje,
+               tip,
                srecanje.ucitelj as ucitelj,
                oseba.priimek as priimek_ucitelja,
                srecanje.ucilnica as ucilnica,
