@@ -127,6 +127,11 @@ def ucilnica(ucilnica):
     return dict(con.execute(sql, [ucilnica]).fetchone())
 
 
+def nalozi_predmet(predmet):
+    sql = '''SELECT * FROM predmet WHERE id = ?'''
+    return dict(con.execute(sql, [predmet]).fetchone())
+
+
 def nalozi_srecanje(srecanje_id):
     sql_srecanje = '''
         SELECT id, predmet, ucitelj, ucilnica, ura, dan, trajanje, tip
@@ -239,7 +244,21 @@ def povezana_srecanja(srecanje):
     return urnik(letniki, [ucitelj], [])
 
 
-def prosti_termini(id_srecanja, ustrezne=[9, 10], alternative=[6, 7, 8]):
+def ustrezne_ucilnice(stevilo_studentov, racunalniski):
+    ustrezne = []
+    alternative = []
+    for ucilnica in seznam_ucilnic():
+        if ucilnica['velikost'] >= stevilo_studentov:
+            ustrezne.append(ucilnica['id'])
+        elif ucilnica['velikost'] >= 0.75 * stevilo_studentov:
+            alternative.append(ucilnica['id'])
+    return ustrezne, alternative
+
+
+def prosti_termini(id_srecanja):
+    izbrano_srecanje = nalozi_srecanje(id_srecanja)
+    predmet = nalozi_predmet(izbrano_srecanje['predmet'])
+    ustrezne, alternative = ustrezne_ucilnice(predmet['stevilo_studentov'], predmet['racunalniski'])
     zasedene = {}
     ucilnice = ustrezne + alternative
     sql = '''
@@ -258,7 +277,6 @@ def prosti_termini(id_srecanja, ustrezne=[9, 10], alternative=[6, 7, 8]):
     def prosta(ucilnica, dan, ura):
         return ucilnica not in zasedene.get((dan, ura), [])
 
-    izbrano_srecanje = nalozi_srecanje(id_srecanja)
 
     termini = {}
     for dan in range(1, 6):
