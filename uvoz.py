@@ -64,18 +64,6 @@ def zdruzi_ure(ure):
     yield dan_zacetka, ura_zacetka, trajanje
 
 ################################################################################
-# PRAZNJENJE BAZE
-################################################################################
-
-con.execute('DELETE FROM predmet_letnik')
-con.execute('DELETE FROM srecanje')
-con.execute('DELETE FROM letnik')
-con.execute('DELETE FROM oseba')
-con.execute('DELETE FROM predmet')
-con.execute('DELETE FROM ucilnica')
-con.execute('UPDATE sqlite_sequence SET seq = 0')
-
-################################################################################
 # BRANJE STARIH PODATKOV
 ################################################################################
 
@@ -180,7 +168,69 @@ for (ucilnica, tip, oznaka, ucitelj, predmet), ure in bloki.items():
     #     'trajanje': 1
     # })
 
+################################################################################
+# USTVARJANJE BAZE
+################################################################################
 
+con.execute('''
+    CREATE TABLE srecanje (
+        id       INTEGER PRIMARY KEY AUTOINCREMENT,
+        ucilnica INTEGER REFERENCES ucilnica (id),
+        ura      INTEGER CHECK (ura BETWEEN 7 AND 19),
+        dan      INTEGER CHECK (dan BETWEEN 1 AND 5),
+        trajanje INTEGER CONSTRAINT [srečanje se ne konča do 20h] CHECK (ura + trajanje <= 20),
+        tip      CHAR    CHECK (tip IN ('P', 'S', 'V', 'L') ) 
+                         NOT NULL,
+        ucitelj  INTEGER REFERENCES oseba (id),
+        predmet  INTEGER REFERENCES predmet (id),
+        oznaka   CHAR
+    )
+''')
+con.execute('''
+    CREATE TABLE ucilnica (
+        id           INTEGER PRIMARY KEY AUTOINCREMENT,
+        oznaka       TEXT    UNIQUE
+                             NOT NULL,
+        velikost     INTEGER NOT NULL
+                             CHECK (velikost > 0),
+        racunalniska BOOLEAN DEFAULT (0) 
+                             NOT NULL
+    )
+''')
+con.execute('''
+    CREATE TABLE predmet_letnik (
+        predmet INTEGER REFERENCES predmet (id),
+        letnik  INTEGER REFERENCES letnik (id),
+        PRIMARY KEY (
+            predmet,
+            letnik
+        )
+    )
+''')
+con.execute('''
+    CREATE TABLE oseba (
+        id      INTEGER PRIMARY KEY AUTOINCREMENT,
+        ime     TEXT    NOT NULL,
+        priimek TEXT    NOT NULL,
+        email   TEXT    UNIQUE
+    )
+''')
+con.execute('''
+    CREATE TABLE letnik (
+        id   INTEGER PRIMARY KEY AUTOINCREMENT,
+        smer TEXT,
+        leto INTEGER CHECK (leto BETWEEN 1 AND 5) 
+    )
+''')
+con.execute('''
+    CREATE TABLE predmet (
+        id                INTEGER PRIMARY KEY AUTOINCREMENT,
+        ime               TEXT    NOT NULL,
+        kratica           TEXT,
+        stevilo_studentov INTEGER,
+        racunalniski      BOOLEAN DEFAULT (0) 
+    )
+''')
 
 ################################################################################
 # PISANJE V BAZO
