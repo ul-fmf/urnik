@@ -20,7 +20,7 @@ def seznam_slovarjev(vrstice):
 
 def nalozi_podatke(tabela, kljuci=(), ime_kljuca='id', vrstni_red=()):
     where = 'WHERE {} IN ({})'.format(ime_kljuca, vprasaji(kljuci)) if kljuci else ''
-    order_by = 'ORDER BY {}'.format(', '.join(vrstni_red))
+    order_by = 'ORDER BY {}'.format(', '.join(vrstni_red)) if vrstni_red else ''
     sql = 'SELECT * FROM {} {} {}'.format(tabela, where, order_by)
     return OrderedDict(
         (vrstica[ime_kljuca], dict(vrstica)) for vrstica in con.execute(sql, kljuci)
@@ -59,6 +59,14 @@ def podatki_ucilnic(kljuci=[]):
 
 def podatki_ucilnice(kljuc):
     return nalozi_podatek('ucilnica', kljuc)
+
+
+def podatki_srecanj(kljuci=[]):
+    return nalozi_podatke('srecanje', kljuci)
+
+
+def podatki_predmetov(kljuci=[]):
+    return nalozi_podatke('predmet', kljuci)
 
 
 def seznam_predmetov():
@@ -192,7 +200,6 @@ def nalozi_srecanje(srecanje_id):
         row['letnik'] for row in con.execute(sql_letniki, [srecanje['predmet']]).fetchall()
     ]
     return srecanje
-
 
 ##########################################################################
 # UREJANJE SREČANJ
