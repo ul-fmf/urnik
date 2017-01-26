@@ -1,4 +1,4 @@
-% rebase('osnova.tpl')
+% rebase('obrazec.tpl')
 % urejanje = defined('ucilnica')
 % ucilnica = get('ucilnica', {'oznaka': '', 'velikost': '', 'racunalniska': False})
 <form method="post">

@@ -1,4 +1,4 @@
-% rebase('osnova.tpl')
+% rebase('obrazec.tpl')
 % urejanje = defined('letnik')
 % letnik = get('letnik', {'smer': '', 'leto': ''})
 <form method="post">

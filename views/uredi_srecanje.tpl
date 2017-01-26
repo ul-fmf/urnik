@@ -1,4 +1,4 @@
-% rebase('osnova.tpl')
+% rebase('obrazec.tpl')
 <form method="post">
     <div class="input-field">
         <select name="predmet">

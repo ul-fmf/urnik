@@ -1,4 +1,4 @@
-% rebase('osnova.tpl')
+% rebase('obrazec.tpl')
 % urejanje = defined('oseba')
 % oseba = get('oseba', {'ime': '', 'priimek': '', 'email': ''})
 <form method="post">
