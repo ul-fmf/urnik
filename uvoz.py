@@ -40,17 +40,17 @@ def opozorilo(niz):
     print(niz)
 
 def zdruzi_ure(ure):
-    # zdruzene_ure = set()
-    # for dan, ura in sorted(ure):
-    #     trajanje = 1
-    #     while (dan, ura + trajanje) in ure:
-    #         ure.remove((dan, ura + trajanje))
-    #         trajanje += 1
-    #     zdruzene_ure.add((dan, ura, trajanje))
-    # return zdruzene_ure
-    for dan, ura in ure:
-        yield dan, ura, 1
-
+    zdruzene_ure = {}
+    dan_zacetka, ura_zacetka, trajanje = None, None, 1
+    for dan, ura in sorted(ure):
+        if dan_zacetka is None:
+            dan_zacetka, ura_zacetka = dan, ura
+        elif (dan_zacetka, ura_zacetka + trajanje) == (dan, ura):
+            trajanje += 1
+        else:
+            yield dan_zacetka, ura_zacetka, trajanje
+            dan_zacetka, ura_zacetka, trajanje = dan, ura, 1
+    yield dan_zacetka, ura_zacetka, trajanje
 
 ################################################################################
 # PRAZNJENJE BAZE
