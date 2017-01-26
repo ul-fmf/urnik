@@ -19,6 +19,14 @@
         <input id="racunalniski" name="racunalniski" type="checkbox" {{'checked="checked"' if predmet['racunalniski'] else ''}} />
         <label for="racunalniski">Vaje potekajo v računalniški učilnici</label>
     </p>
+    <div class="input-field">
+        <select multiple name="letniki">
+            % for letnik in letniki.values():
+            <option value="{{letnik['id']}}" {{ 'selected' if letnik['id'] in predmet['letniki'] else '' }}>{{letnik['smer']}}, {{letnik['leto']}}</option>
+            % end
+        </select>
+        <label>Letniki</label>
+    </div>
     <button class="btn waves-effect waves-light" type="submit">
         {{ 'Spremeni' if urejanje else 'Ustvari' }}
     </button>

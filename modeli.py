@@ -68,8 +68,12 @@ def podatki_srecanj(kljuci=[]):
 def podatki_predmetov(kljuci=[]):
     return nalozi_podatke('predmet', kljuci, vrstni_red=('ime',))
 
+
 def podatki_predmeta(kljuc):
-    return nalozi_podatek('predmet', kljuc)
+    predmet = nalozi_podatek('predmet', kljuc)
+    sql = 'SELECT letnik FROM predmet_letnik WHERE predmet = ?'
+    predmet['letniki'] = [vrstica['letnik'] for vrstica in con.execute(sql, (kljuc,))]
+    return predmet
 
 
 def seznam_predmetov():
@@ -141,13 +145,26 @@ def uredi_srecanje(srecanje, ucitelj, predmet, tip):
     con.commit()
 
 
-def uredi_predmet(predmet, ime, kratica, stevilo_studentov, racunalniski):
+def uredi_predmet(predmet, ime, kratica, stevilo_studentov, racunalniski, letniki):
     sql = '''
         UPDATE predmet
         SET ime = ?, kratica = ?, stevilo_studentov = ?, racunalniski = ?
         WHERE id = ?
     '''
     con.execute(sql, [ime, kratica, stevilo_studentov, racunalniski, predmet])
+    sql = '''
+        DELETE FROM predmet_letnik
+        WHERE predmet = ? AND letnik NOT IN ({})
+    '''.format(vprasaji(letniki))
+    con.execute(sql, [predmet] + letniki)
+    sql = '''
+        INSERT INTO predmet_letnik
+        (predmet, letnik)
+        SELECT ?, id
+        FROM letnik
+        WHERE id NOT in (SELECT letnik FROM predmet_letnik WHERE predmet = ?) AND id IN ({})
+    '''.format(vprasaji(letniki))
+    con.execute(sql, [predmet, predmet] + letniki)
     con.commit()
 
 

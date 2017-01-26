@@ -75,7 +75,8 @@ def uredi_ucilnico_post(ucilnica):
 def uredi_predmet(predmet):
     return template(
         'uredi_predmet',
-        predmet=modeli.podatki_predmeta(predmet)
+        predmet=modeli.podatki_predmeta(predmet),
+        letniki=modeli.podatki_letnikov()
     )
 
 
@@ -83,9 +84,10 @@ def uredi_predmet(predmet):
 def uredi_predmet_post(predmet):
     ime = request.forms.ime
     kratica = request.forms.kratica
-    stevilo_studentov = None if request.forms.stevilo_studentov is None else int(request.forms.stevilo_studentov)
+    stevilo_studentov = None if request.forms.stevilo_studentov is '' else int(request.forms.stevilo_studentov)
     racunalniski = request.forms.racunalniski
-    modeli.uredi_predmet(predmet, ime, kratica, stevilo_studentov, racunalniski)
+    letniki = [int(letnik) for letnik in request.forms.getall('letniki')]
+    modeli.uredi_predmet(predmet, ime, kratica, stevilo_studentov, racunalniski, letniki)
     redirect('/')
 
 ##########################################################################
