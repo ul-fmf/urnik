@@ -109,26 +109,44 @@ for oznaka, (smer, leto) in SMERI.items():
         'leto': leto,
     }
 
+podatki_osebe = {}
+with open('uvoz/podatki oseb.csv') as csvfile:
+    for ime, priimek, email in csv.reader(csvfile):
+        podatki_osebe[(ime, priimek)] = (ime, priimek, email)
+prevod_osebe = {}
+with open('uvoz/prevod oseb.csv') as csvfile:
+    for oznaka, ime, priimek in csv.reader(csvfile):
+        prevod_osebe[oznaka] = (ime, priimek)
+
 OSEBE = {izlusci_predmet(urnik.Profesor) for urnik in nalozi_paradox('urn')}
 osebe = {}
 for oseba in OSEBE:
+    ime, priimek, email = podatki_osebe.get(
+        prevod_osebe.get(oseba),
+        ('???', oseba, None)
+    )
     osebe[oseba] = {
-        'ime': '???',
-        'priimek': oseba,
-        'email': None,
+        'ime': ime,
+        'priimek': priimek,
+        'email': email if email else None,
     }
 
 podatki_predmeta = {}
-with open('uvoz/predmeti.csv') as csvfile:
-    for _, _, _, oznaka, kratica, ime, stevilo_studentov in csv.reader(csvfile, delimiter=';'):
-        if kratica:
-            podatki_predmeta[oznaka] = (ime, kratica, stevilo_studentov)
+with open('uvoz/podatki predmetov.csv') as csvfile:
+    for program, smer, predmet, ime, kratica, stevilo_studentov in csv.reader(csvfile):
+        podatki_predmeta[(program, smer, predmet)] = (ime, kratica, stevilo_studentov)
+prevod_predmeta = {}
+with open('uvoz/prevod predmetov.csv') as csvfile:
+    for oznaka, program, smer, predmet in csv.reader(csvfile):
+        prevod_predmeta[oznaka] = (program, smer, predmet)
 
 PREDMETI = {izlusci_predmet(urnik.Predmet) for urnik in nalozi_paradox('urn')}
 predmeti = {}
 for predmet in PREDMETI:
     ime, kratica, stevilo_studentov = podatki_predmeta.get(
-        predmet, (predmet, predmet, None))
+        prevod_predmeta.get(predmet),
+        (predmet, predmet, None)
+    )
     predmeti[predmet] = {
         'ime': ime,
         'kratica': kratica,
