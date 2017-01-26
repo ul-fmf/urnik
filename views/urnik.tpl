@@ -33,7 +33,7 @@
     % style = 'left: {:.2%}; width: {:.2%}; top: {:.2%}; height: {:.2%}'.format(left, width, top, height)
     <div class="srecanje" style="{{ style }};">
         <div class="predmet">
-            {{srecanje['ime_predmeta']}} {{srecanje['tip']}}
+            {{srecanje['ime_predmeta']}} {{srecanje['tip']}}{{srecanje['oznaka'] if srecanje['oznaka'] else ''}}
         </div>
         <div class="ucitelj">
             <a href="/urnik?oseba={{srecanje['ucitelj']}}">

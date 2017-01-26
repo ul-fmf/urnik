@@ -30,6 +30,14 @@ def izlusci_tip(predmet):
     else:
         return 'P'
 
+def izlusci_oznako(predmet):
+    if ' V1' in predmet:
+        return 1
+    elif ' V2' in predmet:
+        return 2
+    elif ' V3' in predmet:
+        return 3
+
 def izlusci_ucilnico(ucilnica):
     if ucilnica[0] == '(' and ucilnica[-1] == ')':
         return ucilnica[1:-1]
@@ -137,14 +145,16 @@ for urnik in nalozi_paradox('urn'):
     tip = izlusci_tip(urnik.Predmet)
     ucitelj = urnik.Profesor
     predmet = izlusci_predmet(urnik.Predmet)
+    oznaka = izlusci_oznako(urnik.Predmet)
     ura = urnik.Ura
-    bloki.setdefault((ucilnica, tip, ucitelj, predmet), set()).add((urnik.Dan, urnik.Ura))
+    bloki.setdefault((ucilnica, tip, oznaka, ucitelj, predmet), set()).add((urnik.Dan, urnik.Ura))
 srecanja = []
-for (ucilnica, tip, ucitelj, predmet), ure in bloki.items():
+for (ucilnica, tip, oznaka, ucitelj, predmet), ure in bloki.items():
     for dan, ura, trajanje in zdruzi_ure(ure):
         srecanja.append({
             'ucilnica': ucilnica,
             'tip': tip,
+            'oznaka': oznaka,
             'ucitelj': ucitelj,
             'predmet': predmet,
             'dan': dan,
@@ -223,11 +233,12 @@ for srecanje in srecanja:
     cur = con.execute('''
         INSERT INTO
         srecanje
-        (ucilnica, tip, ucitelj, predmet, dan, ura, trajanje)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        (ucilnica, tip, oznaka, ucitelj, predmet, dan, ura, trajanje)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     ''', (
         ucilnica_pk[ucilnica],
         srecanje['tip'],
+        srecanje['oznaka'],
         oseba_pk[srecanje['ucitelj']],
         predmet_pk[srecanje['predmet']],
         srecanje['dan'],
