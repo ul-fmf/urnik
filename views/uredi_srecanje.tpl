@@ -20,8 +20,8 @@
     <div class="input-field">
         <select name="ucitelj">
             <option value="" {{ '' if srecanje['ucitelj'] else 'selected' }}>brez učitelja</option>
-            % for ucitelj in ucitelji:
-            <option value="{{ucitelj['id']}}" {{ 'selected' if ucitelj['id'] == srecanje['ucitelj'] else '' }}>{{ucitelj['ime']}} {{ucitelj['priimek']}}</option>
+            % for ucitelj in ucitelji.values():
+            <option value="{{ucitelj['id']}}" {{ 'selected' if ucitelj['id'] == srecanje['ucitelj'] else '' }}>{{ucitelj['priimek']}} {{ucitelj['ime']}}</option>
             % end
         </select>
         <label>Učitelj</label>

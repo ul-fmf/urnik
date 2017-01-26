@@ -10,9 +10,9 @@ import modeli
 def domaca_stran():
     return template(
         'domaca_stran',
-        letniki=modeli.seznam_letnikov(),
-        osebe=modeli.seznam_oseb(),
-        ucilnice=modeli.seznam_ucilnic(),
+        letniki=modeli.podatki_letnikov(),
+        osebe=modeli.podatki_oseb(),
+        ucilnice=modeli.podatki_ucilnic(),
     )
 
 ##########################################################################
@@ -171,7 +171,7 @@ def uredi_srecanje(srecanje):
     return template(
         'uredi_srecanje',
         srecanje=modeli.nalozi_srecanje(srecanje),
-        ucitelji=modeli.seznam_oseb(),
+        ucitelji=modeli.podatki_oseb(),
         predmeti=modeli.seznam_predmetov(),
         next=request.headers.get('referer') or '/',
     )

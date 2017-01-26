@@ -1,5 +1,5 @@
 import sqlite3
-
+from collections import OrderedDict
 
 ##########################################################################
 # POMOŽNE DEFINICIJE
@@ -17,24 +17,48 @@ def vprasaji(seznam):
 def seznam_slovarjev(vrstice):
     return [dict(vrstica) for vrstica in vrstice]
 
+
+def nalozi_podatke(tabela, kljuci=(), ime_kljuca='id', vrstni_red=()):
+    where = 'WHERE {} IN ({})'.format(ime_kljuca, vprasaji(kljuci)) if kljuci else ''
+    order_by = 'ORDER BY {}'.format(', '.join(vrstni_red))
+    sql = 'SELECT * FROM {} {} {}'.format(tabela, where, order_by)
+    return OrderedDict(
+        (vrstica[ime_kljuca], dict(vrstica)) for vrstica in con.execute(sql, kljuci)
+    )
+
+
+def nalozi_podatek(tabela, kljuc, ime_kljuca='id'):
+    sql = 'SELECT * FROM {} WHERE {} = ?'.format(tabela, ime_kljuca)
+    return dict(con.execute(sql, (kljuc,)).fetchone())
+
+
 ##########################################################################
-# SEZNAMI ENTITET
+# NALAGANJE PODATKOV
 ##########################################################################
 
 
-def seznam_letnikov():
-    sql = '''SELECT * FROM letnik ORDER BY smer, leto'''
-    return seznam_slovarjev(con.execute(sql))
+def podatki_letnikov(kljuci=[]):
+    return nalozi_podatke('letnik', kljuci, vrstni_red=('smer', 'leto'))
 
 
-def seznam_oseb():
-    sql = '''SELECT * FROM oseba ORDER BY priimek, ime'''
-    return seznam_slovarjev(con.execute(sql))
+def podatki_letnika(kljuc):
+    return nalozi_podatek('letnik', kljuc)
 
 
-def seznam_ucilnic():
-    sql = '''SELECT * FROM ucilnica ORDER BY oznaka'''
-    return seznam_slovarjev(con.execute(sql))
+def podatki_oseb(kljuci=[]):
+    return nalozi_podatke('oseba', kljuci, vrstni_red=('priimek', 'ime'))
+
+
+def podatki_osebe(kljuc):
+    return nalozi_podatke('oseba', kljuc)
+
+
+def podatki_ucilnic(kljuci=[]):
+    return nalozi_podatke('ucilnica', kljuci, vrstni_red=('oznaka',))
+
+
+def podatki_ucilnice(kljuc):
+    return nalozi_podatke('ucilnica', kljuc)
 
 
 def seznam_predmetov():

@@ -8,7 +8,7 @@
                 </tr>
             </thead>
             <tbody>
-                %for letnik in letniki:
+                %for letnik in letniki.values():
                 <tr>
                     <td>
                         <a href="/urnik?letnik={{letnik['id']}}">
@@ -39,7 +39,7 @@
                 </tr>
             </thead>
             <tbody>
-                %for oseba in osebe:
+                %for oseba in osebe.values():
                 <tr>
                     <td>
                         <a href="/urnik?oseba={{oseba['id']}}">
@@ -70,7 +70,7 @@
                 </tr>
             </thead>
             <tbody>
-                %for ucilnica in ucilnice:
+                %for ucilnica in ucilnice.values():
                 <tr>
                     <td>
                         <a href="/urnik?ucilnica={{ucilnica['id']}}">
