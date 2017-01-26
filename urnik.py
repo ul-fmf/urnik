@@ -1,4 +1,4 @@
-from bottle import route, run, template, get, post, request, redirect
+from bottle import route, run, template, get, post, request, redirect, default_app
 import modeli
 
 
@@ -207,4 +207,7 @@ def urnik():
 # ZAGON APLIKACIJE
 ################################################################################
 
-run(debug=True, reloader=True)
+if __name__ == '__main__':
+    run(debug=True, reloader=True)
+else:
+    app = default_app()
