@@ -24,7 +24,7 @@ def domaca_stran():
 def uredi_letnik(letnik):
     return template(
         'uredi_letnik',
-        letnik=modeli.letnik(letnik)
+        letnik=modeli.podatki_letnika(letnik)
     )
 
 
@@ -40,7 +40,7 @@ def uredi_letnik_post(letnik):
 def uredi_osebo(oseba):
     return template(
         'uredi_osebo',
-        oseba=modeli.oseba(oseba)
+        oseba=modeli.podatki_osebe(oseba)
     )
 
 
@@ -57,7 +57,7 @@ def uredi_osebo_post(oseba):
 def uredi_ucilnico(ucilnica):
     return template(
         'uredi_ucilnico',
-        ucilnica=modeli.ucilnica(ucilnica)
+        ucilnica=modeli.podatki_ucilnice(ucilnica)
     )
 
 

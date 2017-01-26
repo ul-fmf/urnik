@@ -50,7 +50,7 @@ def podatki_oseb(kljuci=[]):
 
 
 def podatki_osebe(kljuc):
-    return nalozi_podatke('oseba', kljuc)
+    return nalozi_podatek('oseba', kljuc)
 
 
 def podatki_ucilnic(kljuci=[]):
@@ -58,7 +58,7 @@ def podatki_ucilnic(kljuci=[]):
 
 
 def podatki_ucilnice(kljuc):
-    return nalozi_podatke('ucilnica', kljuc)
+    return nalozi_podatek('ucilnica', kljuc)
 
 
 def seznam_predmetov():
@@ -169,21 +169,6 @@ def ustvari_ucilnico(oznaka, velikost, racunalniska):
 ##########################################################################
 # NALAGANJE POSAMEZNE ENTITETE
 ##########################################################################
-
-
-def letnik(letnik):
-    sql = '''SELECT * FROM letnik WHERE id = ?'''
-    return dict(con.execute(sql, [letnik]).fetchone())
-
-
-def oseba(oseba):
-    sql = '''SELECT * FROM oseba WHERE id = ?'''
-    return dict(con.execute(sql, [oseba]).fetchone())
-
-
-def ucilnica(ucilnica):
-    sql = '''SELECT * FROM ucilnica WHERE id = ?'''
-    return dict(con.execute(sql, [ucilnica]).fetchone())
 
 
 def nalozi_predmet(predmet):

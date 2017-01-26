@@ -102,7 +102,7 @@
                 <input value="{{dan}}" name="dan" type="hidden">
                 <input value="{{ura}}" name="ura" type="hidden">
                 <input value="{{ucilnica}}" name="ucilnica" type="hidden">
-                <button class="">{{modeli.ucilnica(ucilnica)['oznaka']}}</button>
+                <button class="">{{modeli.podatki_ucilnice(ucilnica)['oznaka']}}</button>
             </form>
         % end
         </div>
