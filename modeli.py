@@ -247,6 +247,37 @@ def premakni_srecanje(srecanje, dan, ura, ucilnica):
 
 
 ##########################################################################
+# IZRAČUN PREKRIVANJ
+##########################################################################
+
+def prekrivanje_ucilnic():
+    '''Vrne podatke o prekrivanju srečanj po učilnicah.
+
+    Funkcija vrne slovar, ki trojici (ID učilnice, dan, ura)
+    priredi seznam ID-jev srečanj, ki tam in takrat potekajo hkrati.
+    '''
+    sql = '''
+    SELECT prvo.ucilnica AS ucilnica,
+           prvo.dan AS dan,
+           drugo.ura AS ura,
+           prvo.id AS prvo,
+           drugo.id AS drugo
+      FROM srecanje AS prvo
+           INNER JOIN
+           srecanje AS drugo ON prvo.ucilnica = drugo.ucilnica AND 
+                                prvo.dan = drugo.dan
+     WHERE prvo.id != drugo.id AND 
+           prvo.ura <= drugo.ura AND 
+           drugo.ura < prvo.ura + prvo.trajanje
+    '''
+    prekrivanja = {}
+    for ucilnica, dan, ura, prvo, drugo in con.execute(sql):
+        if ucilnica == 42:
+            print(ucilnica, dan, ura, prvo, drugo)
+        prekrivanja.setdefault((ucilnica, dan, ura), set()).update((prvo, drugo))
+    return prekrivanja
+
+##########################################################################
 # PRIKAZ URNIKA
 ##########################################################################
 

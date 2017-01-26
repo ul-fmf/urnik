@@ -203,6 +203,16 @@ def urnik():
         )
     )
 
+@route('/prekrivanje')
+def prekrivanje():
+    return template(
+        'prekrivanje',
+        prekrivanje_ucilnic=modeli.prekrivanje_ucilnic(),
+        podatki_srecanj=modeli.podatki_srecanj(),
+        podatki_oseb=modeli.podatki_oseb(),
+        podatki_ucilnic=modeli.podatki_ucilnic(),
+        podatki_predmetov=modeli.podatki_predmetov(),
+    )
 
 ##########################################################################
 # ZAGON APLIKACIJE
