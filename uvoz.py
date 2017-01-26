@@ -1,3 +1,4 @@
+import csv
 import pypxlib
 import sqlite3
 
@@ -18,6 +19,8 @@ def nalozi_paradox(koncnica):
     return pypxlib.Table(OSNOVA + koncnica, encoding='cp852')
 
 def izlusci_predmet(predmet):
+    if predmet[:3] == 'GU ':
+        return 'GU'
     for niz in (' V1', ' V2', ' V3', ' V', ' SEM'):
         predmet = predmet.replace(niz, '')
     return predmet
@@ -25,15 +28,15 @@ def izlusci_predmet(predmet):
 def izlusci_tip(predmet):
     if any(tip in predmet for tip in (' V1', ' V2', ' V3', ' V')):
         return 'V'
-    elif ' SEM' in predmet:
+    elif any(tip in predmet for tip in (' SEM', ' S1', ' S2')):
         return 'S'
     else:
         return 'P'
 
 def izlusci_oznako(predmet):
-    if ' V1' in predmet:
+    if any(tip in predmet for tip in (' V1', ' S1')):
         return 1
-    elif ' V2' in predmet:
+    elif any(tip in predmet for tip in (' V2', ' S2')):
         return 2
     elif ' V3' in predmet:
         return 3
@@ -119,17 +122,26 @@ for oseba in OSEBE:
         'email': None,
     }
 
+podatki_predmeta = {}
+with open('uvoz/predmeti.csv') as csvfile:
+    for _, _, _, oznaka, kratica, ime, stevilo_studentov in csv.reader(csvfile, delimiter=';'):
+        if kratica:
+            podatki_predmeta[oznaka] = (ime, kratica, stevilo_studentov)
+
 PREDMETI = {izlusci_predmet(urnik.Predmet) for urnik in nalozi_paradox('urn')}
 predmeti = {}
 for predmet in PREDMETI:
+    ime, kratica, stevilo_studentov = podatki_predmeta.get(predmet, (predmet, predmet, None))
     predmeti[predmet] = {
-        'ime': predmet,
-        'kratica': predmet,
-        'stevilo_studentov': 40,
+        'ime': ime,
+        'kratica': kratica,
+        'stevilo_studentov': stevilo_studentov,
         'racunalniski': False,
     }
 for urnik in nalozi_paradox('urn'):
     predmet = izlusci_predmet(urnik.Predmet)
+    if predmet in ('SSP',):
+        print('!!!', urnik)
     smeri = sorted(urnik.Letnik.split())
     if 'smeri' not in predmeti[predmet]:
         predmeti[predmet]['smeri'] = smeri
