@@ -2,21 +2,23 @@ import csv
 import pypxlib
 import sqlite3
 
-################################################################################
+##########################################################################
 # OSNOVNE NASTAVITVE
-################################################################################
+##########################################################################
 
 con = sqlite3.connect('urnik.sqlite3')
 con.row_factory = sqlite3.Row
 con.execute('PRAGMA foreign_keys = ON')
-OSNOVA = '/Users/matija/Documents/urnik/uvoz/urnik 1617letni.'
-################################################################################
+
+##########################################################################
 # POMOŽNE FUNKCIJE
-################################################################################
+##########################################################################
+
 
 def nalozi_paradox(koncnica):
     OSNOVA = '/Users/matija/Documents/urnik/uvoz/urnik 1617letni.'
     return pypxlib.Table(OSNOVA + koncnica, encoding='cp852')
+
 
 def izlusci_predmet(predmet):
     if predmet[:3] == 'GU ':
@@ -24,6 +26,7 @@ def izlusci_predmet(predmet):
     for niz in (' V1', ' V2', ' V3', ' V', ' SEM'):
         predmet = predmet.replace(niz, '')
     return predmet
+
 
 def izlusci_tip(predmet):
     if any(tip in predmet for tip in (' V1', ' V2', ' V3', ' V')):
@@ -33,6 +36,7 @@ def izlusci_tip(predmet):
     else:
         return 'P'
 
+
 def izlusci_oznako(predmet):
     if any(tip in predmet for tip in (' V1', ' S1')):
         return 1
@@ -41,14 +45,17 @@ def izlusci_oznako(predmet):
     elif ' V3' in predmet:
         return 3
 
+
 def izlusci_ucilnico(ucilnica):
     if ucilnica[0] == '(' and ucilnica[-1] == ')':
         return ucilnica[1:-1]
     else:
         return ucilnica
 
+
 def opozorilo(niz):
     print(niz)
+
 
 def zdruzi_ure(ure):
     zdruzene_ure = {}
@@ -63,9 +70,9 @@ def zdruzi_ure(ure):
             dan_zacetka, ura_zacetka, trajanje = dan, ura, 1
     yield dan_zacetka, ura_zacetka, trajanje
 
-################################################################################
+##########################################################################
 # BRANJE STARIH PODATKOV
-################################################################################
+##########################################################################
 
 ucilnice = {}
 for ucilnica in nalozi_paradox('uci'):
@@ -76,7 +83,8 @@ for ucilnica in nalozi_paradox('uci'):
         'velikost': ucilnica.Velikost,
         'racunalniska': ucilnica.Predavalnica[:3] == '3.1',
     }
-NEZNANE_UCILNICE = {izlusci_ucilnico(urnik.Predavalnica) for urnik in nalozi_paradox('urn')}
+NEZNANE_UCILNICE = {izlusci_ucilnico(
+    urnik.Predavalnica) for urnik in nalozi_paradox('urn')}
 for neznana in NEZNANE_UCILNICE:
     if neznana not in ucilnice:
         ucilnice[neznana] = {
@@ -119,7 +127,8 @@ with open('uvoz/predmeti.csv') as csvfile:
 PREDMETI = {izlusci_predmet(urnik.Predmet) for urnik in nalozi_paradox('urn')}
 predmeti = {}
 for predmet in PREDMETI:
-    ime, kratica, stevilo_studentov = podatki_predmeta.get(predmet, (predmet, predmet, None))
+    ime, kratica, stevilo_studentov = podatki_predmeta.get(
+        predmet, (predmet, predmet, None))
     predmeti[predmet] = {
         'ime': ime,
         'kratica': kratica,
@@ -128,8 +137,6 @@ for predmet in PREDMETI:
     }
 for urnik in nalozi_paradox('urn'):
     predmet = izlusci_predmet(urnik.Predmet)
-    if predmet in ('SSP',):
-        print('!!!', urnik)
     smeri = sorted(urnik.Letnik.split())
     if 'smeri' not in predmeti[predmet]:
         predmeti[predmet]['smeri'] = smeri
@@ -147,7 +154,8 @@ for urnik in nalozi_paradox('urn'):
     predmet = izlusci_predmet(urnik.Predmet)
     oznaka = izlusci_oznako(urnik.Predmet)
     ura = urnik.Ura
-    bloki.setdefault((ucilnica, tip, oznaka, ucitelj, predmet), set()).add((urnik.Dan, urnik.Ura))
+    bloki.setdefault((ucilnica, tip, oznaka, ucitelj, predmet),
+                     set()).add((urnik.Dan, urnik.Ura))
 srecanja = []
 for (ucilnica, tip, oznaka, ucitelj, predmet), ure in bloki.items():
     for dan, ura, trajanje in zdruzi_ure(ure):
@@ -162,15 +170,10 @@ for (ucilnica, tip, oznaka, ucitelj, predmet), ure in bloki.items():
             'trajanje': trajanje,
         })
 
-    # ure.append({
-    #     'ura': urnik.Ura,
-    #     'dan': urnik.Dan,
-    #     'trajanje': 1
-    # })
 
-################################################################################
+##########################################################################
 # USTVARJANJE BAZE
-################################################################################
+##########################################################################
 
 con.execute('''
     CREATE TABLE srecanje (
@@ -232,9 +235,9 @@ con.execute('''
     )
 ''')
 
-################################################################################
+##########################################################################
 # PISANJE V BAZO
-################################################################################
+##########################################################################
 
 ucilnica_pk = {}
 for kljuc, ucilnica in ucilnice.items():

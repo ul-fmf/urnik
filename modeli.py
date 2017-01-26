@@ -1,9 +1,9 @@
 import sqlite3
 
 
-################################################################################
+##########################################################################
 # POMOŽNE DEFINICIJE
-################################################################################
+##########################################################################
 
 con = sqlite3.connect('urnik.sqlite3')
 con.row_factory = sqlite3.Row
@@ -17,9 +17,9 @@ def vprasaji(seznam):
 def seznam_slovarjev(vrstice):
     return [dict(vrstica) for vrstica in vrstice]
 
-################################################################################
+##########################################################################
 # SEZNAMI ENTITET
-################################################################################
+##########################################################################
 
 
 def seznam_letnikov():
@@ -35,6 +35,7 @@ def seznam_oseb():
 def seznam_ucilnic():
     sql = '''SELECT * FROM ucilnica ORDER BY oznaka'''
     return seznam_slovarjev(con.execute(sql))
+
 
 def seznam_predmetov():
     sql = '''SELECT * FROM predmet ORDER BY ime'''
@@ -56,12 +57,13 @@ def seznam_predmetov():
             in
             letniki_predmeta.get(predmet['id'], [])
         )
-        predmet['opis'] = '{} ({})'.format(predmet['ime'], letniki) if letniki else predmet['ime']
+        predmet['opis'] = '{} ({})'.format(
+            predmet['ime'], letniki) if letniki else predmet['ime']
     return predmeti
 
-################################################################################
+##########################################################################
 # UREJANJE
-################################################################################
+##########################################################################
 
 
 def uredi_letnik(letnik, smer, leto):
@@ -93,6 +95,7 @@ def uredi_ucilnico(ucilnica, oznaka, velikost, racunalniska):
     con.execute(sql, [oznaka, velikost, racunalniska, ucilnica])
     con.commit()
 
+
 def uredi_srecanje(srecanje, ucitelj, predmet, tip):
     sql = '''
         UPDATE srecanje
@@ -102,9 +105,9 @@ def uredi_srecanje(srecanje, ucitelj, predmet, tip):
     con.execute(sql, [ucitelj, predmet, tip, srecanje])
     con.commit()
 
-################################################################################
+##########################################################################
 # USTVARJANJE
-################################################################################
+##########################################################################
 
 
 def ustvari_letnik(smer, leto):
@@ -139,9 +142,9 @@ def ustvari_ucilnico(oznaka, velikost, racunalniska):
     con.execute(sql, [oznaka, velikost, racunalniska])
     con.commit()
 
-################################################################################
+##########################################################################
 # NALAGANJE POSAMEZNE ENTITETE
-################################################################################
+##########################################################################
 
 
 def letnik(letnik):
@@ -182,9 +185,9 @@ def nalozi_srecanje(srecanje_id):
     return srecanje
 
 
-################################################################################
+##########################################################################
 # UREJANJE SREČANJ
-################################################################################
+##########################################################################
 
 def nastavi_trajanje(srecanje, trajanje):
     sql = '''
@@ -227,9 +230,9 @@ def premakni_srecanje(srecanje, dan, ura, ucilnica):
     con.commit()
 
 
-################################################################################
+##########################################################################
 # PRIKAZ URNIKA
-################################################################################
+##########################################################################
 
 def urnik(letniki, osebe, ucilnice):
     sql = '''
@@ -292,7 +295,8 @@ def ustrezne_ucilnice(stevilo_studentov, racunalniski):
 def prosti_termini(id_srecanja):
     izbrano_srecanje = nalozi_srecanje(id_srecanja)
     predmet = nalozi_predmet(izbrano_srecanje['predmet'])
-    ustrezne, alternative = ustrezne_ucilnice(predmet['stevilo_studentov'], predmet['racunalniski'])
+    ustrezne, alternative = ustrezne_ucilnice(
+        predmet['stevilo_studentov'], predmet['racunalniski'])
     zasedene = {}
     ucilnice = ustrezne + alternative
     sql = '''
@@ -310,7 +314,6 @@ def prosti_termini(id_srecanja):
 
     def prosta(ucilnica, dan, ura):
         return ucilnica not in zasedene.get((dan, ura), [])
-
 
     termini = {}
     for dan in range(1, 6):
@@ -363,7 +366,8 @@ def razdeli_dan_na_skupine(srecanja):
     skupina, konec_zadnjega_srecanja = [], None
 
     for srecanje in srecanja:
-        # Če se naslednje srečanje začne za koncem vseh prejšnjih, zaključimo skupino.
+        # Če se naslednje srečanje začne za koncem vseh prejšnjih, zaključimo
+        # skupino.
         if konec_zadnjega_srecanja is not None and srecanje['ura'] >= konec_zadnjega_srecanja:
             yield skupina
             skupina, konec_zadnjega_srecanja = [], None
