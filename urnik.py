@@ -13,6 +13,7 @@ def domaca_stran():
         letniki=modeli.podatki_letnikov(),
         osebe=modeli.podatki_oseb(),
         ucilnice=modeli.podatki_ucilnic(),
+        predmeti=modeli.podatki_predmetov(),
     )
 
 ##########################################################################
@@ -64,11 +65,28 @@ def uredi_ucilnico(ucilnica):
 @post('/ucilnica/<ucilnica:int>/uredi')
 def uredi_ucilnico_post(ucilnica):
     oznaka = request.forms.oznaka
-    velikost = int(request.forms.velikost)
+    velikost = None if request.forms.velikost is None else int(request.forms.velikost)
     racunalniska = request.forms.racunalniska
     modeli.uredi_ucilnico(ucilnica, oznaka, velikost, racunalniska)
     redirect('/')
 
+
+@get('/predmet/<predmet:int>/uredi')
+def uredi_predmet(predmet):
+    return template(
+        'uredi_predmet',
+        predmet=modeli.podatki_predmeta(predmet)
+    )
+
+
+@post('/predmet/<predmet:int>/uredi')
+def uredi_predmet_post(predmet):
+    ime = request.forms.ime
+    kratica = request.forms.kratica
+    stevilo_studentov = None if request.forms.stevilo_studentov is None else int(request.forms.stevilo_studentov)
+    racunalniski = request.forms.racunalniski
+    modeli.uredi_predmet(predmet, ime, kratica, stevilo_studentov, racunalniski)
+    redirect('/')
 
 ##########################################################################
 # USTVARJANJE

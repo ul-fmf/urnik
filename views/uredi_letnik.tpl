@@ -1,6 +1,7 @@
 % rebase('obrazec.tpl')
 % urejanje = defined('letnik')
 % letnik = get('letnik', {'smer': '', 'leto': ''})
+<h3>Urejanje letnika</h3>
 <form method="post">
     <div class="input-field">
         <input value="{{letnik['smer']}}" placeholder="1Mate" name="smer" type="text" class="validate" />

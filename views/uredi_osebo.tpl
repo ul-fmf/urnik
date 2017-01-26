@@ -1,6 +1,7 @@
 % rebase('obrazec.tpl')
 % urejanje = defined('oseba')
 % oseba = get('oseba', {'ime': '', 'priimek': '', 'email': ''})
+<h3>Urejanje osebe</h3>
 <form method="post">
     <div class="input-field">
         <input value="{{oseba['ime']}}" placeholder="Janez" name="ime" type="text" class="validate">

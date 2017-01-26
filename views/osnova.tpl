@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <style>
         body {
-            background: #ddd;
+            /*background: #ddd;*/
         }
         #urnik {
             position: absolute;

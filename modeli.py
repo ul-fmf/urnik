@@ -66,7 +66,10 @@ def podatki_srecanj(kljuci=[]):
 
 
 def podatki_predmetov(kljuci=[]):
-    return nalozi_podatke('predmet', kljuci)
+    return nalozi_podatke('predmet', kljuci, vrstni_red=('ime',))
+
+def podatki_predmeta(kljuc):
+    return nalozi_podatek('predmet', kljuc)
 
 
 def seznam_predmetov():
@@ -136,6 +139,17 @@ def uredi_srecanje(srecanje, ucitelj, predmet, tip):
     '''
     con.execute(sql, [ucitelj, predmet, tip, srecanje])
     con.commit()
+
+
+def uredi_predmet(predmet, ime, kratica, stevilo_studentov, racunalniski):
+    sql = '''
+        UPDATE predmet
+        SET ime = ?, kratica = ?, stevilo_studentov = ?, racunalniski = ?
+        WHERE id = ?
+    '''
+    con.execute(sql, [ime, kratica, stevilo_studentov, racunalniski, predmet])
+    con.commit()
+
 
 ##########################################################################
 # USTVARJANJE
