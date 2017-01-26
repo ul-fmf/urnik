@@ -208,10 +208,13 @@ def prekrivanje():
     return template(
         'prekrivanje',
         prekrivanje_ucilnic=modeli.prekrivanje_ucilnic(),
+        prekrivanje_oseb=modeli.prekrivanje_oseb(),
+        prekrivanje_letnikov=modeli.prekrivanje_letnikov(),
         podatki_srecanj=modeli.podatki_srecanj(),
         podatki_oseb=modeli.podatki_oseb(),
         podatki_ucilnic=modeli.podatki_ucilnic(),
         podatki_predmetov=modeli.podatki_predmetov(),
+        podatki_letnikov=modeli.podatki_letnikov(),
     )
 
 ##########################################################################

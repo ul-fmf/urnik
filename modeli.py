@@ -272,9 +272,50 @@ def prekrivanje_ucilnic():
     '''
     prekrivanja = {}
     for ucilnica, dan, ura, prvo, drugo in con.execute(sql):
-        if ucilnica == 42:
-            print(ucilnica, dan, ura, prvo, drugo)
         prekrivanja.setdefault((ucilnica, dan, ura), set()).update((prvo, drugo))
+    return prekrivanja
+
+def prekrivanje_oseb():
+    sql = '''
+    SELECT prvo.ucitelj AS oseba,
+           prvo.dan AS dan,
+           drugo.ura AS ura,
+           prvo.id AS prvo,
+           drugo.id AS drugo
+      FROM srecanje AS prvo
+           INNER JOIN
+           srecanje AS drugo ON prvo.ucitelj = drugo.ucitelj AND 
+                                prvo.dan = drugo.dan
+     WHERE prvo.id != drugo.id AND 
+           prvo.ura <= drugo.ura AND 
+           drugo.ura < prvo.ura + prvo.trajanje
+    '''
+    prekrivanja = {}
+    for ucitelj, dan, ura, prvo, drugo in con.execute(sql):
+        prekrivanja.setdefault((ucitelj, dan, ura), set()).update((prvo, drugo))
+    return prekrivanja
+
+def prekrivanje_letnikov():
+    sql = '''
+    SELECT prvo_letnik.letnik AS letnik,
+           prvo.dan AS dan,
+           drugo.ura AS ura,
+           prvo.id AS prvo,
+           drugo.id AS drugo
+      FROM srecanje AS prvo
+           INNER JOIN
+           predmet_letnik AS prvo_letnik ON prvo.predmet = prvo_letnik.predmet
+           INNER JOIN
+           predmet_letnik AS drugo_letnik ON prvo_letnik.letnik = drugo_letnik.letnik
+           INNER JOIN
+           srecanje AS drugo ON drugo.predmet = drugo_letnik.predmet AND prvo.dan = drugo.dan
+     WHERE prvo.id != drugo.id AND 
+           prvo.ura <= drugo.ura AND 
+           drugo.ura < prvo.ura + prvo.trajanje
+    '''
+    prekrivanja = {}
+    for letnik, dan, ura, prvo, drugo in con.execute(sql):
+        prekrivanja.setdefault((letnik, dan, ura), set()).update((prvo, drugo))
     return prekrivanja
 
 ##########################################################################
