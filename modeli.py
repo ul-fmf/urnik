@@ -233,7 +233,7 @@ def premakni_srecanje(srecanje, dan, ura, ucilnica):
 
 def urnik(letniki, osebe, ucilnice):
     sql = '''
-        SELECT srecanje.id as id,
+        SELECT DISTINCT srecanje.id as id,
                dan,
                ura,
                trajanje,
@@ -244,13 +244,13 @@ def urnik(letniki, osebe, ucilnice):
                ucilnica.oznaka as oznaka_ucilnice,
                predmet.ime as ime_predmeta
           FROM srecanje
-               INNER JOIN
+               LEFT JOIN
                oseba ON srecanje.ucitelj = oseba.id
-               INNER JOIN
+               LEFT JOIN
                ucilnica ON srecanje.ucilnica = ucilnica.id
-               INNER JOIN
+               LEFT JOIN
                predmet_letnik ON srecanje.predmet = predmet_letnik.predmet
-               INNER JOIN
+               LEFT JOIN
                predmet ON srecanje.predmet = predmet.id
          WHERE predmet_letnik.letnik IN ({})
             OR srecanje.ucitelj IN ({})
