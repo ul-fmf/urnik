@@ -416,13 +416,16 @@ def povezana_srecanja(srecanje):
 
 def ustrezne_ucilnice(stevilo_studentov, racunalniski):
     ustrezne = []
-    alternative = []
+    morebitne = []
     for ucilnica in podatki_ucilnic().values():
-        if stevilo_studentov is not None and ucilnica['velikost'] >= stevilo_studentov:
+        velikost = ucilnica['velikost']
+        if velikost is None:
+            pass
+        elif stevilo_studentov is None or 2/3 <= velikost / stevilo_studentov <= 3/4:
+            morebitne.append(ucilnica['id'])
+        elif 3/4 < velikost / stevilo_studentov:
             ustrezne.append(ucilnica['id'])
-        elif stevilo_studentov is None or ucilnica['velikost'] >= 0.75 * stevilo_studentov:
-            alternative.append(ucilnica['id'])
-    return ustrezne, alternative
+    return ustrezne, morebitne
 
 
 def prosti_termini(id_srecanja):

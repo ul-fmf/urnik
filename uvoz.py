@@ -89,7 +89,7 @@ for neznana in NEZNANE_UCILNICE:
     if neznana not in ucilnice:
         ucilnice[neznana] = {
             'oznaka': neznana,
-            'velikost': 1,
+            'velikost': None,
             'racunalniska': False,
         }
 
@@ -215,8 +215,7 @@ con.execute('''
         id           INTEGER PRIMARY KEY AUTOINCREMENT,
         oznaka       TEXT    UNIQUE
                              NOT NULL,
-        velikost     INTEGER NOT NULL
-                             CHECK (velikost > 0),
+        velikost     INTEGER,
         racunalniska BOOLEAN DEFAULT (0) 
                              NOT NULL
     )
