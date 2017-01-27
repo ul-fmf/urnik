@@ -237,6 +237,7 @@ def urnik():
         srecanja=modeli.urnik(
             letniki=[int(letnik) for letnik in request.query.getall('letnik')],
             osebe=[int(oseba) for oseba in request.query.getall('oseba')],
+            predmeti=[int(predmet) for predmet in request.query.getall('predmet')],
             ucilnice=[int(ucilnica)
                       for ucilnica in request.query.getall('ucilnica')],
         )

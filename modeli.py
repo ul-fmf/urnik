@@ -366,7 +366,7 @@ def prekrivanje_letnikov():
 # PRIKAZ URNIKA
 ##########################################################################
 
-def urnik(letniki, osebe, ucilnice):
+def urnik(letniki, osebe, predmeti, ucilnice):
     sql = '''
         SELECT DISTINCT srecanje.id as id,
                dan,
@@ -390,10 +390,11 @@ def urnik(letniki, osebe, ucilnice):
                predmet ON srecanje.predmet = predmet.id
          WHERE predmet_letnik.letnik IN ({})
             OR srecanje.ucitelj IN ({})
+            OR predmet.id IN ({})
             OR srecanje.ucilnica IN ({})
          ORDER BY dan, ura, trajanje
-    '''.format(vprasaji(letniki), vprasaji(osebe), vprasaji(ucilnice))
-    srecanja = seznam_slovarjev(con.execute(sql, letniki + osebe + ucilnice))
+    '''.format(vprasaji(letniki), vprasaji(osebe), vprasaji(predmeti), vprasaji(ucilnice))
+    srecanja = seznam_slovarjev(con.execute(sql, letniki + osebe + predmeti + ucilnice))
     return nastavi_sirine_srecanj(srecanja)
 
 

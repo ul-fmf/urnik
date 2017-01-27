@@ -73,7 +73,7 @@
                 %for predmet in predmeti.values():
                 <tr>
                     <td>
-                        <a href="/urnik?ucilnica={{predmet['id']}}">
+                        <a href="/urnik?predmet={{predmet['id']}}">
                             {{predmet['ime']}}
                         </a>
                         %if predmet['racunalniski']:
