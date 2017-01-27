@@ -12,9 +12,17 @@
             position: absolute;
             left: 5%;
             top: 5%;
-            width: 90%;
+            width: 70%;
             height: 90%;
-            background: #fff;
+            background: #efefef;
+        }
+        #informacije {
+            position: absolute;
+            left: 75%;
+            top: 5%;
+            width: 20%;
+            height: 90%;
+            background: #fff;            
         }
         #dnevi {
             position: absolute;
