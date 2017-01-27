@@ -1,15 +1,46 @@
 import csv
 import pypxlib
+import os
 import sqlite3
 
 ##########################################################################
 # OSNOVNE NASTAVITVE
 ##########################################################################
 
-con = sqlite3.connect('urnik.sqlite3')
-con.row_factory = sqlite3.Row
-con.execute('PRAGMA foreign_keys = ON')
-
+IME_DATOTEKE = 'urnik.sqlite3'
+SEMINARJI = (
+    'OSN SEM',
+    'GEOTOP SEM',
+    'SAFA SEM',
+    'SEJA',
+    'GEO SEM',
+    'ALG SEM',
+    'KA SEM',
+    'DM SEM',
+    'FM SEM',
+    'GRAALG SEM',
+    'NA SEM',
+    'SRE SEM',
+    'TOP SEM',
+    'MAT KOL',
+)
+POSEBNI_PREDMETI = {
+    'GU': ('Govorilne ure', 'GU', None),
+    'OSN SEM': ('Seminar za OSN', 'SEM-OSN', None),
+    'GEOTOP SEM': ('Seminar za GEOTOP', 'SEM-GEOTOP', None),
+    'SAFA SEM': ('Seminar za SAFA', 'SEM-SAFA', None),
+    'SEJA': ('Seja', 'SEJA', None),
+    'GEO SEM': ('Seminar za GEO', 'SEM-GEO', None),
+    'ALG SEM': ('Seminar za algebro', 'SEM-ALG', None),
+    'KA SEM': ('Seminar za algebro', 'SEM-KA', None),
+    'DM SEM': ('Seminar za DM', 'SEM-DM', None),
+    'FM SEM': ('Seminar za FM', 'SEM-FM', None),
+    'GRAALG SEM': ('Seminar za GRAALG', 'SEM-GRAALG', None),
+    'NA SEM': ('Seminar za NA', 'SEM-NA', None),
+    'SRE SEM': ('Seminar za SRE', 'SEM-SRE', None),
+    'TOP SEM': ('Topološki seminar', 'SEM-TOP', None),
+    'MAT KOL': ('Matematični kolokvij', 'SEM-MK', None),
+}
 ##########################################################################
 # POMOŽNE FUNKCIJE
 ##########################################################################
@@ -23,9 +54,16 @@ def nalozi_paradox(koncnica):
 def izlusci_predmet(predmet):
     if predmet[:3] == 'GU ':
         return 'GU'
-    for niz in (' V1', ' V2', ' V3', ' V', ' SEM'):
+    for niz in (' V1', ' V2', ' V3', ' V'):
         predmet = predmet.replace(niz, '')
+    if ' SEM' in predmet and not any(predmet.startswith(seminar) for seminar in SEMINARJI):
+        predmet = predmet.replace(' SEM', '')
     return predmet
+
+def izlusci_seminar(predmet):
+    for seminar in SEMINARJI:
+        if predmet.startswith(seminar) and predmet != seminar:
+            return seminar
 
 
 def izlusci_tip(predmet):
@@ -143,8 +181,10 @@ with open('uvoz/prevod predmetov.csv') as csvfile:
 PREDMETI = {izlusci_predmet(urnik.Predmet) for urnik in nalozi_paradox('urn')}
 predmeti = {}
 for predmet in PREDMETI:
-    if predmet == 'GU':
-        ime, kratica, stevilo_studentov = 'Govorilne ure', 'GU', None
+    if izlusci_seminar(predmet):
+        continue
+    if predmet in POSEBNI_PREDMETI:
+        ime, kratica, stevilo_studentov = POSEBNI_PREDMETI[predmet]
     else:
         ime, kratica, stevilo_studentov = podatki_predmeta.get(
             prevod_predmeta.get(predmet),
@@ -158,6 +198,8 @@ for predmet in PREDMETI:
     }
 for urnik in nalozi_paradox('urn'):
     predmet = izlusci_predmet(urnik.Predmet)
+    if izlusci_seminar(predmet):
+        continue
     smeri = sorted(urnik.Letnik.split())
     if 'smeri' not in predmeti[predmet]:
         predmeti[predmet]['smeri'] = smeri
@@ -168,6 +210,7 @@ for urnik in nalozi_paradox('urn'):
             ', '.join(predmeti[predmet]['smeri'])
         ))
 bloki = {}
+slusatelji = {seminar: set() for seminar in SEMINARJI}
 for urnik in nalozi_paradox('urn'):
     ucilnica = urnik.Predavalnica
     tip = izlusci_tip(urnik.Predmet)
@@ -175,8 +218,12 @@ for urnik in nalozi_paradox('urn'):
     predmet = izlusci_predmet(urnik.Predmet)
     oznaka = izlusci_oznako(urnik.Predmet)
     ura = urnik.Ura
-    bloki.setdefault((ucilnica, tip, oznaka, ucitelj, predmet),
-                     set()).add((urnik.Dan, urnik.Ura))
+    seminar = izlusci_seminar(urnik.Predmet)
+    if seminar and predmet != seminar:
+        slusatelji[seminar].add(ucitelj)
+    else:
+        bloki.setdefault((ucilnica, tip, oznaka, ucitelj, predmet),
+                         set()).add((urnik.Dan, urnik.Ura))
 srecanja = []
 for (ucilnica, tip, oznaka, ucitelj, predmet), ure in bloki.items():
     for dan, ura, trajanje in zdruzi_ure(ure):
@@ -195,6 +242,11 @@ for (ucilnica, tip, oznaka, ucitelj, predmet), ure in bloki.items():
 ##########################################################################
 # USTVARJANJE BAZE
 ##########################################################################
+
+os.remove(IME_DATOTEKE)
+con = sqlite3.connect(IME_DATOTEKE)
+con.row_factory = sqlite3.Row
+con.execute('PRAGMA foreign_keys = ON')
 
 con.execute('''
     CREATE TABLE srecanje (
@@ -227,6 +279,16 @@ con.execute('''
         PRIMARY KEY (
             predmet,
             letnik
+        )
+    )
+''')
+con.execute('''
+    CREATE TABLE slusatelji (
+        oseba    INTEGER REFERENCES oseba (id),
+        srecanje INTEGER REFERENCES srecanje (id),
+        PRIMARY KEY (
+            oseba,
+            srecanje
         )
     )
 ''')
@@ -330,5 +392,19 @@ for srecanje in srecanja:
         srecanje['ura'],
         srecanje['trajanje']
     ))
+    kljuc = cur.lastrowid
+    for oseba in slusatelji.get((srecanje['dan'], srecanje['ura'], srecanje['predmet']), []):
+        con.execute('''
+            INSERT INTO
+            slusatelji
+            (oseba, srecanje)
+            SELECT ?, ?
+            WHERE NOT EXISTS (SELECT 1 FROM slusatelji WHERE oseba = ? AND srecanje = ?)
+        ''', (
+            oseba_pk[oseba],
+            kljuc,
+            oseba_pk[oseba],
+            kljuc
+        ))
 
 con.commit()
