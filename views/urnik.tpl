@@ -50,6 +50,11 @@
                 <a href="/srecanje/{{srecanje['id']}}/premakni">
                     <i class="tiny material-icons">open_with</i>
                 </a>
+                <form method="post" action="/srecanje/{{srecanje['id']}}/odlozi">
+                    <button>
+                        <i class="tiny material-icons">move_to_inbox</i>
+                    </button>
+                </form>
                 <a href="/srecanje/{{srecanje['id']}}/uredi">
                     <i class="tiny material-icons">edit</i>
                 </a>
@@ -111,6 +116,66 @@
 </div>
 </div>
 <div id='informacije'>
+    % for srecanje in odlozena_srecanja:
+    % left = 0.1
+    % top = 0
+    % height = srecanje['trajanje'] * enota_visine
+    % width = 0.8
+    % style = 'left: {:.2%}; width: {:.2%}; top: {:.2%}; height: {:.2%}'.format(left, width, top, height)
+    <div class="srecanje" style="{{ style }};">
+        <div class="predmet">
+            {{srecanje['ime_predmeta']}} {{srecanje['tip']}}{{srecanje['oznaka'] if srecanje['oznaka'] else ''}}
+        </div>
+        <div class="ucitelj">
+            <a href="/urnik?oseba={{srecanje['ucitelj']}}">
+                {{srecanje['priimek_ucitelja']}}
+            </a>
+        </div>
+        <div class="ucilnica">
+            <a href="/urnik?ucilnica={{srecanje['ucilnica']}}">
+                {{srecanje['oznaka_ucilnice']}}
+            </a>
+        </div>
+        <div class="urejanje">
+            <div class="right">
+                <a href="/srecanje/{{srecanje['id']}}/premakni">
+                    <i class="tiny material-icons">open_with</i>
+                </a>
+                <a href="/srecanje/{{srecanje['id']}}/uredi">
+                    <i class="tiny material-icons">edit</i>
+                </a>
+                <form method="post" action="/srecanje/{{srecanje['id']}}/izbrisi">
+                    <button>
+                        <i class="tiny material-icons">delete</i>
+                    </button>
+                </form>
+                <form method="post" action="/srecanje/{{srecanje['id']}}/podvoji">
+                    <button>
+                        <i class="tiny material-icons">content_copy</i>
+                    </button>
+                </form>
+            </div>
+            <div class="podaljsevanje">
+                % if srecanje['trajanje'] > 1:
+                <form method="post" action="/srecanje/{{srecanje['id']}}/trajanje">
+                    <input type="hidden" name="next" value="{{next}}">
+                    <input type="hidden" name="trajanje" value="{{srecanje['trajanje'] - 1}}">
+                    <button>
+                        <i class="tiny material-icons">file_upload</i>
+                    </button>
+                </form>
+                % end
+                <form method="post" action="/srecanje/{{srecanje['id']}}/trajanje">
+                    <input type="hidden" name="next" value="{{next}}">
+                    <input type="hidden" name="trajanje" value="{{srecanje['trajanje'] + 1}}">
+                    <button>
+                        <i class="tiny material-icons">file_download</i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    % end
 <ul>
 %for (ucilnica, dan, ura), srecanja in prekrivanje_ucilnic.items():
 <li>

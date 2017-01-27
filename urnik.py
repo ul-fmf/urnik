@@ -171,6 +171,7 @@ def premakni_srecanje(srecanje):
     return template(
         'urnik',
         premaknjeno_srecanje=srecanje,
+        odlozena_srecanja=modeli.odlozena_srecanja(),
         srecanja=modeli.povezana_srecanja(srecanje),
         prosti_termini=modeli.prosti_termini(srecanje),
         next=request.headers.get('referer') or '/',
@@ -203,6 +204,11 @@ def izbrisi(srecanje):
 @post('/srecanje/<srecanje:int>/podvoji')
 def podvoji(srecanje):
     modeli.podvoji_srecanje(srecanje)
+    redirect(request.headers.get('referer') or '/')
+
+@post('/srecanje/<srecanje:int>/odlozi')
+def odlozi(srecanje):
+    modeli.odlozi_srecanje(srecanje)
     redirect(request.headers.get('referer') or '/')
 
 
@@ -249,6 +255,7 @@ def urnik():
             ucilnice=[int(ucilnica)
                       for ucilnica in request.query.getall('ucilnica')],
         ),
+        odlozena_srecanja=modeli.odlozena_srecanja(),
         prekrivanje_ucilnic=modeli.prekrivanje_ucilnic(),
         prekrivanje_oseb=modeli.prekrivanje_oseb(),
         prekrivanje_letnikov=modeli.prekrivanje_letnikov(),

@@ -74,6 +74,9 @@
             position: absolute;
             padding: 2pt;
         }
+        #informacije .srecanje {
+            position: relative;
+        }
         .ucitelj, .ucilnica {
             position: absolute;
             color: #999;

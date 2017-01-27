@@ -290,6 +290,16 @@ def premakni_srecanje(srecanje, dan, ura, ucilnica):
     con.commit()
 
 
+def odlozi_srecanje(srecanje):
+    sql = '''
+        UPDATE srecanje
+        SET dan = NULL, ura = NULL, ucilnica = NULL
+        WHERE id = ?
+    '''
+    con.execute(sql, [srecanje])
+    con.commit()
+
+
 ##########################################################################
 # IZRAČUN PREKRIVANJ
 ##########################################################################
@@ -388,14 +398,43 @@ def urnik(letniki, osebe, predmeti, ucilnice):
                predmet_letnik ON srecanje.predmet = predmet_letnik.predmet
                LEFT JOIN
                predmet ON srecanje.predmet = predmet.id
-         WHERE predmet_letnik.letnik IN ({})
+         WHERE dan IS NOT NULL AND ucilnica IS NOT NULL AND ura IS NOT NULL
+            AND (predmet_letnik.letnik IN ({})
             OR srecanje.ucitelj IN ({})
             OR predmet.id IN ({})
-            OR srecanje.ucilnica IN ({})
+            OR srecanje.ucilnica IN ({}))
          ORDER BY dan, ura, trajanje
     '''.format(vprasaji(letniki), vprasaji(osebe), vprasaji(predmeti), vprasaji(ucilnice))
     srecanja = seznam_slovarjev(con.execute(sql, letniki + osebe + predmeti + ucilnice))
+    print(srecanja)
     return nastavi_sirine_srecanj(srecanja)
+
+def odlozena_srecanja():
+    sql = '''
+        SELECT DISTINCT srecanje.id as id,
+               dan,
+               ura,
+               trajanje,
+               tip,
+               srecanje.oznaka as oznaka,
+               srecanje.ucitelj as ucitelj,
+               oseba.priimek as priimek_ucitelja,
+               srecanje.ucilnica as ucilnica,
+               ucilnica.oznaka as oznaka_ucilnice,
+               predmet.ime as ime_predmeta
+          FROM srecanje
+               LEFT JOIN
+               oseba ON srecanje.ucitelj = oseba.id
+               LEFT JOIN
+               ucilnica ON srecanje.ucilnica = ucilnica.id
+               LEFT JOIN
+               predmet_letnik ON srecanje.predmet = predmet_letnik.predmet
+               LEFT JOIN
+               predmet ON srecanje.predmet = predmet.id
+         WHERE dan IS NULL AND ucilnica IS NULL AND ura IS NULL
+    '''
+    return seznam_slovarjev(con.execute(sql))
+
 
 
 def povezana_srecanja(srecanje):
