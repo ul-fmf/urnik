@@ -12,7 +12,7 @@
                 <tr>
                     <td>
                         <a href="/urnik?letnik={{letnik['id']}}">
-                            {{letnik['smer']}}{{', {}. let'.format(letnik['leto']) if letnik['leto'] else ''}}
+                            {{letnik['smer']}}{{', {}. letnik'.format(letnik['leto']) if letnik['leto'] else ''}}
                         </a>
                         <a href="/letnik/{{letnik['id']}}/uredi">
                             <i class="tiny material-icons">edit</i>
@@ -25,40 +25,6 @@
                         <a href="/letnik/ustvari">
                             <i class="tiny material-icons">add</i>
                             ustvari nov letnik
-                        </a>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <div class="col s2">
-        <table class="highlight">
-            <thead>
-                <tr>
-                    <th>Učilnica</th>
-                </tr>
-            </thead>
-            <tbody>
-                %for ucilnica in ucilnice.values():
-                <tr>
-                    <td>
-                        <a href="/urnik?ucilnica={{ucilnica['id']}}">
-                            {{ucilnica['oznaka']}}
-                        </a>
-                        %if ucilnica['racunalniska']:
-                        <i class="tiny material-icons">computer</i>
-                        %end
-                        <a href="/ucilnica/{{ucilnica['id']}}/uredi">
-                            <i class="tiny material-icons">edit</i>
-                        </a>
-                    </td>
-                </tr>
-                %end
-                <tr>
-                    <td>
-                        <a href="/ucilnica/ustvari">
-                            <i class="tiny material-icons">add</i>
-                            ustvari novo učilnico
                         </a>
                     </td>
                 </tr>
@@ -129,4 +95,39 @@
                 </tr>
             </tbody>
         </table>
-    </div></div>
+    </div>
+    <div class="col s2">
+        <table class="highlight">
+            <thead>
+                <tr>
+                    <th>Učilnica</th>
+                </tr>
+            </thead>
+            <tbody>
+                %for ucilnica in ucilnice.values():
+                <tr>
+                    <td>
+                        <a href="/urnik?ucilnica={{ucilnica['id']}}">
+                            {{ucilnica['oznaka']}}
+                        </a>
+                        %if ucilnica['racunalniska']:
+                        <i class="tiny material-icons">computer</i>
+                        %end
+                        <a href="/ucilnica/{{ucilnica['id']}}/uredi">
+                            <i class="tiny material-icons">edit</i>
+                        </a>
+                    </td>
+                </tr>
+                %end
+                <tr>
+                    <td>
+                        <a href="/ucilnica/ustvari">
+                            <i class="tiny material-icons">add</i>
+                            ustvari novo učilnico
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

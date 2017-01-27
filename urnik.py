@@ -142,6 +142,25 @@ def ustvari_ucilnico_post():
     redirect('/')
 
 
+@get('/predmet/ustvari')
+def ustvari_predmet():
+    return template(
+        'uredi_predmet',
+        letniki=modeli.podatki_letnikov()
+    )
+
+
+@post('/predmet/ustvari')
+def ustvari_predmet_post():
+    ime = request.forms.ime
+    kratica = request.forms.kratica
+    stevilo_studentov = None if request.forms.stevilo_studentov is '' else int(request.forms.stevilo_studentov)
+    racunalniski = request.forms.racunalniski
+    letniki = [int(letnik) for letnik in request.forms.getall('letniki')]
+    modeli.ustvari_predmet(ime, kratica, stevilo_studentov, racunalniski, letniki)
+    redirect('/')
+
+
 ##########################################################################
 # UREJANJE SREČANJ
 ##########################################################################

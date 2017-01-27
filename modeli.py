@@ -205,6 +205,19 @@ def ustvari_ucilnico(oznaka, velikost, racunalniska):
     con.execute(sql, [oznaka, velikost, racunalniska])
     con.commit()
 
+
+def ustvari_predmet(ime, kratica, stevilo_studentov, racunalniski, letniki):
+    sql = '''
+        INSERT INTO predmet
+        (ime, kratica, stevilo_studentov, racunalniski)
+        VALUES
+        (?, ?, ?, ?)
+    '''
+    cur = con.execute(sql, [ime, kratica, stevilo_studentov, racunalniski])
+    predmet = cur.lastrowid
+    con.commit()
+    uredi_predmet(predmet, ime, kratica, stevilo_studentov, racunalniski, letniki)
+
 ##########################################################################
 # NALAGANJE POSAMEZNE ENTITETE
 ##########################################################################
