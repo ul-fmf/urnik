@@ -31,7 +31,7 @@ def izlusci_predmet(predmet):
 def izlusci_tip(predmet):
     if any(tip in predmet for tip in (' V1', ' V2', ' V3', ' V')):
         return 'V'
-    elif any(tip in predmet for tip in (' SEM', ' S1', ' S2')):
+    elif any(tip in predmet for tip in ('SEM', ' S1', ' S2')):
         return 'S'
     else:
         return 'P'
@@ -143,10 +143,13 @@ with open('uvoz/prevod predmetov.csv') as csvfile:
 PREDMETI = {izlusci_predmet(urnik.Predmet) for urnik in nalozi_paradox('urn')}
 predmeti = {}
 for predmet in PREDMETI:
-    ime, kratica, stevilo_studentov = podatki_predmeta.get(
-        prevod_predmeta.get(predmet),
-        (predmet, predmet, None)
-    )
+    if predmet == 'GU':
+        ime, kratica, stevilo_studentov = 'Govorilne ure', 'GU', None
+    else:
+        ime, kratica, stevilo_studentov = podatki_predmeta.get(
+            prevod_predmeta.get(predmet),
+            (predmet, predmet, None)
+        )
     predmeti[predmet] = {
         'ime': ime,
         'kratica': kratica,

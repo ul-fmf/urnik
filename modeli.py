@@ -411,7 +411,7 @@ def povezana_srecanja(srecanje):
         SELECT ucitelj FROM srecanje WHERE id = ?
     '''
     ucitelj = con.execute(sql_ucitelj, [srecanje]).fetchone()['ucitelj']
-    return urnik(letniki, [ucitelj], [])
+    return urnik(letniki, [ucitelj], [], [])
 
 
 def ustrezne_ucilnice(stevilo_studentov, racunalniski):
