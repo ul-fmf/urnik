@@ -66,8 +66,11 @@ def podatki_srecanj(kljuci=[]):
 
 
 def podatki_predmetov(kljuci=[]):
-    return nalozi_podatke('predmet', kljuci, vrstni_red=('ime',))
-
+    predmeti = nalozi_podatke('predmet', kljuci, vrstni_red=('ime',))
+    for predmet, letnik in con.execute('SELECT predmet, letnik FROM predmet_letnik'):
+        predmeti[predmet].setdefault('letniki', set()).add(letnik)
+    print(predmeti)
+    return predmeti
 
 def podatki_predmeta(kljuc):
     predmet = nalozi_podatek('predmet', kljuc)
@@ -145,13 +148,13 @@ def uredi_srecanje(srecanje, ucitelj, predmet, tip):
     con.commit()
 
 
-def uredi_predmet(predmet, ime, kratica, stevilo_studentov, racunalniski, letniki):
+def uredi_predmet(predmet, ime, kratica, stevilo_studentov, letniki):
     sql = '''
         UPDATE predmet
-        SET ime = ?, kratica = ?, stevilo_studentov = ?, racunalniski = ?
+        SET ime = ?, kratica = ?, stevilo_studentov = ?
         WHERE id = ?
     '''
-    con.execute(sql, [ime, kratica, stevilo_studentov, racunalniski, predmet])
+    con.execute(sql, [ime, kratica, stevilo_studentov, predmet])
     sql = '''
         DELETE FROM predmet_letnik
         WHERE predmet = ? AND letnik NOT IN ({})
@@ -206,17 +209,17 @@ def ustvari_ucilnico(oznaka, velikost, racunalniska):
     con.commit()
 
 
-def ustvari_predmet(ime, kratica, stevilo_studentov, racunalniski, letniki):
+def ustvari_predmet(ime, kratica, stevilo_studentov, letniki):
     sql = '''
         INSERT INTO predmet
-        (ime, kratica, stevilo_studentov, racunalniski)
+        (ime, kratica, stevilo_studentov)
         VALUES
-        (?, ?, ?, ?)
+        (?, ?, ?)
     '''
-    cur = con.execute(sql, [ime, kratica, stevilo_studentov, racunalniski])
+    cur = con.execute(sql, [ime, kratica, stevilo_studentov])
     predmet = cur.lastrowid
     con.commit()
-    uredi_predmet(predmet, ime, kratica, stevilo_studentov, racunalniski, letniki)
+    uredi_predmet(predmet, ime, kratica, stevilo_studentov, letniki)
 
 ##########################################################################
 # NALAGANJE POSAMEZNE ENTITETE
@@ -398,15 +401,17 @@ def urnik(letniki, osebe, predmeti, ucilnice):
                predmet_letnik ON srecanje.predmet = predmet_letnik.predmet
                LEFT JOIN
                predmet ON srecanje.predmet = predmet.id
+               LEFT JOIN
+               slusatelji ON slusatelji.predmet = srecanje.predmet
          WHERE dan IS NOT NULL AND ucilnica IS NOT NULL AND ura IS NOT NULL
             AND (predmet_letnik.letnik IN ({})
             OR srecanje.ucitelj IN ({})
             OR predmet.id IN ({})
-            OR srecanje.ucilnica IN ({}))
+            OR srecanje.ucilnica IN ({})
+            OR slusatelji.oseba in ({}))
          ORDER BY dan, ura, trajanje
-    '''.format(vprasaji(letniki), vprasaji(osebe), vprasaji(predmeti), vprasaji(ucilnice))
-    srecanja = seznam_slovarjev(con.execute(sql, letniki + osebe + predmeti + ucilnice))
-    print(srecanja)
+    '''.format(vprasaji(letniki), vprasaji(osebe), vprasaji(predmeti), vprasaji(ucilnice), vprasaji(osebe))
+    srecanja = seznam_slovarjev(con.execute(sql, letniki + osebe + predmeti + ucilnice + osebe))
     return nastavi_sirine_srecanj(srecanja)
 
 def odlozena_srecanja():
@@ -453,7 +458,7 @@ def povezana_srecanja(srecanje):
     return urnik(letniki, [ucitelj], [], [])
 
 
-def ustrezne_ucilnice(stevilo_studentov, racunalniski):
+def ustrezne_ucilnice(stevilo_studentov):
     ustrezne = []
     morebitne = []
     for ucilnica in podatki_ucilnic().values():
@@ -470,8 +475,7 @@ def ustrezne_ucilnice(stevilo_studentov, racunalniski):
 def prosti_termini(id_srecanja):
     izbrano_srecanje = nalozi_srecanje(id_srecanja)
     predmet = nalozi_predmet(izbrano_srecanje['predmet'])
-    ustrezne, alternative = ustrezne_ucilnice(
-        predmet['stevilo_studentov'], predmet['racunalniski'])
+    ustrezne, alternative = ustrezne_ucilnice(predmet['stevilo_studentov'])
     zasedene = {}
     ucilnice = ustrezne + alternative
     sql = '''
@@ -480,9 +484,9 @@ def prosti_termini(id_srecanja):
                trajanje,
                ucilnica
           FROM srecanje
-         WHERE ucilnica IN ({})
+         WHERE id != ? AND ucilnica IN ({})
     '''.format(vprasaji(ucilnice))
-    for srecanje in con.execute(sql, ucilnice):
+    for srecanje in con.execute(sql, [id_srecanja] + ucilnice):
         dan = srecanje['dan']
         for ura in range(srecanje['ura'], srecanje['ura'] + srecanje['trajanje']):
             zasedene.setdefault((dan, ura), set()).add(srecanje['ucilnica'])

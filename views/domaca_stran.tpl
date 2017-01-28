@@ -76,6 +76,9 @@
                         <a href="/urnik?predmet={{predmet['id']}}">
                             {{predmet['ime']}}
                         </a>
+                        %for letnik in predmet.get('letniki', []):
+                        <small>{{letnik}}</small>
+                        %end
                         <a href="/predmet/{{predmet['id']}}/uredi">
                             <i class="tiny material-icons">edit</i>
                         </a>
@@ -102,6 +105,9 @@
             </thead>
             <tbody>
                 %for ucilnica in ucilnice.values():
+                %if ucilnica['skrita']:
+                %    continue
+                %end
                 <tr>
                     <td>
                         <a href="/urnik?ucilnica={{ucilnica['id']}}">

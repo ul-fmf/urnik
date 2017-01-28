@@ -28,28 +28,37 @@ SEMINARJI = (
 
 POSEBNI_PREDMETI = {
     'GU': ('Govorilne ure', 'GU', None),
-    'OSN SEM': ('Seminar za OSN', 'SEM-OSN', None),
-    'GEOTOP SEM': ('Seminar za GEOTOP', 'SEM-GEOTOP', None),
+    'REZ': ('Rezervacija', 'REZ', None),
+    'OSN SEM': ('Seminar za osnove', 'SEM-OSN', None),
+    'GEOTOP SEM': ('Seminar za geometrijsko topologijo', 'SEM-GEOTOP', None),
     'SAFA SEM': ('Seminar za SAFA', 'SEM-SAFA', None),
     'SEJA': ('Seja', 'SEJA', None),
-    'GEO SEM': ('Seminar za GEO', 'SEM-GEO', None),
+    'GEO SEM': ('Seminar za geometrijo', 'SEM-GEO', None),
     'ALG SEM': ('Seminar za algebro', 'SEM-ALG', None),
-    'KA SEM': ('Seminar za algebro', 'SEM-KA', None),
-    'DM SEM': ('Seminar za DM', 'SEM-DM', None),
-    'FM SEM': ('Seminar za FM', 'SEM-FM', None),
+    'KA SEM': ('Seminar za kompleksno analizo', 'SEM-KA', None),
+    'DM SEM': ('Seminar za diskretno matematiko', 'SEM-DM', None),
+    'FM SEM': ('Seminar za finančno matematiko', 'SEM-FM', None),
     'GRAALG SEM': ('Seminar za GRAALG', 'SEM-GRAALG', None),
-    'NA SEM': ('Seminar za NA', 'SEM-NA', None),
-    'SRE SEM': ('Seminar za SRE', 'SEM-SRE', None),
+    'NA SEM': ('Seminar za numerično analizo', 'SEM-NA', None),
+    'SRE SEM': ('Sredin seminar', 'SEM-SRE', None),
     'TOP SEM': ('Topološki seminar', 'SEM-TOP', None),
     'MAT KOL': ('Matematični kolokvij', 'SEM-MK', None),
+    'ZGODMAT': ('Seminar za matematično zgodovino', 'SEM-ZGOD', None),
 }
 
 VIDNE_UCILNICE = (
-    'P.01', 'P.02', 'P.05', '2.01', '2.02'
+    'P.01', 'P.02', 'P.05',
+    '2.01', '2.02', '2.03', '2.04', '2.05',
+    '3.04', '3.05', '3.06', '3.07', '3.10', '3.11', '3.12',
 )
 
 RACUNALNISKE_UCILNICE = (
     '3.10', '3.11', '3.12'
+)
+
+FIKTIVNE_UCILNICE = (
+    '1.00001', '1.0001', '1.001', '1.01',
+    'Z', 'ZZ', 'ZZZ', 'ZZZZ'
 )
 
 LETNIKI = {
@@ -59,12 +68,27 @@ LETNIKI = {
     '4P': ('2PeMa', 4), '5P': ('2PeMa', 5),
     '4F': ('2FiMa', None), '4I': ('2ISRM', None), 'R': ('2Mate', None),
     'D': ('3Mate', None), 'S': ('3MaSt', None),
-    'W': ('Fiz', None), 'X': ('Ostalo', None), 'Z': ('Rez', None),
+    'W': ('Fiz', None),
 }
 
 IZPUSCENI_LETNIKI = (
-    '3M', 'Y', '4T', '2Z', '1M', '4U', '2M', '4M'
+    '3M', 'Y', '4T', '2Z', '1M', '4U', '2M', '4M', 'Z', 'X'
 )
+
+POPRAVEK_PREDMETOV = {
+    'SEM DM (KONVALINKA)': 'DM SEM (KONVALINKA)',
+    'SAFA (ŠEMRL)': 'SAFA SEM (ŠEMRL)',
+    'MM  (PRA)': 'MM (PRA)',
+    'FIZ1': 'FIZ 1',
+    'STAT  (PRA)': 'STAT (PRA)',
+    'NM2 (F)': 'NM 2 (F)',
+    'MATMOD': 'MM',
+    'MAT (KI)': 'MAT (KEMINŽ)',
+    'REZERVACIJA': 'REZ',
+    'KOMA (REZERVACIJA)': 'REZ',
+    'IPRM (REZ)': 'REZ',
+    'VERJ (REZ)': 'REZ',
+}
 
 ##########################################################################
 # POMOŽNE FUNKCIJE
@@ -81,6 +105,9 @@ def izlusci_predmet(predmet):
         return 'GU'
     for niz in (' V1', ' V2', ' V3', ' V'):
         predmet = predmet.replace(niz, '')
+    if predmet.startswith('REZ ') or predmet.startswith('REZERVACIJA'):
+        predmet = 'REZ'
+    predmet = POPRAVEK_PREDMETOV.get(predmet, predmet)
     if ' SEM' in predmet and not any(predmet.startswith(seminar) for seminar in SEMINARJI):
         predmet = predmet.replace(' SEM', '')
     return predmet
@@ -163,6 +190,8 @@ ucilnice = {
     ucilnica
     in
     {izlusci_ucilnico(srecanje.Predavalnica) for srecanje in nalozi_paradox('urn')}
+    if
+    ucilnica not in FIKTIVNE_UCILNICE
 }
 
 prevod_osebe = {(ime, priimek): oseba for oseba, ime, priimek in csv.reader(open('uvoz/prevod oseb.csv'))}
@@ -224,6 +253,8 @@ for srecanje in nalozi_paradox('urn'):
             if letnik not in IZPUSCENI_LETNIKI:
                 predmeti[predmet]['letniki'].add(letnik)
         ucilnica = izlusci_ucilnico(srecanje.Predavalnica)
+        if ucilnica in FIKTIVNE_UCILNICE:
+            continue
         tip = izlusci_tip(srecanje.Predmet)
         ucitelj = srecanje.Profesor
         predmet = izlusci_predmet(srecanje.Predmet)
