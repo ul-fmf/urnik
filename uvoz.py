@@ -8,6 +8,7 @@ import sqlite3
 ##########################################################################
 
 IME_DATOTEKE = 'urnik.sqlite3'
+
 SEMINARJI = (
     'OSN SEM',
     'GEOTOP SEM',
@@ -24,6 +25,7 @@ SEMINARJI = (
     'TOP SEM',
     'MAT KOL',
 )
+
 POSEBNI_PREDMETI = {
     'GU': ('Govorilne ure', 'GU', None),
     'OSN SEM': ('Seminar za OSN', 'SEM-OSN', None),
@@ -41,6 +43,29 @@ POSEBNI_PREDMETI = {
     'TOP SEM': ('Topološki seminar', 'SEM-TOP', None),
     'MAT KOL': ('Matematični kolokvij', 'SEM-MK', None),
 }
+
+VIDNE_UCILNICE = (
+    'P.01', 'P.02', 'P.05', '2.01', '2.02'
+)
+
+RACUNALNISKE_UCILNICE = (
+    '3.10', '3.11', '3.12'
+)
+
+LETNIKI = {
+    '1F': ('1FiMa', 1), '1I': ('1ISRM', 1), '1N': ('1Mate', 1), '1P': ('2PeMa', 1), 'A': ('1PrMa', 1),
+    '2F': ('1FiMa', 2), '2I': ('1ISRM', 2), '2N': ('1Mate', 2), '2P': ('2PeMa', 2), 'B': ('1PrMa', 2),
+    '3F': ('1FiMa', 3), '3I': ('1ISRM', 3), '3N': ('1Mate', 3), '3P': ('2PeMa', 3), 'C': ('1PrMa', 3),
+    '4P': ('2PeMa', 4), '5P': ('2PeMa', 5),
+    '4F': ('2FiMa', None), '4I': ('2ISRM', None), 'R': ('2Mate', None),
+    'D': ('3Mate', None), 'S': ('3MaSt', None),
+    'W': ('Fiz', None), 'X': ('Ostalo', None), 'Z': ('Rez', None),
+}
+
+IZPUSCENI_LETNIKI = (
+    '3M', 'Y', '4T', '2Z', '1M', '4U', '2M', '4M'
+)
+
 ##########################################################################
 # POMOŽNE FUNKCIJE
 ##########################################################################
@@ -59,6 +84,7 @@ def izlusci_predmet(predmet):
     if ' SEM' in predmet and not any(predmet.startswith(seminar) for seminar in SEMINARJI):
         predmet = predmet.replace(' SEM', '')
     return predmet
+
 
 def izlusci_seminar(predmet):
     for seminar in SEMINARJI:
@@ -112,131 +138,119 @@ def zdruzi_ure(ure):
 # BRANJE STARIH PODATKOV
 ##########################################################################
 
-ucilnice = {}
-for ucilnica in nalozi_paradox('uci'):
-    if ucilnica.Predavalnica == '4.27':
-        continue
-    ucilnice[ucilnica.Predavalnica] = {
-        'oznaka': ucilnica.Predavalnica,
-        'velikost': ucilnica.Velikost,
-        'racunalniska': ucilnica.Predavalnica[:3] == '3.1',
-    }
-NEZNANE_UCILNICE = {izlusci_ucilnico(
-    urnik.Predavalnica) for urnik in nalozi_paradox('urn')}
-for neznana in NEZNANE_UCILNICE:
-    if neznana not in ucilnice:
-        ucilnice[neznana] = {
-            'oznaka': neznana,
-            'velikost': None,
-            'racunalniska': False,
-        }
-
-SMERI = {
-    '1F': ('1FiMa', 1), '1I': ('1ISRM', 1), '1N': ('1Mate', 1), '1P': ('2PeMa', 1), 'A': ('1PrMa', 1),
-    '2F': ('1FiMa', 2), '2I': ('1ISRM', 2), '2N': ('1Mate', 2), '2P': ('2PeMa', 2), 'B': ('1PrMa', 2),
-    '3F': ('1FiMa', 3), '3I': ('1ISRM', 3), '3N': ('1Mate', 3), '3P': ('2PeMa', 3), 'C': ('1PrMa', 3),
-    '4P': ('2PeMa', 4), '5P': ('2PeMa', 5),
-    '4F': ('2FiMa', None), '4I': ('2ISRM', None), 'R': ('2Mate', None),
-    'D': ('3Mate', None), 'S': ('3MaSt', None),
-    'W': ('Fiz', None), 'X': ('Ostalo', None), 'Z': ('Rez', None),
-}
-letniki = {}
-for oznaka, (smer, leto) in SMERI.items():
-    letniki[oznaka] = {
+letniki = {
+    letnik: {
         'smer': smer,
-        'leto': leto,
+        'leto': leto
     }
+    for
+    letnik, (smer, leto)
+    in
+    LETNIKI.items()
+}
 
-podatki_osebe = {}
-with open('uvoz/podatki oseb.csv') as csvfile:
-    for ime, priimek, email in csv.reader(csvfile):
-        podatki_osebe[(ime, priimek)] = (ime, priimek, email)
-prevod_osebe = {}
-with open('uvoz/prevod oseb.csv') as csvfile:
-    for oznaka, ime, priimek in csv.reader(csvfile):
-        prevod_osebe[oznaka] = (ime, priimek)
+velikost_ucilnice = {
+    ucilnica.Predavalnica: ucilnica.Velikost for ucilnica in nalozi_paradox('uci')
+}
+ucilnice = {
+    ucilnica: {
+        'oznaka': ucilnica,
+        'velikost': velikost_ucilnice.get(ucilnica),
+        'racunalniska': ucilnica in RACUNALNISKE_UCILNICE,
+        'skrita': ucilnica not in VIDNE_UCILNICE,
+    }
+    for
+    ucilnica
+    in
+    {izlusci_ucilnico(srecanje.Predavalnica) for srecanje in nalozi_paradox('urn')}
+}
 
-OSEBE = {izlusci_predmet(urnik.Profesor) for urnik in nalozi_paradox('urn')}
+prevod_osebe = {(ime, priimek): oseba for oseba, ime, priimek in csv.reader(open('uvoz/prevod oseb.csv'))}
+podatki_osebe = {
+    prevod_osebe[(ime, priimek)]: (ime, priimek, email)
+    for
+    ime, priimek, email
+    in
+    csv.reader(open('uvoz/podatki oseb.csv'))
+    if
+    (ime, priimek) in prevod_osebe
+}
+domaca_stran_osebe = {oseba.Ime: oseba.Povezava for oseba in nalozi_paradox('lin')}
 osebe = {}
-for oseba in OSEBE:
-    ime, priimek, email = podatki_osebe.get(
-        prevod_osebe.get(oseba),
-        ('???', oseba, None)
-    )
+for oseba in {urnik.Profesor for urnik in nalozi_paradox('urn')}:
+    ime, priimek, email = podatki_osebe.get(oseba, ('', oseba, None))
+    domaca_stran = domaca_stran_osebe.get(oseba)
     osebe[oseba] = {
         'ime': ime,
         'priimek': priimek,
         'email': email if email else None,
+        'domaca_stran': domaca_stran if domaca_stran else None,
     }
 
-podatki_predmeta = {}
-with open('uvoz/podatki predmetov.csv') as csvfile:
-    for program, smer, predmet, ime, kratica, stevilo_studentov in csv.reader(csvfile):
-        podatki_predmeta[(program, smer, predmet)] = (ime, kratica, stevilo_studentov)
-prevod_predmeta = {}
-with open('uvoz/prevod predmetov.csv') as csvfile:
-    for oznaka, program, smer, predmet in csv.reader(csvfile):
-        prevod_predmeta[oznaka] = (program, smer, predmet)
-
-PREDMETI = {izlusci_predmet(urnik.Predmet) for urnik in nalozi_paradox('urn')}
+prevod_predmeta = {(program, smer, predmet): oznaka for oznaka, program, smer, predmet in csv.reader(open('uvoz/prevod predmetov.csv'))}
+podatki_predmeta = {
+    prevod_predmeta[(program, smer, predmet)]: (ime, kratica, stevilo_studentov)
+    for
+    program, smer, predmet, ime, kratica, stevilo_studentov
+    in
+    csv.reader(open('uvoz/podatki predmetov.csv'))
+    if
+    (program, smer, predmet) in prevod_predmeta
+}
 predmeti = {}
-for predmet in PREDMETI:
+for predmet in {izlusci_predmet(urnik.Predmet) for urnik in nalozi_paradox('urn')} | set(SEMINARJI):
     if izlusci_seminar(predmet):
         continue
-    if predmet in POSEBNI_PREDMETI:
+    elif predmet in POSEBNI_PREDMETI:
         ime, kratica, stevilo_studentov = POSEBNI_PREDMETI[predmet]
     else:
-        ime, kratica, stevilo_studentov = podatki_predmeta.get(
-            prevod_predmeta.get(predmet),
-            (predmet, predmet, None)
-        )
+        ime, kratica, stevilo_studentov = podatki_predmeta.get(predmet, (predmet, predmet, None))
     predmeti[predmet] = {
         'ime': ime,
         'kratica': kratica,
         'stevilo_studentov': stevilo_studentov,
-        'racunalniski': False,
+        'letniki': set(),
+        'slusatelji': set()
     }
-for urnik in nalozi_paradox('urn'):
-    predmet = izlusci_predmet(urnik.Predmet)
-    if izlusci_seminar(predmet):
-        continue
-    smeri = sorted(urnik.Letnik.split())
-    if 'smeri' not in predmeti[predmet]:
-        predmeti[predmet]['smeri'] = smeri
-    elif predmeti[predmet]['smeri'] != smeri:
-        opozorilo('Predmet {} ima včasih vpisane smeri {}, včasih pa {}'.format(
-            predmet,
-            ', '.join(smeri),
-            ', '.join(predmeti[predmet]['smeri'])
-        ))
+
 bloki = {}
-slusatelji = {seminar: set() for seminar in SEMINARJI}
-for urnik in nalozi_paradox('urn'):
-    ucilnica = urnik.Predavalnica
-    tip = izlusci_tip(urnik.Predmet)
-    ucitelj = urnik.Profesor
-    predmet = izlusci_predmet(urnik.Predmet)
-    oznaka = izlusci_oznako(urnik.Predmet)
-    ura = urnik.Ura
-    seminar = izlusci_seminar(urnik.Predmet)
-    if seminar and predmet != seminar:
-        slusatelji[seminar].add(ucitelj)
+for srecanje in nalozi_paradox('urn'):
+    predmet = izlusci_predmet(srecanje.Predmet)
+    seminar = izlusci_seminar(predmet)
+    if seminar:
+        predmeti[seminar]['slusatelji'].add(srecanje.Profesor)
     else:
+        for letnik in srecanje.Letnik.split():
+            if letnik not in IZPUSCENI_LETNIKI:
+                predmeti[predmet]['letniki'].add(letnik)
+        ucilnica = izlusci_ucilnico(srecanje.Predavalnica)
+        tip = izlusci_tip(srecanje.Predmet)
+        ucitelj = srecanje.Profesor
+        predmet = izlusci_predmet(srecanje.Predmet)
+        oznaka = izlusci_oznako(srecanje.Predmet)
+        ura = srecanje.Ura
         bloki.setdefault((ucilnica, tip, oznaka, ucitelj, predmet),
-                         set()).add((urnik.Dan, urnik.Ura))
-srecanja = []
-for (ucilnica, tip, oznaka, ucitelj, predmet), ure in bloki.items():
-    for dan, ura, trajanje in zdruzi_ure(ure):
-        srecanja.append({
-            'ucilnica': ucilnica,
-            'tip': tip,
-            'oznaka': oznaka,
-            'ucitelj': ucitelj,
-            'predmet': predmet,
-            'dan': dan,
-            'ura': ura,
-            'trajanje': trajanje,
-        })
+                         set()).add((srecanje.Dan, srecanje.Ura))
+
+
+srecanja = [
+    {
+        'ucilnica': ucilnica,
+        'tip': tip,
+        'oznaka': oznaka,
+        'ucitelj': ucitelj,
+        'predmet': predmet,
+        'dan': dan,
+        'ura': ura,
+        'trajanje': trajanje,
+    }
+    for
+    (ucilnica, tip, oznaka, ucitelj, predmet), ure in bloki.items()
+    for
+    dan, ura, trajanje
+    in
+    zdruzi_ure(ure)
+]
 
 
 ##########################################################################
@@ -262,6 +276,7 @@ con.execute('''
         oznaka   CHAR
     )
 ''')
+
 con.execute('''
     CREATE TABLE ucilnica (
         id           INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -269,9 +284,12 @@ con.execute('''
                              NOT NULL,
         velikost     INTEGER,
         racunalniska BOOLEAN DEFAULT (0) 
+                             NOT NULL,
+        skrita       BOOLEAN DEFAULT (0) 
                              NOT NULL
     )
 ''')
+
 con.execute('''
     CREATE TABLE predmet_letnik (
         predmet INTEGER REFERENCES predmet (id),
@@ -282,24 +300,28 @@ con.execute('''
         )
     )
 ''')
+
 con.execute('''
     CREATE TABLE slusatelji (
-        oseba    INTEGER REFERENCES oseba (id),
-        srecanje INTEGER REFERENCES srecanje (id),
+        predmet INTEGER REFERENCES predmet (id),
+        oseba   INTEGER REFERENCES oseba (id),
         PRIMARY KEY (
-            oseba,
-            srecanje
+            predmet,
+            oseba
         )
     )
 ''')
+
 con.execute('''
     CREATE TABLE oseba (
-        id      INTEGER PRIMARY KEY AUTOINCREMENT,
-        ime     TEXT    NOT NULL,
-        priimek TEXT    NOT NULL,
-        email   TEXT    UNIQUE
+        id           INTEGER PRIMARY KEY AUTOINCREMENT,
+        ime          TEXT    NOT NULL,
+        priimek      TEXT    NOT NULL,
+        email        TEXT    UNIQUE,
+        domaca_stran TEXT
     )
 ''')
+
 con.execute('''
     CREATE TABLE letnik (
         id   INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -307,13 +329,13 @@ con.execute('''
         leto INTEGER CHECK (leto BETWEEN 1 AND 5) 
     )
 ''')
+
 con.execute('''
     CREATE TABLE predmet (
         id                INTEGER PRIMARY KEY AUTOINCREMENT,
         ime               TEXT    NOT NULL,
         kratica           TEXT,
-        stevilo_studentov INTEGER,
-        racunalniski      BOOLEAN DEFAULT (0) 
+        stevilo_studentov INTEGER
     )
 ''')
 
@@ -326,9 +348,14 @@ for kljuc, ucilnica in ucilnice.items():
     cur = con.execute('''
         INSERT INTO
         ucilnica
-        (oznaka, velikost, racunalniska)
-        VALUES (?, ?, ?)
-    ''', (ucilnica['oznaka'], ucilnica['velikost'], ucilnica['racunalniska']))
+        (oznaka, velikost, racunalniska, skrita)
+        VALUES (?, ?, ?, ?)
+    ''', (
+        ucilnica['oznaka'],
+        ucilnica['velikost'],
+        ucilnica['racunalniska'],
+        ucilnica['skrita'],
+    ))
     ucilnica_pk[kljuc] = cur.lastrowid
 
 
@@ -339,72 +366,78 @@ for kljuc, letnik in letniki.items():
         letnik
         (smer, leto)
         VALUES (?, ?)
-    ''', (letnik['smer'], letnik['leto']))
+    ''', (
+        letnik['smer'],
+        letnik['leto'],
+    ))
     letnik_pk[kljuc] = cur.lastrowid
+
 
 oseba_pk = {}
 for kljuc, oseba in osebe.items():
     cur = con.execute('''
         INSERT INTO
         oseba
-        (ime, priimek, email)
-        VALUES (?, ?, ?)
-    ''', (oseba['ime'], oseba['priimek'], oseba['email']))
+        (ime, priimek, email, domaca_stran)
+        VALUES (?, ?, ?, ?)
+    ''', (
+        oseba['ime'],
+        oseba['priimek'],
+        oseba['email'],
+        oseba['domaca_stran'],
+    ))
     oseba_pk[kljuc] = cur.lastrowid
+
 
 predmet_pk = {}
 for kljuc, predmet in predmeti.items():
     cur = con.execute('''
         INSERT INTO
         predmet
-        (ime, kratica, stevilo_studentov, racunalniski)
-        VALUES (?, ?, ?, ?)
-    ''', (predmet['ime'], predmet['kratica'], predmet['stevilo_studentov'], predmet['racunalniski']))
+        (ime, kratica, stevilo_studentov)
+        VALUES (?, ?, ?)
+    ''', (
+        predmet['ime'],
+        predmet['kratica'],
+        predmet['stevilo_studentov'],
+    ))
     predmet_pk[kljuc] = cur.lastrowid
-    for smer in predmet['smeri']:
-        if smer in letnik_pk:
-            con.execute('''
-                INSERT INTO
-                predmet_letnik
-                (predmet, letnik)
-                VALUES (?, ?)
-            ''', (predmet_pk[kljuc], letnik_pk[smer]))
-        else:
-            opozorilo('Predmet {} ima vpisano smer {}, ki ne obstaja'.format(
-                kljuc,
-                smer
-            ))
+    for letnik in predmet['letniki']:
+        con.execute('''
+            INSERT INTO
+            predmet_letnik
+            (predmet, letnik)
+            VALUES (?, ?)
+        ''', (
+            predmet_pk[kljuc],
+            letnik_pk[letnik],
+        ))
+    for oseba in predmet['slusatelji']:
+        con.execute('''
+            INSERT INTO
+            slusatelji
+            (predmet, oseba)
+            VALUES (?, ?)
+        ''', (
+            predmet_pk[kljuc],
+            oseba_pk[oseba],
+        ))
 
 for srecanje in srecanja:
-    ucilnica = izlusci_ucilnico(srecanje['ucilnica'])
     cur = con.execute('''
         INSERT INTO
         srecanje
         (ucilnica, tip, oznaka, ucitelj, predmet, dan, ura, trajanje)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     ''', (
-        ucilnica_pk[ucilnica],
+        ucilnica_pk[srecanje['ucilnica']],
         srecanje['tip'],
         srecanje['oznaka'],
         oseba_pk[srecanje['ucitelj']],
         predmet_pk[srecanje['predmet']],
         srecanje['dan'],
         srecanje['ura'],
-        srecanje['trajanje']
+        srecanje['trajanje'],
     ))
-    kljuc = cur.lastrowid
-    for oseba in slusatelji.get((srecanje['dan'], srecanje['ura'], srecanje['predmet']), []):
-        con.execute('''
-            INSERT INTO
-            slusatelji
-            (oseba, srecanje)
-            SELECT ?, ?
-            WHERE NOT EXISTS (SELECT 1 FROM slusatelji WHERE oseba = ? AND srecanje = ?)
-        ''', (
-            oseba_pk[oseba],
-            kljuc,
-            oseba_pk[oseba],
-            kljuc
-        ))
 
 con.commit()

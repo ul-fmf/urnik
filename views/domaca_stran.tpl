@@ -76,9 +76,6 @@
                         <a href="/urnik?predmet={{predmet['id']}}">
                             {{predmet['ime']}}
                         </a>
-                        %if predmet['racunalniski']:
-                        <i class="tiny material-icons">computer</i>
-                        %end
                         <a href="/predmet/{{predmet['id']}}/uredi">
                             <i class="tiny material-icons">edit</i>
                         </a>
