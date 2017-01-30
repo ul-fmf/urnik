@@ -421,45 +421,31 @@ def prekrivanje_letnikov():
 
 def urnik(letniki, osebe, predmeti, ucilnice):
     sql = '''
-        SELECT DISTINCT srecanje.id as id,
-               dan,
-               ura,
-               trajanje,
-               tip,
-               srecanje.oznaka as oznaka,
-               srecanje.ucitelj as ucitelj,
-               oseba.priimek as priimek_ucitelja,
-               srecanje.ucilnica as ucilnica,
-               ucilnica.oznaka as oznaka_ucilnice,
-               predmet.ime as ime_predmeta
+        SELECT DISTINCT srecanje.id
           FROM srecanje
-               LEFT JOIN
-               oseba ON srecanje.ucitelj = oseba.id
-               LEFT JOIN
-               ucilnica ON srecanje.ucilnica = ucilnica.id
                LEFT JOIN
                predmet_letnik ON srecanje.predmet = predmet_letnik.predmet
                LEFT JOIN
-               predmet ON srecanje.predmet = predmet.id
-               LEFT JOIN
-               slusatelji ON slusatelji.predmet = srecanje.predmet
+               slusatelji ON srecanje.predmet = slusatelji.predmet
          WHERE dan IS NOT NULL AND ucilnica IS NOT NULL AND ura IS NOT NULL
             AND (predmet_letnik.letnik IN ({})
             OR srecanje.ucitelj IN ({})
-            OR predmet.id IN ({})
+            OR srecanje.predmet IN ({})
             OR srecanje.ucilnica IN ({})
             OR slusatelji.oseba in ({}))
          ORDER BY dan, ura, trajanje
     '''.format(vprasaji(letniki), vprasaji(osebe), vprasaji(predmeti), vprasaji(ucilnice), vprasaji(osebe))
-    srecanja = seznam_slovarjev(con.execute(sql, letniki + osebe + predmeti + ucilnice + osebe))
-    return nastavi_sirine_srecanj(srecanja)
+    srecanja = podatki_srecanj([vrstica['id'] for vrstica in con.execute(sql, letniki + osebe + predmeti + ucilnice + osebe)])
+    bla = nastavi_sirine_srecanj(srecanja.values())
+    print(bla)
+    return bla
 
 def odlozena_srecanja():
     sql = '''
         SELECT id FROM srecanje
          WHERE dan IS NULL AND ucilnica IS NULL AND ura IS NULL
     '''
-    return podatki_srecanj([vrstica['id'] for vrstica in con.execute(sql)])
+    return podatki_srecanj([vrstica['id'] for vrstica in con.execute(sql)]).values()
 
 def povezana_srecanja(srecanje):
     sql_letniki = '''
@@ -494,6 +480,7 @@ def ustrezne_ucilnice(stevilo_studentov):
 def prosti_termini(id_srecanja):
     izbrano_srecanje = nalozi_srecanje(id_srecanja)
     predmet = nalozi_predmet(izbrano_srecanje['predmet'])
+    podatki_uc = podatki_ucilnic()
     ustrezne, alternative = ustrezne_ucilnice(predmet['stevilo_studentov'])
     zasedene = {}
     ucilnice = ustrezne + alternative
@@ -543,11 +530,11 @@ def prosti_termini(id_srecanja):
         elif termin['proste_alternative']:
             termin['zasedenost'] = 'alternative'
         termin['ucilnice'] = [
-            (ucilnica, 'prosta') for ucilnica in termin['proste']
+            (podatki_uc[ucilnica], 'prosta') for ucilnica in termin['proste']
         ] + [
-            (ucilnica, 'prosta_alternativa') for ucilnica in termin['proste_alternative']
+            (podatki_uc[ucilnica], 'prosta_alternativa') for ucilnica in termin['proste_alternative']
         ] + [
-            (ucilnica, 'deloma_prosta') for ucilnica in termin['deloma_proste']
+            (podatki_uc[ucilnica], 'deloma_prosta') for ucilnica in termin['deloma_proste']
         ]
 
     return termini
