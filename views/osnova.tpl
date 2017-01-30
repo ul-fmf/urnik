@@ -170,7 +170,14 @@
 </head>
 
 <body>
-    <div class="container">
+    <div class="navbar-fixed">
+        <nav>
+            <div class="nav-wrapper">
+                <a href="/" class="brand-logo">Urnik</a>
+            </div>
+        </nav>
+    </div>
+    <div class="container" style="position: absolute; width: 100%; bottom: 0; top: 64px">
         {{!base}}
     </div>
 
