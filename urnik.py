@@ -50,7 +50,7 @@ def uredi_osebo(oseba):
 def uredi_osebo_post(oseba):
     ime = request.forms.ime
     priimek = request.forms.priimek
-    email = request.forms.email
+    email = request.forms.email if request.forms.email else None
     modeli.uredi_osebo(oseba, ime, priimek, email)
     redirect('/')
 
@@ -121,7 +121,7 @@ def ustvari_osebo():
 def ustvari_osebo_post():
     ime = request.forms.ime
     priimek = request.forms.priimek
-    email = request.forms.email
+    email = request.forms.email if request.forms.email else None
     modeli.ustvari_osebo(ime, priimek, email)
     redirect('/')
 
