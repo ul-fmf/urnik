@@ -336,7 +336,7 @@ def premakni_srecanje(srecanje, dan, ura, ucilnica):
 def odlozi_srecanje(srecanje):
     sql = '''
         UPDATE srecanje
-        SET dan = NULL, ura = NULL, ucilnica = NULL
+        SET dan = NULL, ura = NULL
         WHERE id = ?
     '''
     con.execute(sql, [srecanje])
@@ -452,7 +452,7 @@ def urnik(letniki, osebe, predmeti, ucilnice):
                predmet_letnik ON srecanje.predmet = predmet_letnik.predmet
                LEFT JOIN
                slusatelji ON srecanje.predmet = slusatelji.predmet
-         WHERE dan IS NOT NULL AND ucilnica IS NOT NULL AND ura IS NOT NULL
+         WHERE dan IS NOT NULL AND ura IS NOT NULL
             AND (predmet_letnik.letnik IN ({})
             OR srecanje.ucitelj IN ({})
             OR srecanje.predmet IN ({})
@@ -487,7 +487,7 @@ def fiziki():
 def odlozena_srecanja():
     sql = '''
         SELECT id FROM srecanje
-         WHERE dan IS NULL AND ucilnica IS NULL AND ura IS NULL
+         WHERE dan IS NULL AND ura IS NULL
     '''
     odlozena = [vrstica['id'] for vrstica in con.execute(sql)]
     if odlozena:

@@ -131,6 +131,11 @@
                 {{srecanje['ucitelj']['priimek']}}
             </a>
         </div>
+        <div class="ucilnica">
+            <a href="/urnik?ucilnica={{srecanje['ucilnica']['id']}}">
+                {{srecanje['ucilnica']['oznaka']}}
+            </a>
+        </div>
         <div class="urejanje">
             <div class="right">
                 <a href="/srecanje/{{srecanje['id']}}/premakni">
