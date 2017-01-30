@@ -493,7 +493,7 @@ def ustrezne_ucilnice(stevilo_studentov):
         velikost = ucilnica['velikost']
         if velikost is None:
             pass
-        elif stevilo_studentov is None or 2/3 <= velikost / stevilo_studentov <= 3/4:
+        elif not stevilo_studentov or 2/3 <= velikost / stevilo_studentov <= 3/4:
             morebitne.append(ucilnica['id'])
         elif 3/4 < velikost / stevilo_studentov:
             ustrezne.append(ucilnica['id'])
