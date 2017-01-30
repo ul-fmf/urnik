@@ -4,8 +4,8 @@
     <div class="input-field">
         <select name="predmet">
             <option value="" {{ '' if srecanje['predmet'] else 'selected' }}>brez učilnice</option>
-            % for predmet in predmeti:
-            <option value="{{predmet['id']}}" {{ 'selected' if predmet['id'] == srecanje['predmet'] else '' }}>{{predmet['opis']}}</option>
+            % for predmet in predmeti.values():
+            <option value="{{predmet['id']}}" {{ 'selected' if predmet['id'] == srecanje['predmet'] else '' }}>{{predmet['ime']}} {{'({})'.format(predmet['opis_letnikov']) if predmet['opis_letnikov'] else ''}}</option>
             % end
         </select>
         <label>Predmet</label>

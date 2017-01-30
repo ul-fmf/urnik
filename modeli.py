@@ -13,11 +13,6 @@ con.execute("PRAGMA foreign_keys = ON")
 def vprasaji(seznam):
     return ', '.join('?' for _ in seznam)
 
-
-def seznam_slovarjev(vrstice):
-    return [dict(vrstica) for vrstica in vrstice]
-
-
 def nalozi_podatke(tabela, kljuci=(), ime_kljuca='id', vrstni_red=()):
     where = 'WHERE {} IN ({})'.format(ime_kljuca, vprasaji(kljuci)) if kljuci else ''
     order_by = 'ORDER BY {}'.format(', '.join(vrstni_red)) if vrstni_red else ''
@@ -26,10 +21,9 @@ def nalozi_podatke(tabela, kljuci=(), ime_kljuca='id', vrstni_red=()):
         (vrstica[ime_kljuca], dict(vrstica)) for vrstica in con.execute(sql, kljuci)
     )
 
-def nalozi_podatek(tabela, kljuc, ime_kljuca='id'):
-    podatek = nalozi_podatke(tabela, kljuci=[kljuc], ime_kljuca=ime_kljuca)
-    assert len(podatek) == 1
-    return podatek[kljuc]
+def poberi_edinega(slovarji):
+    assert len(slovarji) == 1
+    return list(slovarji.values())[0]
 
 
 
@@ -58,6 +52,21 @@ def podatki_predmetov(kljuci=[]):
         predmeti[predmet].setdefault('letniki', set()).add(letnik)
         povezani_letniki.add(letnik)
     letniki = podatki_letnikov(list(povezani_letniki))
+
+    for predmet in predmeti.values():
+        predmet['opis_letnikov'] = '; '.join(
+            ('{}, {}. letnik'.format(letniki[letnik]['smer'], letniki[letnik]['leto'])
+            if
+            letniki[letnik]['leto']
+            else
+            letniki[letnik]['smer'])
+            for
+            letnik
+            in
+            predmet.get('letniki', [])
+        )
+
+
     sql_osebe = '''
         SELECT predmet, oseba FROM slusatelji
     '''
@@ -99,49 +108,22 @@ def podatki_srecanj(kljuci=[]):
     return srecanja
 
 def podatki_letnika(kljuc):
-    return nalozi_podatek('letnik', kljuc)
+    return poberi_edinega(podatki_letnikov([kljuc]))
 
 def podatki_osebe(kljuc):
-    return nalozi_podatek('oseba', kljuc)
+    return poberi_edinega(podatki_oseb([kljuc]))
 
 def podatki_ucilnic(kljuci=[]):
     return nalozi_podatke('ucilnica', kljuci, vrstni_red=('skrita', 'oznaka'))
 
 def podatki_ucilnice(kljuc):
-    return nalozi_podatek('ucilnica', kljuc)
-
-# def podatki_srecanj(kljuci=[]):
-#     return nalozi_podatke('srecanje', kljuci)
+    return poberi_edinega(podatki_ucilnic([kljuc]))
 
 def podatki_predmeta(kljuc):
-    predmet = nalozi_podatek('predmet', kljuc)
-    sql = 'SELECT letnik FROM predmet_letnik WHERE predmet = ?'
-    predmet['letniki'] = [vrstica['letnik'] for vrstica in con.execute(sql, (kljuc,))]
-    return predmet
+    return poberi_edinega(podatki_predmeta([kljuc]))
 
-def seznam_predmetov():
-    sql = '''SELECT * FROM predmet ORDER BY ime'''
-    predmeti = seznam_slovarjev(con.execute(sql))
-    sql = '''
-        SELECT predmet, smer, leto
-          FROM letnik
-               INNER JOIN
-               predmet_letnik ON predmet_letnik.letnik = letnik.id
-    '''
-    letniki_predmeta = {}
-    for id_predmeta, smer, leto in con.execute(sql):
-        letniki_predmeta.setdefault(id_predmeta, []).append((smer, leto))
-    for predmet in predmeti:
-        letniki = '; '.join(
-            '{}, {}. letnik'.format(smer, leto)
-            for
-            smer, leto
-            in
-            letniki_predmeta.get(predmet['id'], [])
-        )
-        predmet['opis'] = '{} ({})'.format(
-            predmet['ime'], letniki) if letniki else predmet['ime']
-    return predmeti
+def podatki_srecanja(kljuc):
+    return poberi_edinega(podatki_srecanj([kljuc]))
 
 ##########################################################################
 # UREJANJE
@@ -262,33 +244,6 @@ def ustvari_predmet(ime, kratica, stevilo_studentov, letniki):
     uredi_predmet(predmet, ime, kratica, stevilo_studentov, letniki)
 
 ##########################################################################
-# NALAGANJE POSAMEZNE ENTITETE
-##########################################################################
-
-
-def nalozi_predmet(predmet):
-    sql = '''SELECT * FROM predmet WHERE id = ?'''
-    return dict(con.execute(sql, [predmet]).fetchone())
-
-
-def nalozi_srecanje(srecanje_id):
-    sql_srecanje = '''
-        SELECT id, predmet, ucitelj, ucilnica, ura, dan, trajanje, tip, oznaka
-        FROM srecanje
-        WHERE id = ?
-    '''
-    srecanje = dict(con.execute(sql_srecanje, [srecanje_id]).fetchone())
-    sql_letniki = '''
-        SELECT letnik
-        FROM predmet_letnik
-        WHERE predmet = ?
-    '''
-    srecanje['letniki'] = [
-        row['letnik'] for row in con.execute(sql_letniki, [srecanje['predmet']]).fetchall()
-    ]
-    return srecanje
-
-##########################################################################
 # UREJANJE SREČANJ
 ##########################################################################
 
@@ -312,13 +267,13 @@ def izbrisi_srecanje(srecanje):
 
 
 def podvoji_srecanje(id_srecanja):
-    srecanje = nalozi_srecanje(id_srecanja)
+    srecanje = podatki_srecanja(id_srecanja)
     sql = '''
         INSERT INTO srecanje
         (ucitelj, ucilnica, predmet, ura, dan, trajanje, tip)
         VALUES
         (?, ?, ?, ?, ?, ?, ?)'''
-    con.execute(sql, [srecanje['ucitelj'], srecanje['ucilnica'], srecanje['predmet'],
+    con.execute(sql, [srecanje['ucitelj']['id'], srecanje['ucilnica']['id'], srecanje['predmet']['id'],
                       srecanje['ura'], srecanje['dan'], srecanje['trajanje'], srecanje['tip']])
     con.commit()
 
@@ -510,7 +465,8 @@ def povezana_srecanja(srecanje):
     ucitelj = con.execute(sql_ucitelj, [srecanje]).fetchone()['ucitelj']
     return urnik(letniki, [ucitelj], [], [])
 
-def ustrezne_ucilnice(stevilo_studentov):
+def ustrezne_ucilnice(srecanje):
+    stevilo_studentov = srecanje['predmet']['stevilo_studentov']
     ustrezne = []
     morebitne = []
     for ucilnica in podatki_ucilnic().values():
@@ -525,10 +481,10 @@ def ustrezne_ucilnice(stevilo_studentov):
 
 
 def prosti_termini(id_srecanja):
-    izbrano_srecanje = nalozi_srecanje(id_srecanja)
-    predmet = nalozi_predmet(izbrano_srecanje['predmet'])
+    izbrano_srecanje = podatki_srecanja(id_srecanja)
+    predmet = izbrano_srecanje['predmet']
     podatki_uc = podatki_ucilnic()
-    ustrezne, alternative = ustrezne_ucilnice(predmet['stevilo_studentov'])
+    ustrezne, alternative = ustrezne_ucilnice(izbrano_srecanje)
     zasedene = {}
     ucilnice = ustrezne + alternative
     sql = '''

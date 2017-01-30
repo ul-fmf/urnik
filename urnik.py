@@ -216,9 +216,9 @@ def trajanje_srecanja(srecanje):
 def uredi_srecanje(srecanje):
     return template(
         'uredi_srecanje',
-        srecanje=modeli.nalozi_srecanje(srecanje),
+        srecanje=modeli.podatki_srecanja(srecanje),
         ucitelji=modeli.podatki_oseb(),
-        predmeti=modeli.seznam_predmetov(),
+        predmeti=modeli.podatki_predmetov(),
         next=request.headers.get('referer') or '/',
     )
 
