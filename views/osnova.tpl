@@ -10,19 +10,20 @@
         }
         #urnik {
             position: absolute;
-            left: 5%;
-            top: 5%;
-            width: 70%;
-            height: 90%;
+            left: 0%;
+            top: 0%;
+            width: 80%;
+            height: 100%;
             background: white;
         }
         #informacije {
             position: absolute;
-            left: 75%;
-            top: 5%;
+            left: 80%;
+            top: 0%;
             width: 20%;
-            height: 90%;
-            background: #fff;            
+            height: 100%;
+            background: #fff;  
+            overflow-y: scroll;
         }
         #dnevi {
             position: absolute;
@@ -57,7 +58,7 @@
             text-align: right;
             position: relative;
             display: block;
-            top: 0.75em;
+            bottom: -1.5em;
             padding-right: 0.25em;
         }
         .dan {

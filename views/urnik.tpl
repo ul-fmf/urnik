@@ -16,7 +16,7 @@
     % end
 </div>
 <div id="ure">
-    % for ura in range(min_ura, max_ura + 1):
+    % for ura in range(min_ura, max_ura):
     % bottom = (max_ura - ura) * enota_visine
     % style = 'bottom: {:.2%}'.format(bottom)
     <div class="ura" style="{{ style }}">
