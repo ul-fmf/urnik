@@ -8,6 +8,14 @@
                 </tr>
             </thead>
             <tbody>
+                <tr>
+                    <td>
+                        <a href="/letnik/ustvari">
+                            <i class="tiny material-icons">add</i>
+                            ustvari nov letnik
+                        </a>
+                    </td>
+                </tr>
                 %for letnik in letniki.values():
                 <tr>
                     <td>
@@ -20,14 +28,6 @@
                     </td>
                 </tr>
                 %end
-                <tr>
-                    <td>
-                        <a href="/letnik/ustvari">
-                            <i class="tiny material-icons">add</i>
-                            ustvari nov letnik
-                        </a>
-                    </td>
-                </tr>
             </tbody>
         </table>
     </div>
@@ -39,6 +39,14 @@
                 </tr>
             </thead>
             <tbody>
+                <tr>
+                    <td>
+                        <a href="/oseba/ustvari">
+                            <i class="tiny material-icons">add</i>
+                            ustvari novo osebo
+                        </a>
+                    </td>
+                </tr>
                 %for oseba in osebe.values():
                 <tr>
                     <td>
@@ -51,14 +59,6 @@
                     </td>
                 </tr>
                 %end
-                <tr>
-                    <td>
-                        <a href="/oseba/ustvari">
-                            <i class="tiny material-icons">add</i>
-                            ustvari novo osebo
-                        </a>
-                    </td>
-                </tr>
             </tbody>
         </table>
     </div>
@@ -70,6 +70,14 @@
                 </tr>
             </thead>
             <tbody>
+                <tr>
+                    <td>
+                        <a href="/predmet/ustvari">
+                            <i class="tiny material-icons">add</i>
+                            ustvari nov predmet
+                        </a>
+                    </td>
+                </tr>
                 %for predmet in predmeti.values():
                 <tr>
                     <td>
@@ -86,14 +94,6 @@
                     </td>
                 </tr>
                 %end
-                <tr>
-                    <td>
-                        <a href="/predmet/ustvari">
-                            <i class="tiny material-icons">add</i>
-                            ustvari nov predmet
-                        </a>
-                    </td>
-                </tr>
             </tbody>
         </table>
     </div>
@@ -105,6 +105,14 @@
                 </tr>
             </thead>
             <tbody>
+                <tr>
+                    <td>
+                        <a href="/ucilnica/ustvari">
+                            <i class="tiny material-icons">add</i>
+                            ustvari novo učilnico
+                        </a>
+                    </td>
+                </tr>
                 %for ucilnica in ucilnice.values():
                 <tr>
                     <td>
@@ -126,14 +134,6 @@
                     </td>
                 </tr>
                 %end
-                <tr>
-                    <td>
-                        <a href="/ucilnica/ustvari">
-                            <i class="tiny material-icons">add</i>
-                            ustvari novo učilnico
-                        </a>
-                    </td>
-                </tr>
             </tbody>
         </table>
     </div>
