@@ -235,7 +235,8 @@ def uredi_srecanje_post(srecanje):
     ucitelj = int(request.forms.ucitelj)
     predmet = int(request.forms.predmet)
     tip = request.forms.tip
-    modeli.uredi_srecanje(srecanje, ucitelj, predmet, tip)
+    oznaka = request.forms.oznaka
+    modeli.uredi_srecanje(srecanje, ucitelj, predmet, tip, oznaka)
     redirect(request.forms.next)
 
 ##########################################################################

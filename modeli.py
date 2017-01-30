@@ -178,13 +178,13 @@ def uredi_ucilnico(ucilnica, oznaka, velikost, racunalniska, skrita):
     con.commit()
 
 
-def uredi_srecanje(srecanje, ucitelj, predmet, tip):
+def uredi_srecanje(srecanje, ucitelj, predmet, tip, oznaka):
     sql = '''
         UPDATE srecanje
-        SET ucitelj = ?, predmet = ?, tip = ?
+        SET ucitelj = ?, predmet = ?, tip = ?, oznaka = ?
         WHERE id = ?
     '''
-    con.execute(sql, [ucitelj, predmet, tip, srecanje])
+    con.execute(sql, [ucitelj, predmet, tip, oznaka, srecanje])
     con.commit()
 
 
@@ -273,7 +273,7 @@ def nalozi_predmet(predmet):
 
 def nalozi_srecanje(srecanje_id):
     sql_srecanje = '''
-        SELECT id, predmet, ucitelj, ucilnica, ura, dan, trajanje, tip
+        SELECT id, predmet, ucitelj, ucilnica, ura, dan, trajanje, tip, oznaka
         FROM srecanje
         WHERE id = ?
     '''

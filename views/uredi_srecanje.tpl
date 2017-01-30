@@ -19,6 +19,10 @@
         <label>Tip</label>
     </div>
     <div class="input-field">
+        <input value="{{srecanje['oznaka']}}" placeholder="1" name="oznaka" type="text" class="validate" />
+        <label for="oznaka">Oznaka skupine</label>
+    </div>
+    <div class="input-field">
         <select name="ucitelj">
             <option value="" {{ '' if srecanje['ucitelj'] else 'selected' }}>brez učitelja</option>
             % for ucitelj in ucitelji.values():
