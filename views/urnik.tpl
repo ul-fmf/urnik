@@ -36,12 +36,12 @@
             {{srecanje['predmet']['ime']}} {{srecanje['tip']}}{{srecanje['oznaka'] if srecanje['oznaka'] else ''}}
         </div>
         <div class="ucitelj">
-            <a href="/urnik?oseba={{srecanje['ucitelj']}}">
+            <a href="/urnik?oseba={{srecanje['ucitelj']['id']}}">
                 {{srecanje['ucitelj']['priimek']}}
             </a>
         </div>
         <div class="ucilnica">
-            <a href="/urnik?ucilnica={{srecanje['ucilnica']}}">
+            <a href="/urnik?ucilnica={{srecanje['ucilnica']['id']}}">
                 {{srecanje['ucilnica']['oznaka']}}
             </a>
         </div>
