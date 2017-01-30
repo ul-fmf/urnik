@@ -265,6 +265,17 @@ def urnik():
         podatki_letnikov=modeli.podatki_letnikov(),
     )
 
+@route('/fiziki')
+def fiziki():
+    return template(
+        'urnik',
+        srecanja=modeli.fiziki(),
+        prekrivanje_ucilnic=[],
+        prekrivanje_oseb=[],
+        prekrivanje_letnikov=[],
+        odlozena_srecanja=[],
+    )
+
 ##########################################################################
 # ZAGON APLIKACIJE
 ##########################################################################

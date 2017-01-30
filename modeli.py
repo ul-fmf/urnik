@@ -438,6 +438,27 @@ def urnik(letniki, osebe, predmeti, ucilnice):
     srecanja = podatki_srecanj([vrstica['id'] for vrstica in con.execute(sql, letniki + osebe + predmeti + ucilnice + osebe)])
     return nastavi_sirine_srecanj(srecanja.values())
 
+def fiziki():
+    FIZIKALNE_UCILNICE = (
+        'F1', 'F2', 'F3', 'F4', 'F5', 'F7',
+        'P.01', 'P.03', 'P.04',
+        'MFP', 'VFP'
+    )
+    FIZIKALNE_SMERI = ('Fiz',)
+    sql = '''
+        SELECT id FROM ucilnica WHERE oznaka in ({})
+    '''.format(vprasaji(FIZIKALNE_UCILNICE))
+    fizikalne_ucilnice = [
+        vrstica['id'] for vrstica in con.execute(sql, FIZIKALNE_UCILNICE)
+    ]
+    sql = '''
+        SELECT id FROM letnik WHERE smer in ({})
+    '''.format(vprasaji(FIZIKALNE_SMERI))
+    fizikalni_letniki = [
+        vrstica['id'] for vrstica in con.execute(sql, FIZIKALNE_SMERI)
+    ]
+    return urnik(fizikalni_letniki, [], [], fizikalne_ucilnice)
+
 def odlozena_srecanja():
     sql = '''
         SELECT id FROM srecanje
