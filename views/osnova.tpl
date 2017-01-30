@@ -14,7 +14,7 @@
             top: 5%;
             width: 70%;
             height: 90%;
-            background: #efefef;
+            background: white;
         }
         #informacije {
             position: absolute;
