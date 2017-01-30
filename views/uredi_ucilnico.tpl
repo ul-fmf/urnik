@@ -15,6 +15,10 @@
         <input id="racunalniska" name="racunalniska" type="checkbox" {{'checked="checked"' if ucilnica['racunalniska'] else ''}} />
         <label for="racunalniska">Računalniška učilnica</label>
     </p>
+    <p>
+        <input id="skrita" name="skrita" type="checkbox" {{'checked="checked"' if ucilnica['skrita'] else ''}} />
+        <label for="skrita">Skrita učilnica</label>
+    </p>
     <button class="btn waves-effect waves-light" type="submit">
         {{ 'Spremeni' if urejanje else 'Ustvari' }}
     </button>

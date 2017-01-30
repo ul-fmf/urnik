@@ -26,58 +26,98 @@ def nalozi_podatke(tabela, kljuci=(), ime_kljuca='id', vrstni_red=()):
         (vrstica[ime_kljuca], dict(vrstica)) for vrstica in con.execute(sql, kljuci)
     )
 
-
 def nalozi_podatek(tabela, kljuc, ime_kljuca='id'):
-    sql = 'SELECT * FROM {} WHERE {} = ?'.format(tabela, ime_kljuca)
-    return dict(con.execute(sql, (kljuc,)).fetchone())
+    podatek = nalozi_podatke(tabela, kljuci=[kljuc], ime_kljuca=ime_kljuca)
+    assert len(podatek) == 1
+    return podatek[kljuc]
+
 
 
 ##########################################################################
 # NALAGANJE PODATKOV
 ##########################################################################
 
+def podatki_ucilnic(kljuci=[]):
+    return nalozi_podatke('ucilnica', kljuci, vrstni_red=('oznaka',))
 
 def podatki_letnikov(kljuci=[]):
     return nalozi_podatke('letnik', kljuci, vrstni_red=('smer', 'leto'))
 
+def podatki_oseb(kljuci=[]):
+    return nalozi_podatke('oseba', kljuci, vrstni_red=('priimek', 'ime'))
+
+def podatki_predmetov(kljuci=[]):
+    predmeti = nalozi_podatke('predmet', kljuci, vrstni_red=('ime',))
+    sql_letniki = '''
+        SELECT predmet, letnik FROM predmet_letnik
+    '''
+    if kljuci:
+        sql_letniki += ' WHERE predmet IN ({})'.format(vprasaji(kljuci))
+    povezani_letniki = set()
+    for predmet, letnik in con.execute(sql_letniki, kljuci):
+        predmeti[predmet].setdefault('letniki', set()).add(letnik)
+        povezani_letniki.add(letnik)
+    letniki = podatki_letnikov(list(povezani_letniki))
+    sql_osebe = '''
+        SELECT predmet, oseba FROM slusatelji
+    '''
+    if kljuci:
+        sql_osebe += ' WHERE predmet IN ({})'.format(vprasaji(kljuci))
+    povezane_osebe = set()
+    for predmet, oseba in con.execute(sql_osebe, kljuci):
+        predmeti[predmet].setdefault('slusatelji', set()).add(oseba)
+        povezane_osebe.add(oseba)
+    osebe = podatki_oseb(list(povezane_osebe))
+    for predmet in predmeti.values():
+        predmet['letniki'] = [
+            letniki[letnik] for letnik in predmet.get('letniki', set())
+        ]
+        predmet['slusatelji'] = [
+            osebe[oseba] for oseba in predmet.get('slusatelji', set())
+        ]
+    return predmeti
+
+def podatki_srecanj(kljuci=[]):
+    srecanja = nalozi_podatke('srecanje', kljuci, vrstni_red=('dan', 'ura'))
+    sql = '''
+        SELECT predmet, letnik FROM predmet_letnik WHERE predmet IN ({}) 
+    '''.format(vprasaji(kljuci))
+    povezani_predmeti = set()
+    povezane_osebe = set()
+    povezane_ucilnice = set()
+    for srecanje in srecanja.values():
+        povezani_predmeti.add(srecanje['predmet'])
+        povezane_osebe.add(srecanje['ucitelj'])
+        povezane_ucilnice.add(srecanje['ucilnica'])
+    osebe = podatki_oseb(list(povezane_osebe))
+    predmeti = podatki_predmetov(list(povezani_predmeti))
+    ucilnice = podatki_ucilnic(list(povezane_ucilnice))
+    for srecanje in srecanja.values():
+        srecanje['ucitelj'] = osebe.get(srecanje['ucitelj'])
+        srecanje['ucilnica'] = ucilnice.get(srecanje['ucilnica'])
+        srecanje['predmet'] = predmeti.get(srecanje['predmet'])
+    return srecanja
 
 def podatki_letnika(kljuc):
     return nalozi_podatek('letnik', kljuc)
 
-
-def podatki_oseb(kljuci=[]):
-    return nalozi_podatke('oseba', kljuci, vrstni_red=('priimek', 'ime'))
-
-
 def podatki_osebe(kljuc):
     return nalozi_podatek('oseba', kljuc)
 
-
 def podatki_ucilnic(kljuci=[]):
-    return nalozi_podatke('ucilnica', kljuci, vrstni_red=('oznaka',))
-
+    return nalozi_podatke('ucilnica', kljuci, vrstni_red=('skrita', 'oznaka'))
 
 def podatki_ucilnice(kljuc):
     return nalozi_podatek('ucilnica', kljuc)
 
-
-def podatki_srecanj(kljuci=[]):
-    return nalozi_podatke('srecanje', kljuci)
-
-
-def podatki_predmetov(kljuci=[]):
-    predmeti = nalozi_podatke('predmet', kljuci, vrstni_red=('ime',))
-    for predmet, letnik in con.execute('SELECT predmet, letnik FROM predmet_letnik'):
-        predmeti[predmet].setdefault('letniki', set()).add(letnik)
-    print(predmeti)
-    return predmeti
+# def podatki_srecanj(kljuci=[]):
+#     return nalozi_podatke('srecanje', kljuci)
 
 def podatki_predmeta(kljuc):
     predmet = nalozi_podatek('predmet', kljuc)
     sql = 'SELECT letnik FROM predmet_letnik WHERE predmet = ?'
     predmet['letniki'] = [vrstica['letnik'] for vrstica in con.execute(sql, (kljuc,))]
     return predmet
-
 
 def seznam_predmetov():
     sql = '''SELECT * FROM predmet ORDER BY ime'''
@@ -128,13 +168,13 @@ def uredi_osebo(oseba, ime, priimek, email):
     con.commit()
 
 
-def uredi_ucilnico(ucilnica, oznaka, velikost, racunalniska):
+def uredi_ucilnico(ucilnica, oznaka, velikost, racunalniska, skrita):
     sql = '''
         UPDATE ucilnica
-        SET oznaka = ?, velikost = ?, racunalniska = ?
+        SET oznaka = ?, velikost = ?, racunalniska = ?, skrita = ?
         WHERE id = ?
     '''
-    con.execute(sql, [oznaka, velikost, racunalniska, ucilnica])
+    con.execute(sql, [oznaka, velikost, racunalniska, ucilnica, skrita])
     con.commit()
 
 
@@ -416,31 +456,10 @@ def urnik(letniki, osebe, predmeti, ucilnice):
 
 def odlozena_srecanja():
     sql = '''
-        SELECT DISTINCT srecanje.id as id,
-               dan,
-               ura,
-               trajanje,
-               tip,
-               srecanje.oznaka as oznaka,
-               srecanje.ucitelj as ucitelj,
-               oseba.priimek as priimek_ucitelja,
-               srecanje.ucilnica as ucilnica,
-               ucilnica.oznaka as oznaka_ucilnice,
-               predmet.ime as ime_predmeta
-          FROM srecanje
-               LEFT JOIN
-               oseba ON srecanje.ucitelj = oseba.id
-               LEFT JOIN
-               ucilnica ON srecanje.ucilnica = ucilnica.id
-               LEFT JOIN
-               predmet_letnik ON srecanje.predmet = predmet_letnik.predmet
-               LEFT JOIN
-               predmet ON srecanje.predmet = predmet.id
+        SELECT id FROM srecanje
          WHERE dan IS NULL AND ucilnica IS NULL AND ura IS NULL
     '''
-    return seznam_slovarjev(con.execute(sql))
-
-
+    return podatki_srecanj([vrstica['id'] for vrstica in con.execute(sql)])
 
 def povezana_srecanja(srecanje):
     sql_letniki = '''

@@ -15,12 +15,9 @@
         <input value="{{'' if predmet['stevilo_studentov'] is None else predmet['stevilo_studentov']}}" placeholder="neznano" name="stevilo_studentov" type="text" class="validate" />
         <label for="stevilo_studentov">Število študentov</label>
     </div>
-    <p>
-        <input id="racunalniski" name="racunalniski" type="checkbox" {{'checked="checked"' if predmet['racunalniski'] else ''}} />
-        <label for="racunalniski">Vaje potekajo v računalniški učilnici</label>
-    </p>
     <div class="input-field">
         <select multiple name="letniki">
+            <option value="" disabled {{'' if predmet['letniki'] else 'selected'}}>Izberite letnik</option>
             % for letnik in letniki.values():
             <option value="{{letnik['id']}}" {{ 'selected' if letnik['id'] in predmet['letniki'] else '' }}>{{letnik['smer']}}, {{letnik['leto']}}</option>
             % end

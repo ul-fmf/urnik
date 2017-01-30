@@ -76,9 +76,10 @@
                         <a href="/urnik?predmet={{predmet['id']}}">
                             {{predmet['ime']}}
                         </a>
-                        %for letnik in predmet.get('letniki', []):
-                        <small>{{letnik}}</small>
-                        %end
+                        <small>
+                            {{predmet['kratica']}} /
+                            {{predmet['stevilo_studentov'] or '?'}} /
+                        {{', '.join((str(letnik['leto']) + 'L ' if letnik['leto'] else '') + letnik['smer'] for letnik in predmet['letniki'] )}}</small>
                         <a href="/predmet/{{predmet['id']}}/uredi">
                             <i class="tiny material-icons">edit</i>
                         </a>
@@ -105,16 +106,19 @@
             </thead>
             <tbody>
                 %for ucilnica in ucilnice.values():
-                %if ucilnica['skrita']:
-                %    continue
-                %end
                 <tr>
                     <td>
                         <a href="/urnik?ucilnica={{ucilnica['id']}}">
                             {{ucilnica['oznaka']}}
                         </a>
+                        <small>{{ucilnica['velikost'] if ucilnica['velikost'] else '?'}}</small>
                         %if ucilnica['racunalniska']:
                         <i class="tiny material-icons">computer</i>
+                        %end
+                        %if ucilnica['skrita']:
+                        <i class="tiny material-icons">visibility_off</i>
+                        %else:
+                        <i class="tiny material-icons">visibility</i>
                         %end
                         <a href="/ucilnica/{{ucilnica['id']}}/uredi">
                             <i class="tiny material-icons">edit</i>

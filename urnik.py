@@ -85,9 +85,8 @@ def uredi_predmet_post(predmet):
     ime = request.forms.ime
     kratica = request.forms.kratica
     stevilo_studentov = None if request.forms.stevilo_studentov is '' else int(request.forms.stevilo_studentov)
-    racunalniski = request.forms.racunalniski
     letniki = [int(letnik) for letnik in request.forms.getall('letniki')]
-    modeli.uredi_predmet(predmet, ime, kratica, stevilo_studentov, racunalniski, letniki)
+    modeli.uredi_predmet(predmet, ime, kratica, stevilo_studentov, letniki)
     redirect('/')
 
 ##########################################################################
@@ -138,7 +137,8 @@ def ustvari_ucilnico_post():
     oznaka = request.forms.oznaka
     velikost = int(request.forms.velikost)
     racunalniska = request.forms.racunalniska
-    modeli.uredi_ucilnico(oznaka, velikost, racunalniska)
+    skrita = request.forms.skrita
+    modeli.uredi_ucilnico(oznaka, velikost, racunalniska, skrita)
     redirect('/')
 
 
@@ -155,9 +155,8 @@ def ustvari_predmet_post():
     ime = request.forms.ime
     kratica = request.forms.kratica
     stevilo_studentov = None if request.forms.stevilo_studentov is '' else int(request.forms.stevilo_studentov)
-    racunalniski = request.forms.racunalniski
     letniki = [int(letnik) for letnik in request.forms.getall('letniki')]
-    modeli.ustvari_predmet(ime, kratica, stevilo_studentov, racunalniski, letniki)
+    modeli.ustvari_predmet(ime, kratica, stevilo_studentov, letniki)
     redirect('/')
 
 
