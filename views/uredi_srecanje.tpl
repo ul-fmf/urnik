@@ -19,7 +19,7 @@
         <label>Tip</label>
     </div>
     <div class="input-field">
-        <input value="{{srecanje['oznaka']}}" placeholder="1" name="oznaka" type="text" class="validate" />
+        <input value="{{srecanje['oznaka'] if srecanje['oznaka'] else ''}}" placeholder="1" name="oznaka" type="text" class="validate" />
         <label for="oznaka">Oznaka skupine</label>
     </div>
     <div class="input-field">
