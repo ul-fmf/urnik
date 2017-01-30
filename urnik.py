@@ -175,14 +175,7 @@ def premakni_srecanje(srecanje):
         srecanja=modeli.povezana_srecanja(srecanje),
         prosti_termini=modeli.prosti_termini(srecanje),
         next=request.headers.get('referer') or '/',
-        prekrivanje_ucilnic=modeli.prekrivanje_ucilnic(),
-        prekrivanje_oseb=modeli.prekrivanje_oseb(),
-        prekrivanje_letnikov=modeli.prekrivanje_letnikov(),
-        podatki_srecanj=modeli.podatki_srecanj(),
-        podatki_oseb=modeli.podatki_oseb(),
-        podatki_ucilnic=modeli.podatki_ucilnic(),
-        podatki_predmetov=modeli.podatki_predmetov(),
-        podatki_letnikov=modeli.podatki_letnikov(),
+        prekrivanja={},
     )
 
 
@@ -256,14 +249,7 @@ def urnik():
                       for ucilnica in request.query.getall('ucilnica')],
         ),
         odlozena_srecanja=modeli.odlozena_srecanja(),
-        prekrivanje_ucilnic=modeli.prekrivanje_ucilnic(),
-        prekrivanje_oseb=modeli.prekrivanje_oseb(),
-        prekrivanje_letnikov=modeli.prekrivanje_letnikov(),
-        podatki_srecanj=modeli.podatki_srecanj(),
-        podatki_oseb=modeli.podatki_oseb(),
-        podatki_ucilnic=modeli.podatki_ucilnic(),
-        podatki_predmetov=modeli.podatki_predmetov(),
-        podatki_letnikov=modeli.podatki_letnikov(),
+        prekrivanja=modeli.prekrivanja(),
     )
 
 @route('/fiziki')
@@ -271,10 +257,8 @@ def fiziki():
     return template(
         'urnik',
         srecanja=modeli.fiziki(),
-        prekrivanje_ucilnic=[],
-        prekrivanje_oseb=[],
-        prekrivanje_letnikov=[],
         odlozena_srecanja=[],
+        prekrivanja={},
     )
 
 ##########################################################################

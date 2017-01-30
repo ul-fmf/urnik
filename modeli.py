@@ -425,10 +425,20 @@ def prekrivanje_letnikov():
         prekrivanja.setdefault((letnik, dan, ura), set()).update((prvo, drugo))
     pod_srecanj = podatki_srecanj()
     return {
-        (ucilnica, dan, ura): [pod_srecanj[srecanje] for srecanje in srecanja]
+        (letnik, dan, ura): [pod_srecanj[srecanje] for srecanje in srecanja]
         for
-        (ucilnica, dan, ura), srecanja in prekrivanja.items()
+        (letnik, dan, ura), srecanja in prekrivanja.items()
     }
+
+def prekrivanja():
+    prekrivanja = {}
+    for (ucilnica, dan, ura), srecanja in prekrivanje_ucilnic().items():
+        prekrivanja.setdefault((dan, ura), {}).setdefault('ucilnice', {})[ucilnica] = srecanja
+    for (letnik, dan, ura), srecanja in prekrivanje_letnikov().items():
+        prekrivanja.setdefault((dan, ura), {}).setdefault('letniki', {})[letnik] = srecanja
+    for (oseba, dan, ura), srecanja in prekrivanje_oseb().items():
+        prekrivanja.setdefault((dan, ura), {}).setdefault('osebe', {})[oseba] = srecanja
+    return OrderedDict(((dan, ura), prekrivanja[(dan, ura)]) for (dan, ura) in sorted(prekrivanja))
 
 ##########################################################################
 # PRIKAZ URNIKA
