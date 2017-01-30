@@ -370,7 +370,12 @@ def prekrivanje_ucilnic():
     prekrivanja = {}
     for ucilnica, dan, ura, prvo, drugo in con.execute(sql):
         prekrivanja.setdefault((ucilnica, dan, ura), set()).update((prvo, drugo))
-    return prekrivanja
+    pod_srecanj = podatki_srecanj()
+    return {
+        (ucilnica, dan, ura): [pod_srecanj[srecanje] for srecanje in srecanja]
+        for
+        (ucilnica, dan, ura), srecanja in prekrivanja.items()
+    }
 
 def prekrivanje_oseb():
     sql = '''
@@ -390,7 +395,12 @@ def prekrivanje_oseb():
     prekrivanja = {}
     for ucitelj, dan, ura, prvo, drugo in con.execute(sql):
         prekrivanja.setdefault((ucitelj, dan, ura), set()).update((prvo, drugo))
-    return prekrivanja
+    pod_srecanj = podatki_srecanj()
+    return {
+        (ucilnica, dan, ura): [pod_srecanj[srecanje] for srecanje in srecanja]
+        for
+        (ucilnica, dan, ura), srecanja in prekrivanja.items()
+    }
 
 def prekrivanje_letnikov():
     sql = '''
@@ -413,7 +423,12 @@ def prekrivanje_letnikov():
     prekrivanja = {}
     for letnik, dan, ura, prvo, drugo in con.execute(sql):
         prekrivanja.setdefault((letnik, dan, ura), set()).update((prvo, drugo))
-    return prekrivanja
+    pod_srecanj = podatki_srecanj()
+    return {
+        (ucilnica, dan, ura): [pod_srecanj[srecanje] for srecanje in srecanja]
+        for
+        (ucilnica, dan, ura), srecanja in prekrivanja.items()
+    }
 
 ##########################################################################
 # PRIKAZ URNIKA
@@ -484,7 +499,6 @@ def povezana_srecanja(srecanje):
     '''
     ucitelj = con.execute(sql_ucitelj, [srecanje]).fetchone()['ucitelj']
     return urnik(letniki, [ucitelj], [], [])
-
 
 def ustrezne_ucilnice(stevilo_studentov):
     ustrezne = []

@@ -171,5 +171,67 @@
         </div>
     </div>
     % end
+<ul>
+%for (ucilnica, dan, ura), srecanja in prekrivanje_ucilnic.items():
+<li>
+    Učilnica <a href="/urnik?ucilnica={{ucilnica}}">{{podatki_ucilnic[ucilnica]['oznaka']}}</a>,
+    {{['?', 'ponedeljek', 'torek', 'sredo', 'četrtek', 'petek'][dan]}}, {{ura}}h:
+    <ul>
+    %for srecanje in srecanja:
+        <li>
+            {{srecanje['predmet']['kratica']}} {{srecanje['tip']}},
+            {{srecanje['ucitelj']['priimek']}},
+            {{srecanje['ucilnica']['oznaka']}},
+            {{srecanje['ura']}} – {{srecanje['ura'] + srecanje['trajanje']}},
+            <a href="/srecanje/{{srecanje['id']}}/premakni">
+                <i class="tiny material-icons">open_with</i>
+            </a>
+        </li>
+    %end
+    </ul>
+</li>
+%end
+</ul>
+<ul>
+%for (oseba, dan, ura), srecanja in prekrivanje_oseb.items():
+<li>
+    <a href="/urnik?oseba={{oseba}}">{{podatki_oseb[oseba]['ime']}} {{podatki_oseb[oseba]['priimek']}}</a>,
+    {{['?', 'ponedeljek', 'torek', 'sredo', 'četrtek', 'petek'][dan]}}, {{ura}}h:
+    <ul>
+    %for srecanje in srecanja:
+        <li>
+            {{srecanje['predmet']['kratica']}} {{srecanje['tip']}},
+            {{srecanje['ucitelj']['priimek']}},
+            {{srecanje['ucilnica']['oznaka']}},
+            {{srecanje['ura']}} – {{srecanje['ura'] + srecanje['trajanje']}},
+            <a href="/srecanje/{{srecanje['id']}}/premakni">
+                <i class="tiny material-icons">open_with</i>
+            </a>
+        </li>
+    %end
+    </ul>
+</li>
+%end
+</ul>
+<ul>
+%for (letnik, dan, ura), srecanja in prekrivanje_letnikov.items():
+<li>
+    <a href="/urnik?letnik={{letnik}}">{{podatki_letnikov[letnik]['smer']}}, {{podatki_letnikov[letnik]['leto']}}. letnik</a>,
+    {{['?', 'ponedeljek', 'torek', 'sredo', 'četrtek', 'petek'][dan]}}, {{ura}}h:
+    <ul>
+    %for srecanje in srecanja:
+        <li>
+            {{srecanje['predmet']['kratica']}} {{srecanje['tip']}},
+            {{srecanje['ucitelj']['priimek']}},
+            {{srecanje['ucilnica']['oznaka']}},
+            {{srecanje['ura']}} – {{srecanje['ura'] + srecanje['trajanje']}},
+            <a href="/srecanje/{{srecanje['id']}}/premakni">
+                <i class="tiny material-icons">open_with</i>
+            </a>
+        </li>
+    %end
+    </ul>
+</li>
+%end
 </ul>
 </div>
