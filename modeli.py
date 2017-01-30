@@ -537,7 +537,7 @@ def prosti_termini(id_srecanja):
                trajanje,
                ucilnica
           FROM srecanje
-         WHERE id != ? AND ucilnica IN ({})
+         WHERE id != ? AND dan IS NOT NULL and ura IS NOT NULL AND ucilnica IN ({})
     '''.format(vprasaji(ucilnice))
     for srecanje in con.execute(sql, [id_srecanja] + ucilnice):
         dan = srecanje['dan']
