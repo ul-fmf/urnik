@@ -436,16 +436,18 @@ def urnik(letniki, osebe, predmeti, ucilnice):
          ORDER BY dan, ura, trajanje
     '''.format(vprasaji(letniki), vprasaji(osebe), vprasaji(predmeti), vprasaji(ucilnice), vprasaji(osebe))
     srecanja = podatki_srecanj([vrstica['id'] for vrstica in con.execute(sql, letniki + osebe + predmeti + ucilnice + osebe)])
-    bla = nastavi_sirine_srecanj(srecanja.values())
-    print(bla)
-    return bla
+    return nastavi_sirine_srecanj(srecanja.values())
 
 def odlozena_srecanja():
     sql = '''
         SELECT id FROM srecanje
          WHERE dan IS NULL AND ucilnica IS NULL AND ura IS NULL
     '''
-    return podatki_srecanj([vrstica['id'] for vrstica in con.execute(sql)]).values()
+    odlozena = [vrstica['id'] for vrstica in con.execute(sql)]
+    if odlozena:
+        return podatki_srecanj(odlozena).values()
+    else:
+        return []
 
 def povezana_srecanja(srecanje):
     sql_letniki = '''

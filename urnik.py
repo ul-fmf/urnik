@@ -231,7 +231,6 @@ def uredi_srecanje(srecanje):
 
 @post('/srecanje/<srecanje:int>/uredi')
 def uredi_srecanje_post(srecanje):
-    print(dict(request.forms))
     ucitelj = int(request.forms.ucitelj)
     predmet = int(request.forms.predmet)
     tip = request.forms.tip
