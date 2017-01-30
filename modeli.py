@@ -530,6 +530,7 @@ def prosti_termini(id_srecanja):
                 'proste': set(),
                 'deloma_proste': set(),
                 'proste_alternative': set(),
+                'zasedene': set(),
             }
             ure = range(zacetek, zacetek + izbrano_srecanje['trajanje'])
             for ucilnica in ustrezne:
@@ -537,10 +538,12 @@ def prosti_termini(id_srecanja):
                     termin['proste'].add(ucilnica)
                 elif any(prosta(ucilnica, dan, ura) for ura in ure):
                     termin['deloma_proste'].add(ucilnica)
+                else:
+                    termin['zasedene'].add(ucilnica)
             for ucilnica in alternative:
                 if all(prosta(ucilnica, dan, ura) for ura in ure):
                     termin['proste_alternative'].add(ucilnica)
-            if termin['proste'] or termin['deloma_proste'] or termin['proste_alternative']:
+            if termin['proste'] or termin['deloma_proste'] or termin['proste_alternative'] or termin['zasedene']:
                 termini[(dan, zacetek)] = termin
 
     for termin in termini.values():
@@ -552,12 +555,16 @@ def prosti_termini(id_srecanja):
             termin['zasedenost'] = 'deloma'
         elif termin['proste_alternative']:
             termin['zasedenost'] = 'alternative'
+        else:
+            termin['zasedenost'] = 'zaseden'
         termin['ucilnice'] = [
             (podatki_uc[ucilnica], 'prosta') for ucilnica in termin['proste']
         ] + [
             (podatki_uc[ucilnica], 'prosta_alternativa') for ucilnica in termin['proste_alternative']
         ] + [
             (podatki_uc[ucilnica], 'deloma_prosta') for ucilnica in termin['deloma_proste']
+        ] + [
+            (podatki_uc[ucilnica], 'zasedena') for ucilnica in termin['zasedene']
         ]
 
     return termini
