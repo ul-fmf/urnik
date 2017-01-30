@@ -1,4 +1,5 @@
 from bottle import route, run, template, get, post, request, redirect, default_app
+import bottle
 import modeli
 
 
@@ -271,4 +272,5 @@ def urnik():
 if __name__ == '__main__':
     run(debug=True, reloader=True)
 else:
+    bottle.debug(True)
     app = default_app()
