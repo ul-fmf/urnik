@@ -34,7 +34,6 @@
     <div class="srecanje" style="{{ style }};">
         <div class="predmet">
             {{srecanje['predmet']['ime']}} {{srecanje['tip']}}{{srecanje['oznaka'] if srecanje['oznaka'] else ''}}
-            <small>{{srecanje['predmet']['opis_letnikov']}}</small>
         </div>
         <div class="ucitelj">
             <a href="/urnik?oseba={{srecanje['ucitelj']['id']}}">
