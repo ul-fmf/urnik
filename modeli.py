@@ -419,7 +419,7 @@ def urnik(letniki, osebe, predmeti, ucilnice, skrij_rezervacije=False):
     if skrij_rezervacije:
         srecanja = [srecanje for srecanje in srecanja.values() if srecanje['predmet']['kratica'] != 'REZ']
     else:
-        srecanja = srecanje.values()
+        srecanja = srecanja.values()
     return nastavi_sirine_srecanj(srecanja)
 
 def fiziki():
