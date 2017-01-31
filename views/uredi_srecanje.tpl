@@ -5,7 +5,7 @@
         <select name="predmet">
             <option value="" {{ '' if srecanje['predmet'] else 'selected' }}>brez učilnice</option>
             % for predmet in predmeti.values():
-            <option value="{{predmet['id']}}" {{ 'selected' if predmet['id'] == srecanje['predmet'] else '' }}>{{predmet['ime']}} {{'({})'.format(predmet['opis_letnikov']) if predmet['opis_letnikov'] else ''}}</option>
+            <option value="{{predmet['id']}}" {{ 'selected' if predmet['id'] == srecanje['predmet']['id'] else '' }}>{{predmet['ime']}} {{'({})'.format(predmet['opis_letnikov']) if predmet['opis_letnikov'] else ''}}</option>
             % end
         </select>
         <label>Predmet</label>
@@ -26,7 +26,7 @@
         <select name="ucitelj">
             <option value="" {{ '' if srecanje['ucitelj'] else 'selected' }}>brez učitelja</option>
             % for ucitelj in ucitelji.values():
-            <option value="{{ucitelj['id']}}" {{ 'selected' if ucitelj['id'] == srecanje['ucitelj'] else '' }}>{{ucitelj['priimek']}} {{ucitelj['ime']}}</option>
+            <option value="{{ucitelj['id']}}" {{ 'selected' if ucitelj['id'] == srecanje['ucitelj']['id'] else '' }}>{{ucitelj['priimek']}} {{ucitelj['ime']}}</option>
             % end
         </select>
         <label>Učitelj</label>
