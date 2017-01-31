@@ -399,7 +399,7 @@ def prekrivanja():
 # PRIKAZ URNIKA
 ##########################################################################
 
-def urnik(letniki, osebe, predmeti, ucilnice):
+def urnik(letniki, osebe, predmeti, ucilnice, skrij_rezervacije=False):
     sql = '''
         SELECT DISTINCT srecanje.id
           FROM srecanje
@@ -416,7 +416,11 @@ def urnik(letniki, osebe, predmeti, ucilnice):
          ORDER BY dan, ura, trajanje
     '''.format(vprasaji(letniki), vprasaji(osebe), vprasaji(predmeti), vprasaji(ucilnice), vprasaji(osebe))
     srecanja = podatki_srecanj([vrstica['id'] for vrstica in con.execute(sql, letniki + osebe + predmeti + ucilnice + osebe)])
-    return nastavi_sirine_srecanj(srecanja.values())
+    if skrij_rezervacije:
+        srecanja = [srecanje for srecanje in srecanja.values() if srecanje['predmet']['kratica'] != 'REZ']
+    else:
+        srecanja = srecanje.values()
+    return nastavi_sirine_srecanj(srecanja)
 
 def fiziki():
     FIZIKALNE_UCILNICE = (
@@ -463,7 +467,7 @@ def povezana_srecanja(srecanje):
         SELECT ucitelj FROM srecanje WHERE id = ?
     '''
     ucitelj = con.execute(sql_ucitelj, [srecanje]).fetchone()['ucitelj']
-    return urnik(letniki, [ucitelj], [], [])
+    return urnik(letniki, [ucitelj], [], [], skrij_rezervacije=True)
 
 
 def ustrezne_ucilnice(stevilo_studentov):
