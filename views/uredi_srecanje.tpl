@@ -3,7 +3,7 @@
 <form method="post">
     <div class="input-field">
         <select name="predmet">
-            <option value="" {{ '' if srecanje['predmet'] else 'selected' }}>brez učilnice</option>
+            <option value="" {{ '' if srecanje['predmet'] else 'selected' }}>brez predmeta</option>
             % for predmet in predmeti.values():
             <option value="{{predmet['id']}}" {{ 'selected' if predmet['id'] == srecanje['predmet']['id'] else '' }}>{{predmet['ime']}} {{'({})'.format(predmet['opis_letnikov']) if predmet['opis_letnikov'] else ''}}</option>
             % end
@@ -27,6 +27,15 @@
             <option value="" {{ '' if srecanje['ucitelj'] else 'selected' }}>brez učitelja</option>
             % for ucitelj in ucitelji.values():
             <option value="{{ucitelj['id']}}" {{ 'selected' if ucitelj['id'] == srecanje['ucitelj']['id'] else '' }}>{{ucitelj['priimek']}} {{ucitelj['ime']}}</option>
+            % end
+        </select>
+        <label>Učitelj</label>
+    </div>
+    <div class="input-field">
+        <select name="ucilnica">
+            <option value="" {{ '' if srecanje['ucilnica'] else 'selected' }}>brez učilnice</option>
+            % for ucilnica in ucilnice.values():
+            <option value="{{ucilnica['id']}}" {{ 'selected' if ucilnica['id'] == srecanje['ucilnica']['id'] else '' }}>{{ucilnica['oznaka']}} ({{ucilnica['velikost']}})</option>
             % end
         </select>
         <label>Učitelj</label>

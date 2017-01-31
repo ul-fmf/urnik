@@ -160,13 +160,13 @@ def uredi_ucilnico(ucilnica, oznaka, velikost, racunalniska, skrita):
     con.commit()
 
 
-def uredi_srecanje(srecanje, ucitelj, predmet, tip, oznaka):
+def uredi_srecanje(srecanje, ucitelj, predmet, tip, oznaka, ucilnica):
     sql = '''
         UPDATE srecanje
-        SET ucitelj = ?, predmet = ?, tip = ?, oznaka = ?
+        SET ucitelj = ?, predmet = ?, tip = ?, oznaka = ?, ucilnica = ?
         WHERE id = ?
     '''
-    con.execute(sql, [ucitelj, predmet, tip, oznaka, srecanje])
+    con.execute(sql, [ucitelj, predmet, tip, oznaka, ucilnica, srecanje])
     con.commit()
 
 

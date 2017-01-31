@@ -220,6 +220,7 @@ def uredi_srecanje(srecanje):
         srecanje=modeli.podatki_srecanja(srecanje),
         ucitelji=modeli.podatki_oseb(),
         predmeti=modeli.podatki_predmetov(),
+        ucilnice=modeli.podatki_ucilnic(),
         next=request.headers.get('referer') or '/',
     )
 
@@ -227,10 +228,11 @@ def uredi_srecanje(srecanje):
 @post('/srecanje/<srecanje:int>/uredi')
 def uredi_srecanje_post(srecanje):
     ucitelj = int(request.forms.ucitelj)
+    ucilnica = int(request.forms.ucilnica)
     predmet = int(request.forms.predmet)
     tip = request.forms.tip
     oznaka = request.forms.oznaka if request.forms.oznaka else None
-    modeli.uredi_srecanje(srecanje, ucitelj, predmet, tip, oznaka)
+    modeli.uredi_srecanje(srecanje, ucitelj, predmet, tip, oznaka, ucilnica)
     redirect(request.forms.next)
 
 ##########################################################################
