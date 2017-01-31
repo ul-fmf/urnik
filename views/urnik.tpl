@@ -163,11 +163,11 @@
     </div>
     % end
 <h5><i class="material-icons">warning</i> Konflikti</h5>
-<ul>
+<ul class="collection">
 %for (dan, ura), prekrivanja_po_tipih in prekrivanja.items():
     % for tip, prekrivanja in prekrivanja_po_tipih.items():
         % for id, srecanja in prekrivanja.items():
-        <li>
+        <li class="collection-item">
             {{['?', 'ponedeljek', 'torek', 'sredo', 'četrtek', 'petek'][dan]}}, {{ura}}h,
             % if tip == 'ucilnice':
                 {{srecanja[0]['ucilnica']['oznaka']}}:
@@ -176,19 +176,19 @@
             % elif tip == 'letniki':
                 {{','.join([letnik['smer'] + (', ' + str(letnik['leto']) + '. letnik' if letnik['leto'] else '') for letnik in srecanja[0]['predmet']['letniki'] if letnik['id'] == id])}}:
             % end
-            <ul>
+            <small><ul>
             % for srecanje in srecanja:
                 <li>
+                    <a href="/srecanje/{{srecanje['id']}}/premakni">
+                        <i class="tiny material-icons">open_with</i>
+                    </a>
                     {{srecanje['predmet']['kratica']}} {{srecanje['tip']}},
                     {{srecanje['ucitelj']['priimek']}},
                     {{srecanje['ucilnica']['oznaka']}},
                     {{srecanje['ura']}} – {{srecanje['ura'] + srecanje['trajanje']}},
-                    <a href="/srecanje/{{srecanje['id']}}/premakni">
-                        <i class="tiny material-icons">open_with</i>
-                    </a>
                 </li>
             % end
-            </ul>
+            </ul></small>
         </li>
         %end
     % end
