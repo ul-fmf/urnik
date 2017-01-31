@@ -34,6 +34,7 @@
     <div class="srecanje" style="{{ style }};">
         <div class="predmet">
             {{srecanje['predmet']['ime']}} {{srecanje['tip']}}{{srecanje['oznaka'] if srecanje['oznaka'] else ''}}
+            <small>{{srecanje['predmet']['opis_letnikov']}}</small>
         </div>
         <div class="ucitelj">
             <a href="/urnik?oseba={{srecanje['ucitelj']['id']}}">
@@ -95,8 +96,8 @@
     % style = 'position: absolute; left: {:.2%}; width: {:.2%}; top: {:.2%}; height: {:.2%}'.format(left, width, top, height)
     <div class="termin {{termin['zasedenost']}}" style="{{style}}">
         <div class="izbira_ucilnice">
-        % for ucilnica, zasedenost in termin['ucilnice']:
-            <form method="post" class="izbrana_ucilnica {{zasedenost}}">
+        % for ucilnica in termin['ucilnice']:
+            <form method="post" class="izbrana_ucilnica {{ucilnica['zasedenost']}} {{ucilnica['ustreznost']}}">
                 <input type="hidden" name="next" value="{{next}}">
                 <input value="{{dan}}" name="dan" type="hidden">
                 <input value="{{ura}}" name="ura" type="hidden">
@@ -110,13 +111,9 @@
 </div>
 </div>
 <div id='informacije'>
+<h5><i class="material-icons">inbox</i> Odložišče</h5>
     % for srecanje in odlozena_srecanja:
-    % left = 0.1
-    % top = 0
-    % height = srecanje['trajanje'] * enota_visine
-    % width = 0.8
-    % style = 'left: {:.2%}; width: {:.2%}; top: {:.2%}; height: {:.2%}'.format(left, width, top, height)
-    <div class="srecanje" style="{{ style }};">
+    <div class="srecanje">
         <div class="predmet">
             {{srecanje['predmet']['ime']}} {{srecanje['tip']}}{{srecanje['oznaka'] if srecanje['oznaka'] else ''}}
         </div>
@@ -166,7 +163,7 @@
         </div>
     </div>
     % end
-
+<h5><i class="material-icons">warning</i> Konflikti</h5>
 <ul>
 %for (dan, ura), prekrivanja_po_tipih in prekrivanja.items():
     % for tip, prekrivanja in prekrivanja_po_tipih.items():

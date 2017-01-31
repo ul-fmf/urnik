@@ -68,7 +68,8 @@ def uredi_ucilnico_post(ucilnica):
     oznaka = request.forms.oznaka
     velikost = None if request.forms.velikost is None else int(request.forms.velikost)
     racunalniska = request.forms.racunalniska
-    modeli.uredi_ucilnico(ucilnica, oznaka, velikost, racunalniska)
+    skrita = request.forms.skrita
+    modeli.uredi_ucilnico(ucilnica, oznaka, velikost, racunalniska, skrita)
     redirect('/')
 
 

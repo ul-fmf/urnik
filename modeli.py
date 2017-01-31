@@ -120,7 +120,7 @@ def podatki_ucilnice(kljuc):
     return poberi_edinega(podatki_ucilnic([kljuc]))
 
 def podatki_predmeta(kljuc):
-    return poberi_edinega(podatki_predmeta([kljuc]))
+    return poberi_edinega(podatki_predmetov([kljuc]))
 
 def podatki_srecanja(kljuc):
     return poberi_edinega(podatki_srecanj([kljuc]))
@@ -465,28 +465,26 @@ def povezana_srecanja(srecanje):
     ucitelj = con.execute(sql_ucitelj, [srecanje]).fetchone()['ucitelj']
     return urnik(letniki, [ucitelj], [], [])
 
-def ustrezne_ucilnice(srecanje):
-    stevilo_studentov = srecanje['predmet']['stevilo_studentov']
-    ustrezne = []
-    morebitne = []
+
+def ustrezne_ucilnice(stevilo_studentov):
+    ucilnice = []
     for ucilnica in podatki_ucilnic().values():
         velikost = ucilnica['velikost']
         if velikost is None:
-            pass
+            continue
         elif not stevilo_studentov or 2/3 <= velikost / stevilo_studentov <= 3/4:
-            morebitne.append(ucilnica['id'])
+            ucilnica['ustreznost'] = 'morebiti'
+            ucilnice.append(ucilnica)
         elif 3/4 < velikost / stevilo_studentov:
-            ustrezne.append(ucilnica['id'])
-    return ustrezne, morebitne
+            ucilnica['ustreznost'] = 'ustrezna'
+            ucilnice.append(ucilnica)
+        else:
+            continue
+    return ucilnice
 
+from copy import deepcopy
 
-def prosti_termini(id_srecanja):
-    izbrano_srecanje = podatki_srecanja(id_srecanja)
-    predmet = izbrano_srecanje['predmet']
-    podatki_uc = podatki_ucilnic()
-    ustrezne, alternative = ustrezne_ucilnice(izbrano_srecanje)
-    zasedene = {}
-    ucilnice = ustrezne + alternative
+def oznaci_zasedenost(izbrano_srecanje, ucilnice):
     sql = '''
         SELECT dan,
                ura,
@@ -495,60 +493,76 @@ def prosti_termini(id_srecanja):
           FROM srecanje
          WHERE id != ? AND dan IS NOT NULL and ura IS NOT NULL AND ucilnica IN ({})
     '''.format(vprasaji(ucilnice))
-    for srecanje in con.execute(sql, [id_srecanja] + ucilnice):
-        dan = srecanje['dan']
-        for ura in range(srecanje['ura'], srecanje['ura'] + srecanje['trajanje']):
-            zasedene.setdefault((dan, ura), set()).add(srecanje['ucilnica'])
+    zasedene = {}
+    for zasedenost in con.execute(sql, [izbrano_srecanje['id']] + [ucilnica['id'] for ucilnica in ucilnice]):
+        dan = zasedenost['dan']
+        for ura in range(zasedenost['ura'], zasedenost['ura'] + zasedenost['trajanje']):
+            zasedene.setdefault((dan, ura), set()).add(zasedenost['ucilnica'])
 
     def prosta(ucilnica, dan, ura):
-        return ucilnica not in zasedene.get((dan, ura), [])
+        return ucilnica['id'] not in zasedene.get((dan, ura), [])
 
     termini = {}
     for dan in range(1, 6):
         for zacetek in range(7, 20 - izbrano_srecanje['trajanje'] + 1):
-            termin = {
-                'proste': set(),
-                'deloma_proste': set(),
-                'proste_alternative': set(),
-                'zasedene': set(),
-            }
+            termin = termini.setdefault((dan, zacetek), {
+                'ucilnice': deepcopy(ucilnice),
+                'zasedenost': 'zaseden'
+            })
             ure = range(zacetek, zacetek + izbrano_srecanje['trajanje'])
-            for ucilnica in ustrezne:
+            proste_prave = False
+            deloma_prave = False
+            proste_alternative = False
+            deloma_alternative = False
+            for ucilnica in termin['ucilnice']:
                 if all(prosta(ucilnica, dan, ura) for ura in ure):
-                    termin['proste'].add(ucilnica)
+                    ucilnica['zasedenost'] = 'prosta'
+                    if ucilnica['ustreznost'] == 'ustrezna':
+                        proste_prave = True
+                    else:
+                        proste_alternative = True
                 elif any(prosta(ucilnica, dan, ura) for ura in ure):
-                    termin['deloma_proste'].add(ucilnica)
+                    ucilnica['zasedenost'] = 'deloma_prosta'
+                    if ucilnica['ustreznost'] == 'ustrezna':
+                        deloma_prave = True
+                    else:
+                        deloma_alternative = True
                 else:
-                    termin['zasedene'].add(ucilnica)
-            for ucilnica in alternative:
-                if all(prosta(ucilnica, dan, ura) for ura in ure):
-                    termin['proste_alternative'].add(ucilnica)
-            if termin['proste'] or termin['deloma_proste'] or termin['proste_alternative'] or termin['zasedene']:
-                termini[(dan, zacetek)] = termin
+                    ucilnica['zasedenost'] = 'zasedena'
+            if proste_prave:
+                termin['zasedenost'] = 'prosto'
+            elif deloma_prave and proste_alternative:
+                termin['zasedenost'] = 'proste_le_alternative'
+            elif deloma_prave and deloma_alternative:
+                termin['zasedenost'] = 'vse_mogoce'
+            elif deloma_prave:
+                termin['zasedenost'] = 'deloma'
+            elif proste_alternative:
+                termin['zasedenost'] = 'proste_alternative'
+            elif deloma_alternative:
+                termin['zasedenost'] = 'deloma_proste_alternative'
 
-    for termin in termini.values():
-        if termin['proste']:
-            termin['zasedenost'] = 'prosto'
-        elif termin['deloma_proste'] and termin['proste_alternative']:
-            termin['zasedenost'] = 'deloma alternative'
-        elif termin['deloma_proste']:
-            termin['zasedenost'] = 'deloma'
-        elif termin['proste_alternative']:
-            termin['zasedenost'] = 'alternative'
-        else:
-            termin['zasedenost'] = 'zaseden'
-        termin['ucilnice'] = [
-            (podatki_uc[ucilnica], 'prosta') for ucilnica in termin['proste']
-        ] + [
-            (podatki_uc[ucilnica], 'prosta_alternativa') for ucilnica in termin['proste_alternative']
-        ] + [
-            (podatki_uc[ucilnica], 'deloma_prosta') for ucilnica in termin['deloma_proste']
-        ] + [
-            (podatki_uc[ucilnica], 'zasedena') for ucilnica in termin['zasedene']
-        ]
+    #     elif termin['deloma_proste'] and termin['proste_alternative']:
+    #         termin['zasedenost'] = 'vsemogoce'
+    #     elif termin['deloma_proste']:
+    #         termin['zasedenost'] = 'deloma'
+    #     elif termin['proste_alternative']:
+    #         termin['zasedenost'] = 'proste_alternative'
+    #     elif termin['deloma_proste_alternative']:
+    #         termin['zasedenost'] = 'deloma_proste_alternative'
+    #     else:
+    #         termin['zasedenost'] = 'zaseden'
+
 
     return termini
 
+
+def prosti_termini(id_srecanja):
+    izbrano_srecanje = podatki_srecanja(id_srecanja)
+    predmet = izbrano_srecanje['predmet']
+    ucilnice = ustrezne_ucilnice(predmet['stevilo_studentov'])
+    ucilnice = oznaci_zasedenost(izbrano_srecanje, ucilnice)
+    return ucilnice
 
 def razdeli_srecanja_po_dneh(srecanja):
     dnevi = {}

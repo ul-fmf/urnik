@@ -16,10 +16,11 @@
         <label for="stevilo_studentov">Število študentov</label>
     </div>
     <div class="input-field">
+    % letniki_predmeta = [letnik['id'] for letnik in predmet['letniki']]
         <select multiple name="letniki">
-            <option value="" disabled {{'' if predmet['letniki'] else 'selected'}}>Izberite letnik</option>
+            <option value="" disabled {{'' if letniki_predmeta else 'selected'}}>Izberite letnik</option>
             % for letnik in letniki.values():
-            <option value="{{letnik['id']}}" {{ 'selected' if letnik['id'] in predmet['letniki'] else '' }}>{{letnik['smer']}}, {{letnik['leto']}}</option>
+            <option value="{{letnik['id']}}" {{ 'selected' if letnik['id'] in letniki_predmeta else '' }}>{{letnik['smer']}}, {{letnik['leto']}}</option>
             % end
         </select>
         <label>Letniki</label>

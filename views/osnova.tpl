@@ -18,9 +18,9 @@
         }
         #informacije {
             position: absolute;
-            left: 80%;
+            left: 82%;
             top: 0%;
-            width: 20%;
+            width: 18%;
             height: 100%;
             background: #fff;  
             overflow-y: scroll;
@@ -77,6 +77,8 @@
         }
         #informacije .srecanje {
             position: relative;
+            height: 4em;
+            margin-right: 1em;
         }
         .ucitelj, .ucilnica {
             position: absolute;
@@ -100,22 +102,51 @@
             width: 100%;
             height: 100%;
         }
+        .termin.zaseden {
+            background: rgba(255, 0, 0, 0.5);
+        }
         .termin.prosto {
             background: rgba(0, 128, 0, 0.5);
         }
-        .termin.alternative {
+        .termin.proste_alternative {
             background: rgba(255, 165, 0, 0.5);
         }
         .termin.deloma {
-            background: rgba(255, 0, 0, 0.5);
+            background: repeating-linear-gradient(
+              -45deg,
+              rgba(0, 128, 0, 0.5),
+              rgba(0, 128, 0, 0.5) 5px,
+              rgba(255, 0, 0, 0.5) 5px,
+              rgba(255, 0, 0, 0.5) 10px
+            );
         }
-        .termin.deloma.alternative {
+        .termin.proste_le_alternative {
+            background: repeating-linear-gradient(
+              -45deg,
+              rgba(255, 165, 0, 0.5),
+              rgba(255, 165, 0, 0.5) 5px,
+              rgba(0, 128, 0, 0.5) 5px,
+              rgba(0, 128, 0, 0.5) 10px
+            );
+        }
+        .termin.deloma_proste_alternative {
             background: repeating-linear-gradient(
               -45deg,
               rgba(255, 165, 0, 0.5),
               rgba(255, 165, 0, 0.5) 5px,
               rgba(255, 0, 0, 0.5) 5px,
               rgba(255, 0, 0, 0.5) 10px
+            );
+        }
+        .termin.vse_mogoce {
+            background: repeating-linear-gradient(
+              -45deg,
+              rgba(255, 165, 0, 0.5),
+              rgba(255, 165, 0, 0.5) 5px,
+              rgba(255, 0, 0, 0.5) 5px,
+              rgba(255, 0, 0, 0.5) 10px,
+              rgba(0, 128, 0, 0.5) 15px,
+              rgba(0, 128, 0, 0.5) 20px
             );
         }
         .urejanje {
@@ -155,14 +186,35 @@
             float: left;
             width: 25%;
         }
-        .izbrana_ucilnica.prosta button {
+        .izbrana_ucilnica.ustrezna.deloma_prosta button {
+            background: repeating-linear-gradient(
+              -45deg,
+              rgba(0, 128, 0, 1),
+              rgba(0, 128, 0, 1) 5px,
+              rgba(255, 0, 0, 1) 5px,
+              rgba(255, 0, 0, 1) 10px
+            );
+        }
+        .izbrana_ucilnica.ustrezna.zasedena button {
+            background: red;
+        }
+        .izbrana_ucilnica.ustrezna.prosta button {
             background: green;
         }
-        .izbrana_ucilnica.prosta_alternativa button {
-            background: orange;
+        .izbrana_ucilnica.morebiti.deloma_prosta button {
+            background: repeating-linear-gradient(
+              -45deg,
+              orange,
+              orange 5px,
+              rgba(255, 0, 0, 1) 5px,
+              rgba(255, 0, 0, 1) 10px
+            );
         }
-        .izbrana_ucilnica.deloma_prosta button {
+        .izbrana_ucilnica.morebiti.zasedena button {
             background: red;
+        }
+        .izbrana_ucilnica.morebiti.prosta button {
+            background: orange;
         }
     </style>
 </head>
@@ -171,7 +223,10 @@
     <div class="navbar-fixed">
         <nav>
             <div class="nav-wrapper">
-                <a href="/" class="brand-logo">Urnik</a>
+                <a href="/" class="brand-logo">
+                    <i class="large material-icons">schedule</i>
+                    Urnik
+                </a>
             </div>
         </nav>
     </div>
