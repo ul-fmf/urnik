@@ -376,12 +376,16 @@ def urnik(letniki, osebe, predmeti, ucilnice, skrij_rezervacije=False):
             OR slusatelji.oseba in ({}))
          ORDER BY dan, ura, trajanje
     '''.format(vprasaji(letniki), vprasaji(osebe), vprasaji(predmeti), vprasaji(ucilnice), vprasaji(osebe))
-    srecanja = podatki_srecanj([vrstica['id'] for vrstica in con.execute(sql, letniki + osebe + predmeti + ucilnice + osebe)])
-    if skrij_rezervacije:
-        srecanja = [srecanje for srecanje in srecanja.values() if srecanje['predmet']['kratica'] != 'REZ']
+    kljuci = [vrstica['id'] for vrstica in con.execute(sql, letniki + osebe + predmeti + ucilnice + osebe)]
+    if kljuci:
+        srecanja = podatki_srecanj(kljuci)
+        if skrij_rezervacije:
+            srecanja = [srecanje for srecanje in srecanja.values() if srecanje['predmet']['kratica'] != 'REZ']
+        else:
+            srecanja = srecanja.values()
+        return nastavi_sirine_srecanj(srecanja)
     else:
-        srecanja = srecanja.values()
-    return nastavi_sirine_srecanj(srecanja)
+        return []
 
 def fiziki():
     FIZIKALNE_UCILNICE = (
