@@ -1,6 +1,6 @@
 % rebase('obrazec.tpl')
 % urejanje = defined('ucilnica')
-% ucilnica = get('ucilnica', {'oznaka': '', 'velikost': None, 'racunalniska': False})
+% ucilnica = get('ucilnica', {'oznaka': '', 'velikost': None, 'racunalniska': False, 'skrita': False})
 <h3>Urejanje učilnice</h3>
 <form method="post">
     <div class="input-field">
@@ -8,7 +8,7 @@
         <label for="oznaka">Oznaka</label>
     </div>
     <div class="input-field">
-        <input value="{{ucilnica['velikost']}}" name="velikost" type="text" class="validate" />
+        <input value="{{ucilnica['velikost'] if ucilnica['velikost'] else ''}}" name="velikost" type="text" class="validate" />
         <label for="velikost">Velikost</label>
     </div>
     <p>

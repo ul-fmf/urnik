@@ -38,7 +38,7 @@
             <option value="{{ucilnica['id']}}" {{ 'selected' if ucilnica['id'] == srecanje['ucilnica']['id'] else '' }}>{{ucilnica['oznaka']}} ({{ucilnica['velikost']}})</option>
             % end
         </select>
-        <label>Učitelj</label>
+        <label>Učilnica</label>
     </div>
     <input type="hidden" name="next" value="{{next}}">
     <button class="btn waves-effect waves-light" type="submit">

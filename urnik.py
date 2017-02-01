@@ -32,9 +32,11 @@ def uredi_letnik(letnik):
 
 @post('/letnik/<letnik:int>/uredi')
 def uredi_letnik_post(letnik):
-    smer = request.forms.smer
-    leto = int(request.forms.leto)
-    modeli.uredi_letnik(letnik, smer, leto)
+    modeli.shrani_letnik({
+        'id': letnik,
+        'smer': request.forms.smer,
+        'leto': int(request.forms.leto),
+    })
     redirect('/')
 
 
@@ -48,10 +50,12 @@ def uredi_osebo(oseba):
 
 @post('/oseba/<oseba:int>/uredi')
 def uredi_osebo_post(oseba):
-    ime = request.forms.ime
-    priimek = request.forms.priimek
-    email = request.forms.email if request.forms.email else None
-    modeli.uredi_osebo(oseba, ime, priimek, email)
+    modeli.shrani_osebo({
+        'id': oseba,
+        'ime': request.forms.ime,
+        'priimek': request.forms.priimek,
+        'email': request.forms.email if request.forms.email else None,
+    })
     redirect('/')
 
 
@@ -65,11 +69,13 @@ def uredi_ucilnico(ucilnica):
 
 @post('/ucilnica/<ucilnica:int>/uredi')
 def uredi_ucilnico_post(ucilnica):
-    oznaka = request.forms.oznaka
-    velikost = None if request.forms.velikost is None else int(request.forms.velikost)
-    racunalniska = request.forms.racunalniska
-    skrita = request.forms.skrita
-    modeli.uredi_ucilnico(ucilnica, oznaka, velikost, racunalniska, skrita)
+    modeli.shrani_ucilnico({
+        'id': ucilnica,
+        'oznaka': request.forms.oznaka,
+        'velikost': int(request.forms.velikost) if request.forms.velikost else None,
+        'racunalniska': bool(request.forms.racunalniska),
+        'skrita': bool(request.forms.skrita),
+    })
     redirect('/')
 
 
@@ -105,9 +111,10 @@ def ustvari_letnik():
 
 @post('/letnik/ustvari')
 def ustvari_letnik_post():
-    smer = request.forms.smer
-    leto = int(request.forms.leto)
-    modeli.ustvari_letnik(smer, leto)
+    modeli.shrani_letnik({
+        'smer': request.forms.smer,
+        'leto': int(request.forms.leto),
+    })
     redirect('/')
 
 
@@ -120,10 +127,11 @@ def ustvari_osebo():
 
 @post('/oseba/ustvari')
 def ustvari_osebo_post():
-    ime = request.forms.ime
-    priimek = request.forms.priimek
-    email = request.forms.email if request.forms.email else None
-    modeli.ustvari_osebo(ime, priimek, email)
+    modeli.shrani_osebo({
+        'ime': request.forms.ime,
+        'priimek': request.forms.priimek,
+        'email': request.forms.email if request.forms.email else None,
+    })
     redirect('/')
 
 
@@ -136,11 +144,12 @@ def ustvari_ucilnico():
 
 @post('/ucilnica/ustvari')
 def ustvari_ucilnico_post():
-    oznaka = request.forms.oznaka
-    velikost = int(request.forms.velikost)
-    racunalniska = request.forms.racunalniska
-    skrita = request.forms.skrita
-    modeli.uredi_ucilnico(oznaka, velikost, racunalniska, skrita)
+    modeli.shrani_ucilnico({
+        'oznaka': request.forms.oznaka,
+        'velikost': int(request.forms.velikost) if request.forms.velikost else None,
+        'racunalniska': bool(request.forms.racunalniska),
+        'skrita': bool(request.forms.skrita),
+    })
     redirect('/')
 
 

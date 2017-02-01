@@ -25,6 +25,30 @@ def poberi_edinega(slovarji):
     assert len(slovarji) == 1
     return list(slovarji.values())[0]
 
+def shrani_podatke(tabela, podatki, ime_kljuca='id'):
+    if ime_kljuca in podatki:
+        kljuc = podatki.pop(ime_kljuca)
+    else:
+        kljuc = None
+    stolpci, vrednosti = [], []
+    for stolpec, vrednost in podatki.items():
+        stolpci.append(stolpec)
+        vrednosti.append(vrednost)
+    if kljuc is not None:
+        sql = '''
+            UPDATE {}
+            SET {}
+            WHERE {} = ?
+        '''.format(tabela, ', '.join('{} = ?'.format(stolpec) for stolpec in stolpci), ime_kljuca)
+        con.execute(sql, vrednosti + [kljuc])
+    else:
+        sql = '''
+            INSERT INTO {}
+            ({})
+            VALUES ({})
+        '''.format(tabela, ', '.join(stolpci), vprasaji(vrednosti))
+        con.execute(sql, vrednosti)
+    con.commit()
 
 
 ##########################################################################
@@ -129,46 +153,17 @@ def podatki_srecanja(kljuc):
 # UREJANJE
 ##########################################################################
 
+def shrani_osebo(oseba):
+    return shrani_podatke('oseba', oseba)
 
-def uredi_letnik(letnik, smer, leto):
-    sql = '''
-        UPDATE letnik
-        SET smer = ?, leto = ?
-        WHERE id = ?
-    '''
-    con.execute(sql, [smer, leto, letnik])
-    con.commit()
+def shrani_ucilnico(ucilnica):
+    return shrani_podatke('ucilnica', ucilnica)
 
+def shrani_letnik(letnik):
+    return shrani_podatke('letnik', letnik)
 
-def uredi_osebo(oseba, ime, priimek, email):
-    sql = '''
-        UPDATE oseba
-        SET ime = ?, priimek = ?, email = ?
-        WHERE id = ?
-    '''
-    con.execute(sql, [ime, priimek, email, oseba])
-    con.commit()
-
-
-def uredi_ucilnico(ucilnica, oznaka, velikost, racunalniska, skrita):
-    sql = '''
-        UPDATE ucilnica
-        SET oznaka = ?, velikost = ?, racunalniska = ?, skrita = ?
-        WHERE id = ?
-    '''
-    con.execute(sql, [oznaka, velikost, racunalniska, ucilnica, skrita])
-    con.commit()
-
-
-def uredi_srecanje(srecanje, ucitelj, predmet, tip, oznaka, ucilnica):
-    sql = '''
-        UPDATE srecanje
-        SET ucitelj = ?, predmet = ?, tip = ?, oznaka = ?, ucilnica = ?
-        WHERE id = ?
-    '''
-    con.execute(sql, [ucitelj, predmet, tip, oznaka, ucilnica, srecanje])
-    con.commit()
-
+def shrani_srecanje(srecanje):
+    return shrani_podatke('srecanje', srecanje)
 
 def uredi_predmet(predmet, ime, kratica, stevilo_studentov, letniki):
     sql = '''
@@ -196,40 +191,6 @@ def uredi_predmet(predmet, ime, kratica, stevilo_studentov, letniki):
 ##########################################################################
 # USTVARJANJE
 ##########################################################################
-
-
-def ustvari_letnik(smer, leto):
-    sql = '''
-        INSERT INTO letnik
-        (smer, leto)
-        VALUES
-        (?, ?)
-    '''
-    con.execute(sql, [smer, leto])
-    con.commit()
-
-
-def ustvari_osebo(ime, priimek, email):
-    sql = '''
-        INSERT INTO oseba
-        (ime , priimek, email)
-        VALUES
-        (?, ?, ?)
-    '''
-    con.execute(sql, [ime, priimek, email])
-    con.commit()
-
-
-def ustvari_ucilnico(oznaka, velikost, racunalniska):
-    sql = '''
-        INSERT INTO ucilnica
-        (oznaka, velikost, racunalniska)
-        VALUES
-        (?, ?, ?)
-    '''
-    con.execute(sql, [oznaka, velikost, racunalniska])
-    con.commit()
-
 
 def ustvari_predmet(ime, kratica, stevilo_studentov, letniki):
     sql = '''
