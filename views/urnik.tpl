@@ -162,13 +162,13 @@
         </div>
     </div>
     % end
-<h5><i class="material-icons">warning</i> Konflikti</h5>
+%for tip, opis in (('ucilnice', 'Konflikti učilnic'), ('osebe', 'Konflikti oseb'), ('letniki', 'Konflikti smeri')): 
+<h5><i class="material-icons">warning</i> {{opis}}</h5>
 <ul class="collection">
 %for (dan, ura), prekrivanja_po_tipih in prekrivanja.items():
-    % for tip, prekrivanja in prekrivanja_po_tipih.items():
-        % for id, srecanja in prekrivanja.items():
+    % for id, srecanja in prekrivanja_po_tipih.get(tip, {}).items():
         <li class="collection-item">
-            {{['?', 'ponedeljek', 'torek', 'sredo', 'četrtek', 'petek'][dan]}}, {{ura}}h,
+            {{['?', 'PON', 'TOR', 'SRE', 'ČET', 'PET'][dan]}}, {{ura}}h,
             % if tip == 'ucilnice':
                 {{srecanja[0]['ucilnica']['oznaka']}}:
             % elif tip == 'osebe':
@@ -183,15 +183,19 @@
                         <i class="tiny material-icons">open_with</i>
                     </a>
                     {{srecanje['predmet']['kratica']}} {{srecanje['tip']}},
+                    % if tip != 'osebe':
                     {{srecanje['ucitelj']['priimek']}},
+                    % end
+                    % if tip != 'ucilnice':
                     {{srecanje['ucilnica']['oznaka']}},
-                    {{srecanje['ura']}} – {{srecanje['ura'] + srecanje['trajanje']}},
+                    % end
+                    {{srecanje['ura']}}–{{srecanje['ura'] + srecanje['trajanje']}},
                 </li>
             % end
             </ul></small>
         </li>
-        %end
     % end
 % end
 </ul>
+% end
 </div>
