@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
     <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/css/materialize.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -159,6 +160,11 @@
             background: white;
             /*height: 100%;*/
             z-index: 100;
+        }
+        .srecanje:hover {
+            width: 20% !important;
+            z-index: 100;
+            background: #ddd;
         }
         .srecanje:hover .urejanje {
             visibility: visible;
