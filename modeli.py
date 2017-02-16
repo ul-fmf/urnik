@@ -165,7 +165,7 @@ def shrani_letnik(letnik):
 def shrani_srecanje(srecanje):
     return shrani_podatke('srecanje', srecanje)
 
-def uredi_predmet(predmet, ime, kratica, stevilo_studentov, letniki):
+def uredi_predmet(predmet, ime, kratica, stevilo_studentov, letniki, slusatelji):
     sql = '''
         UPDATE predmet
         SET ime = ?, kratica = ?, stevilo_studentov = ?
@@ -185,6 +185,19 @@ def uredi_predmet(predmet, ime, kratica, stevilo_studentov, letniki):
         WHERE id NOT in (SELECT letnik FROM predmet_letnik WHERE predmet = ?) AND id IN ({})
     '''.format(vprasaji(letniki))
     con.execute(sql, [predmet, predmet] + letniki)
+    sql = '''
+        DELETE FROM slusatelji
+        WHERE predmet = ? AND oseba NOT IN ({})
+    '''.format(vprasaji(slusatelji))
+    con.execute(sql, [predmet] + slusatelji)
+    sql = '''
+        INSERT INTO slusatelji
+        (predmet, oseba)
+        SELECT ?, id
+        FROM oseba
+        WHERE id NOT in (SELECT oseba FROM slusatelji WHERE predmet = ?) AND id IN ({})
+    '''.format(vprasaji(slusatelji))
+    con.execute(sql, [predmet, predmet] + slusatelji)
     con.commit()
 
 

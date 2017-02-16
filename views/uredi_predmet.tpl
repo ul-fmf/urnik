@@ -18,12 +18,22 @@
     <div class="input-field">
     % letniki_predmeta = [letnik['id'] for letnik in predmet['letniki']]
         <select multiple name="letniki">
-            <option value="" disabled {{'' if letniki_predmeta else 'selected'}}>Izberite letnik</option>
+            <option value="" disabled {{'' if letniki_predmeta else 'selected'}}>Brez študentov</option>
             % for letnik in letniki.values():
             <option value="{{letnik['id']}}" {{ 'selected' if letnik['id'] in letniki_predmeta else '' }}>{{letnik['smer']}}, {{letnik['leto']}}</option>
             % end
         </select>
         <label>Letniki</label>
+    </div>
+    <div class="input-field">
+    % slusatelji_predmeta = [slusatelj['id'] for slusatelj in predmet['slusatelji']]
+        <select multiple name="slusatelji">
+            <option value="" disabled {{'' if slusatelji_predmeta else 'selected'}}>Brez slušateljev</option>
+            % for slusatelj in slusatelji.values():
+            <option value="{{slusatelj['id']}}" {{ 'selected' if slusatelj['id'] in slusatelji_predmeta else '' }}>{{slusatelj['ime']}} {{slusatelj['priimek']}}</option>
+            % end
+        </select>
+        <label>Slušatelji</label>
     </div>
     <button class="btn waves-effect waves-light" type="submit">
         {{ 'Spremeni' if urejanje else 'Ustvari' }}
