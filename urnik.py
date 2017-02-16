@@ -35,7 +35,7 @@ def uredi_letnik_post(letnik):
     modeli.shrani_letnik({
         'id': letnik,
         'smer': request.forms.smer,
-        'leto': int(request.forms.leto) if requests.forms.leto else None,
+        'leto': int(request.forms.leto) if request.forms.leto else None,
     })
     redirect('/')
 
