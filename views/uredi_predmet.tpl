@@ -1,6 +1,6 @@
 % rebase('obrazec.tpl')
 % urejanje = defined('predmet')
-% predmet = get('predmet', {'ime': '', 'kratica': '', 'stevilo_studentov': None, 'racunalniski': False, 'letniki': []})
+% predmet = get('predmet', {'ime': '', 'kratica': '', 'stevilo_studentov': None, 'racunalniski': False, 'letniki': [], 'slusatelji': []})
 <h3>Urejanje predmeta</h3>
 <form method="post">
     <div class="input-field">

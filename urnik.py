@@ -159,7 +159,8 @@ def ustvari_ucilnico_post():
 def ustvari_predmet():
     return template(
         'uredi_predmet',
-        letniki=modeli.podatki_letnikov()
+        letniki=modeli.podatki_letnikov(),
+        slusatelji=modeli.podatki_oseb(),
     )
 
 
@@ -169,7 +170,8 @@ def ustvari_predmet_post():
     kratica = request.forms.kratica
     stevilo_studentov = None if request.forms.stevilo_studentov is '' else int(request.forms.stevilo_studentov)
     letniki = [int(letnik) for letnik in request.forms.getall('letniki')]
-    modeli.ustvari_predmet(ime, kratica, stevilo_studentov, letniki)
+    slusatelji = [int(letnik) for letnik in request.forms.getall('slusatelji')]
+    modeli.ustvari_predmet(ime, kratica, stevilo_studentov, letniki, slusatelji)
     redirect('/')
 
 

@@ -205,7 +205,7 @@ def uredi_predmet(predmet, ime, kratica, stevilo_studentov, letniki, slusatelji)
 # USTVARJANJE
 ##########################################################################
 
-def ustvari_predmet(ime, kratica, stevilo_studentov, letniki):
+def ustvari_predmet(ime, kratica, stevilo_studentov, letniki, slusatelji):
     sql = '''
         INSERT INTO predmet
         (ime, kratica, stevilo_studentov)
@@ -215,7 +215,7 @@ def ustvari_predmet(ime, kratica, stevilo_studentov, letniki):
     cur = con.execute(sql, [ime, kratica, stevilo_studentov])
     predmet = cur.lastrowid
     con.commit()
-    uredi_predmet(predmet, ime, kratica, stevilo_studentov, letniki)
+    uredi_predmet(predmet, ime, kratica, stevilo_studentov, letniki, slusatelji)
 
 ##########################################################################
 # UREJANJE SREČANJ
