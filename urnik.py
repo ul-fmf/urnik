@@ -9,15 +9,15 @@ import modeli
 
 @route('/index.html')
 def index_html():
-    redirect('/')
+    redirect('http://www.fmf.uni-lj.si/studij-matematike/urnik/')
 
 @route('/<url>/index.html')
 def index_html(url):
-    redirect('/')
+    redirect('http://www.fmf.uni-lj.si/studij-matematike/urnik/')
 
 @route('/<url1>/<url2>/index.html')
 def index_html(url1, url2):
-    redirect('/')
+    redirect('http://www.fmf.uni-lj.si/studij-matematike/urnik/')
 
 @route('/')
 def zacetna_stran():
