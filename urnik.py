@@ -7,6 +7,18 @@ import modeli
 # DOMAČA STRAN
 ##########################################################################
 
+@route('/index.html')
+def index_html():
+    redirect('/')
+
+@route('/<url>/index.html')
+def index_html(url):
+    redirect('/')
+
+@route('/<url1>/<url2>/index.html')
+def index_html(url1, url2):
+    redirect('/')
+
 @route('/')
 def zacetna_stran():
     smeri = {}
