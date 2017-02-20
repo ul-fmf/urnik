@@ -149,6 +149,18 @@ def podatki_predmeta(kljuc):
 def podatki_srecanja(kljuc):
     return poberi_edinega(podatki_srecanj([kljuc]))
 
+def kljuci_relevantnih_oseb():
+    sql = '''
+        SELECT distinct oseba.id
+          FROM oseba
+               LEFT JOIN
+               srecanje ON oseba.id = srecanje.ucitelj
+               LEFT JOIN
+               slusatelji ON oseba.id = slusatelji.oseba
+         WHERE slusatelji.oseba IS NOT NULL OR 
+               srecanje.ucitelj IS NOT NULL
+    '''
+    return [vrstica['id'] for vrstica in con.execute(sql)]
 ##########################################################################
 # UREJANJE
 ##########################################################################

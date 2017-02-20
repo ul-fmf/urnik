@@ -1,4 +1,4 @@
-% rebase('osnova.tpl')
+% rebase('osnova.tpl', domov='/uredi/')
 
 % min_ura, max_ura = 7, 20
 % enota_visine = 1 / (max_ura - min_ura)
@@ -36,18 +36,18 @@
             {{srecanje['predmet']['ime']}} {{srecanje['tip']}}{{srecanje['oznaka'] if srecanje['oznaka'] else ''}}
         </div>
         <div class="ucitelj">
-            <a href="/urnik?oseba={{srecanje['ucitelj']['id']}}">
+            <a href="/uredi/urnik?oseba={{srecanje['ucitelj']['id']}}">
                 {{srecanje['ucitelj']['priimek']}}
             </a>
         </div>
         <div class="ucilnica">
-            <a href="/urnik?ucilnica={{srecanje['ucilnica']['id']}}">
+            <a href="/uredi/urnik?ucilnica={{srecanje['ucilnica']['id']}}">
                 {{srecanje['ucilnica']['oznaka']}}
             </a>
         </div>
         <div class="urejanje">
             % if srecanje['trajanje'] > 1:
-            <form method="post" action="/srecanje/{{srecanje['id']}}/trajanje">
+            <form method="post" action="/uredi/srecanje/{{srecanje['id']}}/trajanje/">
                 <input type="hidden" name="next" value="{{next}}">
                 <input type="hidden" name="trajanje" value="{{srecanje['trajanje'] - 1}}">
                 <button>
@@ -55,32 +55,32 @@
                 </button>
             </form>
             % end
-            <form method="post" action="/srecanje/{{srecanje['id']}}/trajanje">
+            <form method="post" action="/uredi/srecanje/{{srecanje['id']}}/trajanje/">
                 <input type="hidden" name="next" value="{{next}}">
                 <input type="hidden" name="trajanje" value="{{srecanje['trajanje'] + 1}}">
                 <button>
                     <i class="tiny material-icons">file_download</i> podaljšaj
                 </button>
             </form>
-            <form method="post" action="/srecanje/{{srecanje['id']}}/izbrisi">
+            <form method="post" action="/uredi/srecanje/{{srecanje['id']}}/izbrisi/">
                 <button>
                     <i class="tiny material-icons">delete</i> pobriši
                 </button>
             </form>
-            <form method="post" action="/srecanje/{{srecanje['id']}}/podvoji">
+            <form method="post" action="/uredi/srecanje/{{srecanje['id']}}/podvoji/">
                 <button>
                     <i class="tiny material-icons">content_copy</i> podvoji
                 </button>
             </form>
-            <a href="/srecanje/{{srecanje['id']}}/premakni">
+            <a href="/uredi/srecanje/{{srecanje['id']}}/premakni/">
                 <i class="tiny material-icons">open_with</i> premakni
             </a>
-            <form method="post" action="/srecanje/{{srecanje['id']}}/odlozi">
+            <form method="post" action="/uredi/srecanje/{{srecanje['id']}}/odlozi/">
                 <button>
                     <i class="tiny material-icons">move_to_inbox</i> odloži
                 </button>
             </form>
-            <a href="/srecanje/{{srecanje['id']}}/uredi">
+            <a href="/uredi/srecanje/{{srecanje['id']}}/">
                 <i class="tiny material-icons">edit</i> uredi
             </a>
         </div>
@@ -117,18 +117,18 @@
             {{srecanje['predmet']['ime']}} {{srecanje['tip']}}{{srecanje['oznaka'] if srecanje['oznaka'] else ''}}
         </div>
         <div class="ucitelj">
-            <a href="/urnik?oseba={{srecanje['ucitelj']['id']}}">
+            <a href="/uredi/urnik?oseba={{srecanje['ucitelj']['id']}}">
                 {{srecanje['ucitelj']['priimek']}}
             </a>
         </div>
         <div class="ucilnica">
-            <a href="/urnik?ucilnica={{srecanje['ucilnica']['id']}}">
+            <a href="/uredi/urnik?ucilnica={{srecanje['ucilnica']['id']}}">
                 {{srecanje['ucilnica']['oznaka']}}
             </a>
         </div>
         <div class="urejanje">
             % if srecanje['trajanje'] > 1:
-            <form method="post" action="/srecanje/{{srecanje['id']}}/trajanje">
+            <form method="post" action="/uredi/srecanje/{{srecanje['id']}}/trajanje/">
                 <input type="hidden" name="next" value="{{next}}">
                 <input type="hidden" name="trajanje" value="{{srecanje['trajanje'] - 1}}">
                 <button>
@@ -136,27 +136,27 @@
                 </button>
             </form>
             % end
-            <form method="post" action="/srecanje/{{srecanje['id']}}/trajanje">
+            <form method="post" action="/uredi/srecanje/{{srecanje['id']}}/trajanje/">
                 <input type="hidden" name="next" value="{{next}}">
                 <input type="hidden" name="trajanje" value="{{srecanje['trajanje'] + 1}}">
                 <button>
                     <i class="tiny material-icons">file_download</i> podaljšaj
                 </button>
             </form>
-            <form method="post" action="/srecanje/{{srecanje['id']}}/izbrisi">
+            <form method="post" action="/uredi/srecanje/{{srecanje['id']}}/izbrisi/">
                 <button>
                     <i class="tiny material-icons">delete</i> pobriši
                 </button>
             </form>
-            <form method="post" action="/srecanje/{{srecanje['id']}}/podvoji">
+            <form method="post" action="/uredi/srecanje/{{srecanje['id']}}/podvoji/">
                 <button>
                     <i class="tiny material-icons">content_copy</i> podvoji
                 </button>
             </form>
-            <a href="/srecanje/{{srecanje['id']}}/premakni">
+            <a href="/uredi/srecanje/{{srecanje['id']}}/premakni/">
                 <i class="tiny material-icons">open_with</i> premakni
             </a>
-            <a href="/srecanje/{{srecanje['id']}}/uredi">
+            <a href="/uredi/srecanje/{{srecanje['id']}}/">
                 <i class="tiny material-icons">edit</i>
             </a>
         </div>
@@ -179,7 +179,7 @@
             <small><ul>
             % for srecanje in srecanja:
                 <li>
-                    <a href="/srecanje/{{srecanje['id']}}/premakni">
+                    <a href="/uredi/srecanje/{{srecanje['id']}}/premakni/">
                         <i class="tiny material-icons">open_with</i>
                     </a>
                     {{srecanje['predmet']['kratica']}} {{srecanje['tip']}},

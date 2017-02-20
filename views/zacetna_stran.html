@@ -1,0 +1,95 @@
+% rebase('osnova.tpl')
+<div class="container">
+<div class="row">
+    <div class="col s3">
+        <table class="highlight">
+            % for smer in [smer for i, smer in enumerate(sorted(smeri)) if i % 2 == 0]:
+            <thead>
+                <tr>
+                    <th>{{smer}}</th>
+                </tr>
+            </thead>
+            <tbody>
+                % for id, opis in smeri[smer]:
+                <tr>
+                    <td style="padding: 5px">
+                        <a href="/letnik/{{id}}/">{{opis}}</a>
+                    </td>
+                </tr>
+                %end
+            </tbody>
+            % end
+        </table>
+    </div>
+    <div class="col s3">
+        <table class="highlight">
+            % for smer in [smer for i, smer in enumerate(sorted(smeri)) if i % 2 == 1]:
+            <thead>
+                <tr>
+                    <th>{{smer}}</th>
+                </tr>
+            </thead>
+            <tbody>
+                % for id, opis in smeri[smer]:
+                <tr>
+                    <td style="padding: 5px">
+                        <a href="/letnik/{{id}}/">{{opis}}</a>
+                    </td>
+                </tr>
+                %end
+            </tbody>
+            % end
+        </table>
+    </div>
+    <div class="col s2">
+        <table class="highlight">
+            <thead>
+                <tr>
+                    <th>Učilnica</th>
+                </tr>
+            </thead>
+            <tbody>
+                %for ucilnica in ucilnice.values():
+                %if not ucilnica['skrita'] and ucilnica['oznaka'] != 'X':
+                <tr>
+                    <td style="padding: 5px">
+                        <a href="/ucilnica/{{ucilnica['id']}}/">
+                            {{ucilnica['oznaka']}}
+                        </a>
+                        <small>
+                        %if ucilnica['racunalniska']:
+                        <i class="tiny material-icons">computer</i>
+                        %end
+                        ({{ucilnica['velikost'] or '?'}} mest)</small>
+                    </td>
+                </tr>
+                %end
+                %end
+            </tbody>
+        </table>
+    </div>
+    <div class="col s4">
+        <table class="highlight">
+            <thead>
+                <tr>
+                    <th>Oseba</th>
+                </tr>
+            </thead>
+            <tbody>
+                %crke = 'ABCČDEFGHIJKLMNOPQRSŠTUVWXYZŽ'
+                %for oseba in sorted(osebe.values(), key=lambda oseba: (crke.index(oseba['priimek'][0]), oseba['priimek'], oseba['ime'])):
+                %if oseba['priimek'] != 'X':
+                <tr>
+                    <td style="padding: 5px">
+                        <a href="/oseba/{{oseba['id']}}/">
+                            {{oseba['ime']}} <strong>{{oseba['priimek']}}</strong>
+                        </a>
+                    </td>
+                </tr>
+                %end
+                %end
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>

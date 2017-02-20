@@ -8,9 +8,30 @@ import modeli
 ##########################################################################
 
 @route('/')
-def domaca_stran():
+def zacetna_stran():
+    smeri = {}
+    for letnik in modeli.podatki_letnikov().values():
+        if letnik['leto']:
+            letnik['opis'] = '{}, {}. letnik'.format(letnik['smer'], letnik['leto'])
+        else:
+            letnik['opis'] = letnik['smer']
+        try:
+            smer, opis = letnik['opis'].split(',')
+            smeri.setdefault(smer, []).append((letnik['id'], opis))
+        except:
+            pass
     return template(
-        'domaca_stran',
+        'zacetna_stran',
+        smeri=smeri,
+        letniki=modeli.podatki_letnikov(),
+        osebe=modeli.podatki_oseb(kljuci=modeli.kljuci_relevantnih_oseb()),
+        ucilnice=modeli.podatki_ucilnic(),
+    )
+
+@route('/uredi/')
+def uredi_zacetna_stran():
+    return template(
+        'uredi_zacetna_stran',
         letniki=modeli.podatki_letnikov(),
         osebe=modeli.podatki_oseb(),
         ucilnice=modeli.podatki_ucilnic(),
@@ -22,7 +43,7 @@ def domaca_stran():
 ##########################################################################
 
 
-@get('/letnik/<letnik:int>/uredi')
+@get('/uredi/letnik/<letnik:int>/')
 def uredi_letnik(letnik):
     return template(
         'uredi_letnik',
@@ -30,17 +51,17 @@ def uredi_letnik(letnik):
     )
 
 
-@post('/letnik/<letnik:int>/uredi')
+@post('/uredi/letnik/<letnik:int>/')
 def uredi_letnik_post(letnik):
     modeli.shrani_letnik({
         'id': letnik,
         'smer': request.forms.smer,
         'leto': int(request.forms.leto) if request.forms.leto else None,
     })
-    redirect('/')
+    redirect('/uredi/')
 
 
-@get('/oseba/<oseba:int>/uredi')
+@get('/uredi/oseba/<oseba:int>/')
 def uredi_osebo(oseba):
     return template(
         'uredi_osebo',
@@ -48,7 +69,7 @@ def uredi_osebo(oseba):
     )
 
 
-@post('/oseba/<oseba:int>/uredi')
+@post('/uredi/oseba/<oseba:int>/')
 def uredi_osebo_post(oseba):
     modeli.shrani_osebo({
         'id': oseba,
@@ -56,10 +77,10 @@ def uredi_osebo_post(oseba):
         'priimek': request.forms.priimek,
         'email': request.forms.email if request.forms.email else None,
     })
-    redirect('/')
+    redirect('/uredi/')
 
 
-@get('/ucilnica/<ucilnica:int>/uredi')
+@get('/uredi/ucilnica/<ucilnica:int>/')
 def uredi_ucilnico(ucilnica):
     return template(
         'uredi_ucilnico',
@@ -67,7 +88,7 @@ def uredi_ucilnico(ucilnica):
     )
 
 
-@post('/ucilnica/<ucilnica:int>/uredi')
+@post('/uredi/ucilnica/<ucilnica:int>/')
 def uredi_ucilnico_post(ucilnica):
     modeli.shrani_ucilnico({
         'id': ucilnica,
@@ -76,10 +97,10 @@ def uredi_ucilnico_post(ucilnica):
         'racunalniska': bool(request.forms.racunalniska),
         'skrita': bool(request.forms.skrita),
     })
-    redirect('/')
+    redirect('/uredi/')
 
 
-@get('/predmet/<predmet:int>/uredi')
+@get('/uredi/predmet/<predmet:int>/')
 def uredi_predmet(predmet):
     return template(
         'uredi_predmet',
@@ -89,7 +110,7 @@ def uredi_predmet(predmet):
     )
 
 
-@post('/predmet/<predmet:int>/uredi')
+@post('/uredi/predmet/<predmet:int>/')
 def uredi_predmet_post(predmet):
     ime = request.forms.ime
     kratica = request.forms.kratica
@@ -97,54 +118,54 @@ def uredi_predmet_post(predmet):
     letniki = [int(letnik) for letnik in request.forms.getall('letniki')]
     slusatelji = [int(slusatelj) for slusatelj in request.forms.getall('slusatelji')]
     modeli.uredi_predmet(predmet, ime, kratica, stevilo_studentov, letniki, slusatelji)
-    redirect('/')
+    redirect('/uredi/')
 
 ##########################################################################
 # USTVARJANJE
 ##########################################################################
 
 
-@get('/letnik/ustvari')
+@get('/uredi/letnik/ustvari/')
 def ustvari_letnik():
     return template(
         'uredi_letnik'
     )
 
 
-@post('/letnik/ustvari')
+@post('/uredi/letnik/ustvari/')
 def ustvari_letnik_post():
     modeli.shrani_letnik({
         'smer': request.forms.smer,
         'leto': int(request.forms.leto),
     })
-    redirect('/')
+    redirect('/uredi/')
 
 
-@get('/oseba/ustvari')
+@get('/uredi/oseba/ustvari/')
 def ustvari_osebo():
     return template(
         'uredi_osebo'
     )
 
 
-@post('/oseba/ustvari')
+@post('/uredi/oseba/ustvari/')
 def ustvari_osebo_post():
     modeli.shrani_osebo({
         'ime': request.forms.ime,
         'priimek': request.forms.priimek,
         'email': request.forms.email if request.forms.email else None,
     })
-    redirect('/')
+    redirect('/uredi/')
 
 
-@get('/ucilnica/ustvari')
+@get('/uredi/ucilnica/ustvari/')
 def ustvari_ucilnico():
     return template(
         'uredi_ucilnico'
     )
 
 
-@post('/ucilnica/ustvari')
+@post('/uredi/ucilnica/ustvari/')
 def ustvari_ucilnico_post():
     modeli.shrani_ucilnico({
         'oznaka': request.forms.oznaka,
@@ -152,10 +173,10 @@ def ustvari_ucilnico_post():
         'racunalniska': bool(request.forms.racunalniska),
         'skrita': bool(request.forms.skrita),
     })
-    redirect('/')
+    redirect('/uredi/')
 
 
-@get('/predmet/ustvari')
+@get('/uredi/predmet/ustvari/')
 def ustvari_predmet():
     return template(
         'uredi_predmet',
@@ -164,7 +185,7 @@ def ustvari_predmet():
     )
 
 
-@post('/predmet/ustvari')
+@post('/uredi/predmet/ustvari/')
 def ustvari_predmet_post():
     ime = request.forms.ime
     kratica = request.forms.kratica
@@ -172,7 +193,7 @@ def ustvari_predmet_post():
     letniki = [int(letnik) for letnik in request.forms.getall('letniki')]
     slusatelji = [int(letnik) for letnik in request.forms.getall('slusatelji')]
     modeli.ustvari_predmet(ime, kratica, stevilo_studentov, letniki, slusatelji)
-    redirect('/')
+    redirect('/uredi/')
 
 
 ##########################################################################
@@ -180,20 +201,20 @@ def ustvari_predmet_post():
 ##########################################################################
 
 
-@get('/srecanje/<srecanje:int>/premakni')
+@get('/uredi/srecanje/<srecanje:int>/premakni/')
 def premakni_srecanje(srecanje):
     return template(
-        'urnik',
+        'uredi_urnik',
         premaknjeno_srecanje=srecanje,
         odlozena_srecanja=modeli.odlozena_srecanja(),
         srecanja=modeli.povezana_srecanja(srecanje),
         prosti_termini=modeli.prosti_termini(srecanje),
-        next=request.headers.get('referer') or '/',
+        next=request.headers.get('referer') or '/uredi/',
         prekrivanja={},
     )
 
 
-@post('/srecanje/<srecanje:int>/premakni')
+@post('/uredi/srecanje/<srecanje:int>/premakni/')
 def premakni_srecanje(srecanje):
     dan = int(request.forms.dan)
     ura = int(request.forms.ura)
@@ -202,31 +223,31 @@ def premakni_srecanje(srecanje):
     redirect(request.forms.next)
 
 
-@post('/srecanje/<srecanje:int>/izbrisi')
+@post('/uredi/srecanje/<srecanje:int>/izbrisi/')
 def izbrisi(srecanje):
     modeli.izbrisi_srecanje(srecanje)
-    redirect(request.headers.get('referer') or '/')
+    redirect(request.headers.get('referer') or '/uredi/')
 
 
-@post('/srecanje/<srecanje:int>/podvoji')
+@post('/uredi/srecanje/<srecanje:int>/podvoji/')
 def podvoji(srecanje):
     modeli.podvoji_srecanje(srecanje)
-    redirect(request.headers.get('referer') or '/')
+    redirect(request.headers.get('referer') or '/uredi/')
 
-@post('/srecanje/<srecanje:int>/odlozi')
+@post('/uredi/srecanje/<srecanje:int>/odlozi/')
 def odlozi(srecanje):
     modeli.odlozi_srecanje(srecanje)
-    redirect(request.headers.get('referer') or '/')
+    redirect(request.headers.get('referer') or '/uredi/')
 
 
-@post('/srecanje/<srecanje:int>/trajanje')
+@post('/uredi/srecanje/<srecanje:int>/trajanje/')
 def trajanje_srecanja(srecanje):
     trajanje = int(request.forms.trajanje)
     modeli.nastavi_trajanje(srecanje, trajanje)
-    redirect(request.headers.get('referer') or '/')
+    redirect(request.headers.get('referer') or '/uredi/')
 
 
-@get('/srecanje/<srecanje:int>/uredi')
+@get('/uredi/srecanje/<srecanje:int>/')
 def uredi_srecanje(srecanje):
     return template(
         'uredi_srecanje',
@@ -234,11 +255,11 @@ def uredi_srecanje(srecanje):
         ucitelji=modeli.podatki_oseb(),
         predmeti=modeli.podatki_predmetov(),
         ucilnice=modeli.podatki_ucilnic(),
-        next=request.headers.get('referer') or '/',
+        next=request.headers.get('referer') or '/uredi/',
     )
 
 
-@post('/srecanje/<srecanje:int>/uredi')
+@post('/uredi/srecanje/<srecanje:int>/')
 def uredi_srecanje_post(srecanje):
     modeli.shrani_srecanje({
         'id': srecanje,
@@ -255,10 +276,10 @@ def uredi_srecanje_post(srecanje):
 ##########################################################################
 
 
-@route('/urnik')
+@route('/uredi/urnik')
 def urnik():
     return template(
-        'urnik',
+        'uredi_urnik',
         srecanja=modeli.urnik(
             letniki=[int(letnik) for letnik in request.query.getall('letnik')],
             osebe=[int(oseba) for oseba in request.query.getall('oseba')],
@@ -270,7 +291,67 @@ def urnik():
         prekrivanja=modeli.prekrivanja(),
     )
 
-@route('/fiziki')
+@route('/letnik/<letnik:int>/')
+def urnik(letnik):
+    l = modeli.podatki_letnika(letnik)
+    if l['leto']:
+        naslov = '{}, {}. letnik'.format(l['smer'], l['leto'])
+    else:
+        naslov = l['smer']
+    return template(
+        'urnik',
+        srecanja=modeli.urnik(
+            letniki=[letnik],
+            osebe=[],
+            predmeti=[],
+            ucilnice=[],
+        ),
+        naslov=naslov,
+    )
+@route('/oseba/<oseba:int>/')
+def urnik(oseba):
+    l = modeli.podatki_osebe(oseba)
+    naslov = '{} {}'.format(l['ime'], l['priimek'])
+    return template(
+        'urnik',
+        srecanja=modeli.urnik(
+            letniki=[],
+            osebe=[oseba],
+            predmeti=[],
+            ucilnice=[],
+        ),
+        naslov=naslov,
+    )
+@route('/ucilnica/<ucilnica:int>/')
+def urnik(ucilnica):
+    l = modeli.podatki_ucilnice(ucilnica)
+    naslov = 'Učilnica {}'.format(l['oznaka'])
+    return template(
+        'urnik',
+        srecanja=modeli.urnik(
+            letniki=[],
+            osebe=[],
+            predmeti=[],
+            ucilnice=[ucilnica],
+        ),
+        naslov=naslov,
+    )
+@route('/predmet/<predmet:int>/')
+def urnik(predmet):
+    l = modeli.podatki_predmeta(predmet)
+    naslov = l['ime']
+    return template(
+        'urnik',
+        srecanja=modeli.urnik(
+            letniki=[],
+            osebe=[],
+            predmeti=[predmet],
+            ucilnice=[],
+        ),
+        naslov=naslov,
+    )
+
+@route('/uredi/fiziki/')
 def fiziki():
     return template(
         'urnik',

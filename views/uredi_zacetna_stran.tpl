@@ -1,4 +1,4 @@
-% rebase('osnova.tpl')
+% rebase('osnova.tpl', domov='/uredi/')
 <div class="row">
     <div class="col s3">
         <table class="highlight">
@@ -10,7 +10,7 @@
             <tbody>
                 <tr>
                     <td>
-                        <a href="/letnik/ustvari">
+                        <a href="/uredi/letnik/ustvari/">
                             <i class="tiny material-icons">add</i>
                             ustvari nov letnik
                         </a>
@@ -19,10 +19,10 @@
                 %for letnik in letniki.values():
                 <tr>
                     <td>
-                        <a href="/urnik?letnik={{letnik['id']}}">
+                        <a href="/uredi/urnik?letnik={{letnik['id']}}">
                             {{letnik['smer']}}{{', {}. letnik'.format(letnik['leto']) if letnik['leto'] else ''}}
                         </a>
-                        <a href="/letnik/{{letnik['id']}}/uredi">
+                        <a href="/uredi/letnik/{{letnik['id']}}/">
                             <i class="tiny material-icons">edit</i>
                         </a>
                     </td>
@@ -41,7 +41,7 @@
             <tbody>
                 <tr>
                     <td>
-                        <a href="/oseba/ustvari">
+                        <a href="/uredi/oseba/ustvari/">
                             <i class="tiny material-icons">add</i>
                             ustvari novo osebo
                         </a>
@@ -50,10 +50,10 @@
                 %for oseba in osebe.values():
                 <tr>
                     <td>
-                        <a href="/urnik?oseba={{oseba['id']}}">
+                        <a href="/uredi/urnik?oseba={{oseba['id']}}">
                             {{oseba['ime']}} {{oseba['priimek']}}
                         </a>
-                        <a href="/oseba/{{oseba['id']}}/uredi">
+                        <a href="/uredi/oseba/{{oseba['id']}}/">
                             <i class="tiny material-icons">edit</i>
                         </a>
                     </td>
@@ -72,7 +72,7 @@
             <tbody>
                 <tr>
                     <td>
-                        <a href="/predmet/ustvari">
+                        <a href="/uredi/predmet/ustvari/">
                             <i class="tiny material-icons">add</i>
                             ustvari nov predmet
                         </a>
@@ -81,14 +81,14 @@
                 %for predmet in predmeti.values():
                 <tr>
                     <td>
-                        <a href="/urnik?predmet={{predmet['id']}}">
+                        <a href="/uredi/urnik?predmet={{predmet['id']}}">
                             {{predmet['ime']}}
                         </a>
                         <small>
                             {{predmet['kratica']}} /
                             {{predmet['stevilo_studentov'] or '?'}} /
                         {{', '.join((str(letnik['leto']) + 'L ' if letnik['leto'] else '') + letnik['smer'] for letnik in predmet['letniki'] )}}</small>
-                        <a href="/predmet/{{predmet['id']}}/uredi">
+                        <a href="/uredi/predmet/{{predmet['id']}}/">
                             <i class="tiny material-icons">edit</i>
                         </a>
                     </td>
@@ -107,7 +107,7 @@
             <tbody>
                 <tr>
                     <td>
-                        <a href="/ucilnica/ustvari">
+                        <a href="/uredi/ucilnica/ustvari/">
                             <i class="tiny material-icons">add</i>
                             ustvari novo učilnico
                         </a>
@@ -116,7 +116,7 @@
                 %for ucilnica in ucilnice.values():
                 <tr>
                     <td>
-                        <a href="/urnik?ucilnica={{ucilnica['id']}}">
+                        <a href="/uredi/urnik?ucilnica={{ucilnica['id']}}">
                             {{ucilnica['oznaka']}}
                         </a>
                         <small>{{ucilnica['velikost'] if ucilnica['velikost'] else '?'}}</small>
@@ -128,7 +128,7 @@
                         %else:
                         <i class="tiny material-icons">visibility</i>
                         %end
-                        <a href="/ucilnica/{{ucilnica['id']}}/uredi">
+                        <a href="/uredi/ucilnica/{{ucilnica['id']}}/">
                             <i class="tiny material-icons">edit</i>
                         </a>
                     </td>

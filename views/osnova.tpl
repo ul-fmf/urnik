@@ -5,9 +5,23 @@
     <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/css/materialize.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Urnik OM FMF {{ '- ' if defined('naslov') else '' }}{{get('naslov', '')}} – poletni semester 2016/17</title>
     <style>
         body {
             /*background: #ddd;*/
+        }
+        .container, .navbar {
+            min-width: 1024px;
+        }
+        #urnik.cel {
+            position: absolute;
+            left: 2.5%;
+            top: 2.5%;
+            width: 95%;
+            height: 95%;
+            background: white;
+            min-width: 1024px;
+            min-height: 600px;
         }
         #urnik {
             position: absolute;
@@ -28,9 +42,9 @@
         }
         #dnevi {
             position: absolute;
-            left: 5%;
+            left: 3%;
             top: 0%;
-            width: 95%;
+            width: 97%;
             height: 100%;
             color: #333;
         }
@@ -44,9 +58,9 @@
         }
         #srecanja {
             position: absolute;
-            left: 5%;
+            left: 3%;
             top: 5%;
-            width: 95%;
+            width: 97%;
             height: 95%;
         }
         .ura {
@@ -55,7 +69,7 @@
             width: 100%;
         }
         .ura span {
-            width: 5%;
+            width: 3%;
             text-align: right;
             position: relative;
             display: block;
@@ -81,11 +95,14 @@
             height: 4em;
             margin-right: 1em;
         }
+        .ucitelj, .ucilnica, .tip {
+            color: #777;
+            font-weight: normal;
+        }
         .ucitelj, .ucilnica {
-            position: absolute;
-            color: #999;
-            bottom: 4pt;
             font-size: 0.8em;
+            position: absolute;
+            bottom: 4pt;
             z-index: 10;
         }
         .ucilnica {
@@ -102,6 +119,10 @@
             border-style: none;
             width: 100%;
             height: 100%;
+        }
+        .predmet {
+            font-size: 0.9em;
+            font-weight: bold;
         }
         .termin.zaseden {
             background: rgba(255, 0, 0, 0.5);
@@ -162,10 +183,10 @@
             z-index: 100;
         }
         .srecanje:hover {
-            width: 20% !important;
+/*            width: 20% !important;
             z-index: 100;
             background: #ddd;
-        }
+*/        }
         .srecanje:hover .urejanje {
             visibility: visible;
         }
@@ -222,19 +243,47 @@
         .izbrana_ucilnica.morebiti.prosta button {
             background: orange;
         }
+        nav {
+            background-color: #85be4e;
+        }
+        @media print {
+            a {
+                color: black;
+            }
+            #domov {
+                display: none;
+            }
+            .srecanje {
+                background: #eee;
+                border: solid 1.5px white;
+            }
+            .brand-logo {
+                color: black !important;
+            }
+            .brand-logo i {
+                display: none !important;
+            }
+            nav {
+                background: white;
+            }
+        }
     </style>
 </head>
 
 <body>
     <div class="navbar-fixed">
-        <nav>
-            <div class="nav-wrapper">
-                <a href="/" class="brand-logo">
-                    <i class="large material-icons">schedule</i>
-                    Urnik
-                </a>
-            </div>
-        </nav>
+  <nav>
+    <div class="nav-wrapper">
+      <span class="brand-logo center">
+        <i class="large material-icons">schedule</i>
+        {{get('naslov', 'Urnik')}}
+      </span>
+      <ul>
+        <li id="domov"><a href="{{get('domov', '/')}}"><i class="material-icons left">home</i>Urnik OM FMF – poletni semester 2016/17</a></li>
+      </ul>
+    </div>
+  </nav>
+
     </div>
     <div class="container" style="position: absolute; width: 100%; bottom: 0; top: 64px">
         {{!base}}
