@@ -555,6 +555,13 @@ def prosti_termini(id_srecanja):
     izbrano_srecanje = podatki_srecanja(id_srecanja)
     predmet = izbrano_srecanje['predmet']
     ucilnice = ustrezne_ucilnice(predmet['stevilo_studentov'])
+    for ucilnica in ucilnice:
+        if ucilnica['id'] == izbrano_srecanje['ucilnica']['id']:
+            break
+    else:
+        ucilnica = izbrano_srecanje['ucilnica']
+        ucilnica['ustreznost'] = 'ustrezna'
+        ucilnice = [ucilnica] + ucilnice
     ucilnice = oznaci_zasedenost(izbrano_srecanje, ucilnice)
     return ucilnice
 
