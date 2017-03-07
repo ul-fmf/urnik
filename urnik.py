@@ -55,159 +55,90 @@ def uredi_zacetna_stran():
 ##########################################################################
 
 
-@get('/uredi/letnik/<letnik:int>/')
-def uredi_letnik(letnik):
-    return template(
-        'uredi_letnik',
-        letnik=modeli.podatki_letnika(letnik)
-    )
-
-
-@post('/uredi/letnik/<letnik:int>/')
-def uredi_letnik_post(letnik):
-    modeli.shrani_letnik({
-        'id': letnik,
-        'smer': request.forms.smer,
-        'leto': int(request.forms.leto) if request.forms.leto else None,
-    })
-    redirect('/uredi/')
-
-
-@get('/uredi/oseba/<oseba:int>/')
-def uredi_osebo(oseba):
-    return template(
-        'uredi_osebo',
-        oseba=modeli.podatki_osebe(oseba)
-    )
-
-
-@post('/uredi/oseba/<oseba:int>/')
-def uredi_osebo_post(oseba):
-    modeli.shrani_osebo({
-        'id': oseba,
-        'ime': request.forms.ime,
-        'priimek': request.forms.priimek,
-        'email': request.forms.email if request.forms.email else None,
-    })
-    redirect('/uredi/')
-
-
-@get('/uredi/ucilnica/<ucilnica:int>/')
-def uredi_ucilnico(ucilnica):
-    return template(
-        'uredi_ucilnico',
-        ucilnica=modeli.podatki_ucilnice(ucilnica)
-    )
-
-
-@post('/uredi/ucilnica/<ucilnica:int>/')
-def uredi_ucilnico_post(ucilnica):
-    modeli.shrani_ucilnico({
-        'id': ucilnica,
-        'oznaka': request.forms.oznaka,
-        'velikost': int(request.forms.velikost) if request.forms.velikost else None,
-        'racunalniska': bool(request.forms.racunalniska),
-        'skrita': bool(request.forms.skrita),
-    })
-    redirect('/uredi/')
-
-
-@get('/uredi/predmet/<predmet:int>/')
-def uredi_predmet(predmet):
-    return template(
-        'uredi_predmet',
-        predmet=modeli.podatki_predmeta(predmet),
-        letniki=modeli.podatki_letnikov(),
-        slusatelji=modeli.podatki_oseb(),
-    )
-
-
-@post('/uredi/predmet/<predmet:int>/')
-def uredi_predmet_post(predmet):
-    modeli.shrani_predmet({
-        'id': predmet,
-        'ime': request.forms.ime,
-        'kratica': request.forms.kratica,
-        'stevilo_studentov': None if request.forms.stevilo_studentov is '' else int(request.forms.stevilo_studentov),
-        'letniki': {int(letnik) for letnik in request.forms.getall('letniki')},
-        'slusatelji': {int(letnik) for letnik in request.forms.getall('slusatelji')},
-    })
-    redirect('/uredi/')
-
-##########################################################################
-# USTVARJANJE
-##########################################################################
-
-
 @get('/uredi/letnik/ustvari/')
-def ustvari_letnik():
-    return template(
-        'uredi_letnik'
-    )
+@get('/uredi/letnik/<id_letnika:int>/')
+def uredi_letnik(id_letnika=None):
+    return template('uredi_letnik', letnik=modeli.podatki_letnika(id_letnika))
 
 
 @post('/uredi/letnik/ustvari/')
-def ustvari_letnik_post():
-    modeli.shrani_letnik({
+@post('/uredi/letnik/<id_letnika:int>/')
+def uredi_letnik_post(id_letnika=None):
+    letnik = {
         'smer': request.forms.smer,
-        'leto': int(request.forms.leto),
-    })
+        'leto': int(request.forms.leto) if request.forms.leto else None,
+    }
+    if id_letnika is not None:
+        letnik['id'] = id_letnika
+    modeli.shrani_letnik(letnik)
     redirect('/uredi/')
 
 
 @get('/uredi/oseba/ustvari/')
-def ustvari_osebo():
-    return template(
-        'uredi_osebo'
-    )
+@get('/uredi/oseba/<id_osebe:int>/')
+def uredi_osebo(id_osebe=None):
+    return template('uredi_osebo', oseba=modeli.podatki_osebe(id_osebe))
 
 
 @post('/uredi/oseba/ustvari/')
-def ustvari_osebo_post():
-    modeli.shrani_osebo({
+@post('/uredi/oseba/<id_osebe:int>/')
+def uredi_osebo_post(id_osebe=None):
+    oseba = {
         'ime': request.forms.ime,
         'priimek': request.forms.priimek,
         'email': request.forms.email if request.forms.email else None,
-    })
+    }
+    if id_osebe is not None:
+        oseba['id'] = id_osebe
+    modeli.shrani_osebo(oseba)
     redirect('/uredi/')
 
 
 @get('/uredi/ucilnica/ustvari/')
-def ustvari_ucilnico():
-    return template(
-        'uredi_ucilnico'
-    )
+@get('/uredi/ucilnica/<id_ucilnice:int>/')
+def uredi_ucilnico(id_ucilnice=None):
+    return template('uredi_ucilnico', ucilnica=modeli.podatki_ucilnice(id_ucilnice))
 
 
 @post('/uredi/ucilnica/ustvari/')
-def ustvari_ucilnico_post():
-    modeli.shrani_ucilnico({
+@post('/uredi/ucilnica/<id_ucilnice:int>/')
+def uredi_ucilnico_post(id_ucilnice=None):
+    ucilnica = {
         'oznaka': request.forms.oznaka,
         'velikost': int(request.forms.velikost) if request.forms.velikost else None,
         'racunalniska': bool(request.forms.racunalniska),
         'skrita': bool(request.forms.skrita),
-    })
+    }
+    if id_ucilnice is not None:
+        ucilnica['id'] = id_ucilnice
+    modeli.shrani_ucilnico(ucilnica)
     redirect('/uredi/')
 
 
 @get('/uredi/predmet/ustvari/')
-def ustvari_predmet():
+@get('/uredi/predmet/<id_predmeta:int>/')
+def uredi_predmet(id_predmeta=None):
     return template(
         'uredi_predmet',
+        predmet=modeli.podatki_predmeta(id_predmeta),
         letniki=modeli.podatki_letnikov(),
         slusatelji=modeli.podatki_oseb(),
     )
 
 
 @post('/uredi/predmet/ustvari/')
-def ustvari_predmet_post():
-    modeli.shrani_predmet({
+@post('/uredi/predmet/<id_predmeta:int>/')
+def uredi_predmet_post(id_predmeta=None):
+    predmet = {
         'ime': request.forms.ime,
         'kratica': request.forms.kratica,
         'stevilo_studentov': None if request.forms.stevilo_studentov is '' else int(request.forms.stevilo_studentov),
         'letniki': {int(letnik) for letnik in request.forms.getall('letniki')},
         'slusatelji': {int(letnik) for letnik in request.forms.getall('slusatelji')},
-    })
+    }
+    if id_predmeta is not None:
+        predmet['id'] = id_predmeta
+    modeli.shrani_predmet(predmet)
     redirect('/uredi/')
 
 

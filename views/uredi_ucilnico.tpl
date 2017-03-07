@@ -1,6 +1,4 @@
 % rebase('obrazec.tpl')
-% urejanje = defined('ucilnica')
-% ucilnica = get('ucilnica', {'oznaka': '', 'velikost': None, 'racunalniska': False, 'skrita': False})
 <h3>Urejanje učilnice</h3>
 <form method="post">
     <div class="input-field">
@@ -20,6 +18,6 @@
         <label for="skrita">Skrita učilnica</label>
     </p>
     <button class="btn waves-effect waves-light" type="submit">
-        {{ 'Spremeni' if urejanje else 'Ustvari' }}
+        {{ 'Spremeni' if 'id' in ucilnica else 'Ustvari' }}
     </button>
 </form>

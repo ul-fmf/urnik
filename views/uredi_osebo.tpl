@@ -1,6 +1,4 @@
 % rebase('obrazec.tpl')
-% urejanje = defined('oseba')
-% oseba = get('oseba', {'ime': '', 'priimek': '', 'email': ''})
 <h3>Urejanje osebe</h3>
 <form method="post">
     <div class="input-field">
@@ -16,6 +14,6 @@
         <label for="email">Elektronska pošta</label>
     </div>
     <button class="btn waves-effect waves-light" type="submit">
-        {{ 'Spremeni' if urejanje else 'Ustvari' }}
+        {{ 'Spremeni' if 'id' in oseba else 'Ustvari' }}
     </button>
 </form>

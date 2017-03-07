@@ -135,19 +135,50 @@ def podatki_srecanj(kljuci=[]):
     return srecanja
 
 def podatki_letnika(kljuc):
-    return poberi_edinega(podatki_letnikov([kljuc]))
+    if kljuc is None:
+        return {
+            'smer': None,
+            'leto': None
+        }
+    else:
+        return poberi_edinega(podatki_letnikov([kljuc]))
 
 def podatki_osebe(kljuc):
-    return poberi_edinega(podatki_oseb([kljuc]))
+    if kljuc is None:
+        return {
+            'ime': None,
+            'priimek': None,
+            'email': None
+        }
+    else:
+        return poberi_edinega(podatki_oseb([kljuc]))
 
 def podatki_ucilnic(kljuci=[]):
     return nalozi_podatke('ucilnica', kljuci, vrstni_red=('skrita', 'oznaka'))
 
 def podatki_ucilnice(kljuc):
-    return poberi_edinega(podatki_ucilnic([kljuc]))
+    if kljuc is None:
+        return {
+            'oznaka': '',
+            'velikost': None,
+            'racunalniska': False,
+            'skrita': False
+        }
+    else:
+        return poberi_edinega(podatki_ucilnic([kljuc]))
 
 def podatki_predmeta(kljuc):
-    return poberi_edinega(podatki_predmetov([kljuc]))
+    if kljuc is None:
+        return {
+            'ime': '', 
+            'kratica': '', 
+            'stevilo_studentov': None, 
+            'racunalniski': False, 
+            'letniki': set(), 
+            'slusatelji': set()
+        }
+    else:
+        return poberi_edinega(podatki_predmetov([kljuc]))
 
 def podatki_srecanja(kljuc):
     return poberi_edinega(podatki_srecanj([kljuc]))
