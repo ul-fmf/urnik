@@ -124,12 +124,14 @@ def uredi_predmet(predmet):
 
 @post('/uredi/predmet/<predmet:int>/')
 def uredi_predmet_post(predmet):
-    ime = request.forms.ime
-    kratica = request.forms.kratica
-    stevilo_studentov = None if request.forms.stevilo_studentov is '' else int(request.forms.stevilo_studentov)
-    letniki = [int(letnik) for letnik in request.forms.getall('letniki')]
-    slusatelji = [int(slusatelj) for slusatelj in request.forms.getall('slusatelji')]
-    modeli.uredi_predmet(predmet, ime, kratica, stevilo_studentov, letniki, slusatelji)
+    modeli.shrani_predmet({
+        'id': predmet,
+        'ime': request.forms.ime,
+        'kratica': request.forms.kratica,
+        'stevilo_studentov': None if request.forms.stevilo_studentov is '' else int(request.forms.stevilo_studentov),
+        'letniki': {int(letnik) for letnik in request.forms.getall('letniki')},
+        'slusatelji': {int(letnik) for letnik in request.forms.getall('slusatelji')},
+    })
     redirect('/uredi/')
 
 ##########################################################################
@@ -199,12 +201,13 @@ def ustvari_predmet():
 
 @post('/uredi/predmet/ustvari/')
 def ustvari_predmet_post():
-    ime = request.forms.ime
-    kratica = request.forms.kratica
-    stevilo_studentov = None if request.forms.stevilo_studentov is '' else int(request.forms.stevilo_studentov)
-    letniki = [int(letnik) for letnik in request.forms.getall('letniki')]
-    slusatelji = [int(letnik) for letnik in request.forms.getall('slusatelji')]
-    modeli.ustvari_predmet(ime, kratica, stevilo_studentov, letniki, slusatelji)
+    modeli.shrani_predmet({
+        'ime': request.forms.ime,
+        'kratica': request.forms.kratica,
+        'stevilo_studentov': None if request.forms.stevilo_studentov is '' else int(request.forms.stevilo_studentov),
+        'letniki': {int(letnik) for letnik in request.forms.getall('letniki')},
+        'slusatelji': {int(letnik) for letnik in request.forms.getall('slusatelji')},
+    })
     redirect('/uredi/')
 
 

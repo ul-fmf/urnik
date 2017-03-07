@@ -21,33 +21,53 @@ def nalozi_podatke(tabela, kljuci=(), ime_kljuca='id', vrstni_red=()):
         (vrstica[ime_kljuca], dict(vrstica)) for vrstica in con.execute(sql, kljuci)
     )
 
+def nalozi_relacijo(tabela, prvi_kljuc, drugi_kljuc, kljuci):
+    sql = 'SELECT {}, {} FROM {} WHERE {} IN ({})'.format(
+        prvi_kljuc, drugi_kljuc, tabela, prvi_kljuc, vprasaji(kljuci)
+    )
+    relacija = {}
+    for prvi, drugi in con.execute(sql, kljuci):
+        relacija.setdefault(prvi, set()).add(drugi)
+    return relacija
+
 def poberi_edinega(slovarji):
     assert len(slovarji) == 1
     return list(slovarji.values())[0]
 
 def shrani_podatke(tabela, podatki, ime_kljuca='id'):
-    if ime_kljuca in podatki:
-        kljuc = podatki.pop(ime_kljuca)
-    else:
-        kljuc = None
-    stolpci, vrednosti = [], []
-    for stolpec, vrednost in podatki.items():
-        stolpci.append(stolpec)
-        vrednosti.append(vrednost)
+    kljuc = podatki.pop(ime_kljuca) if ime_kljuca in podatki else None
+    stolpci, vrednosti = list(zip(*podatki.items()))
     if kljuc is not None:
-        sql = '''
-            UPDATE {}
-            SET {}
-            WHERE {} = ?
-        '''.format(tabela, ', '.join('{} = ?'.format(stolpec) for stolpec in stolpci), ime_kljuca)
-        con.execute(sql, vrednosti + [kljuc])
+        sql = 'UPDATE {} SET {} WHERE {} = ? '.format(
+            tabela,
+            ', '.join('{} = ?'.format(stolpec) for stolpec in stolpci),
+            ime_kljuca
+        )
+        con.execute(sql, vrednosti + (kljuc,))
     else:
-        sql = '''
-            INSERT INTO {}
-            ({})
-            VALUES ({})
-        '''.format(tabela, ', '.join(stolpci), vprasaji(vrednosti))
-        con.execute(sql, vrednosti)
+        sql = 'INSERT INTO {} ({}) VALUES ({})'.format(
+            tabela,
+            ', '.join(stolpci),
+            vprasaji(vrednosti)
+        )
+        cur = con.execute(sql, vrednosti)
+        kljuc = cur.lastrowid
+    con.commit()
+    return kljuc
+
+
+def shrani_relacijo(tabela, prvi_kljuc, drugi_kljuc, prvi, novi_drugi):
+    sql = 'DELETE FROM {} WHERE {} = ? AND {} NOT IN ({})'.format(
+        tabela, prvi_kljuc, drugi_kljuc, vprasaji(novi_drugi)
+    )
+    con.execute(sql, [prvi] + list(novi_drugi))
+    sql = 'SELECT {} FROM {} WHERE {} = ?'.format(
+        drugi_kljuc, tabela, prvi_kljuc
+    )
+    ze_obstojeci = {drugi for (drugi,) in con.execute(sql, (prvi,))}
+    relacija = {(prvi, drugi) for drugi in novi_drugi - ze_obstojeci}
+    sql = 'INSERT INTO {} ({}, {}) VALUES (?, ?)'.format(tabela, prvi_kljuc, drugi_kljuc)
+    con.executemany(sql, relacija)
     con.commit()
 
 
@@ -66,41 +86,19 @@ def podatki_oseb(kljuci=[]):
 
 def podatki_predmetov(kljuci=[]):
     predmeti = nalozi_podatke('predmet', kljuci, vrstni_red=('ime',))
-    sql_letniki = '''
-        SELECT predmet, letnik FROM predmet_letnik
-    '''
-    if kljuci:
-        sql_letniki += ' WHERE predmet IN ({})'.format(vprasaji(kljuci))
+
     povezani_letniki = set()
-    for predmet, letnik in con.execute(sql_letniki, kljuci):
-        predmeti[predmet].setdefault('letniki', set()).add(letnik)
-        povezani_letniki.add(letnik)
+    for predmet, letniki in nalozi_relacijo('predmet_letnik', 'predmet', 'letnik', kljuci).items():
+        predmeti[predmet]['letniki'] = letniki
+        povezani_letniki |= letniki
     letniki = podatki_letnikov(list(povezani_letniki))
 
-    for predmet in predmeti.values():
-        predmet['opis_letnikov'] = '; '.join(
-            ('{}, {}. letnik'.format(letniki[letnik]['smer'], letniki[letnik]['leto'])
-            if
-            letniki[letnik]['leto']
-            else
-            letniki[letnik]['smer'])
-            for
-            letnik
-            in
-            predmet.get('letniki', [])
-        )
-
-
-    sql_osebe = '''
-        SELECT predmet, oseba FROM slusatelji
-    '''
-    if kljuci:
-        sql_osebe += ' WHERE predmet IN ({})'.format(vprasaji(kljuci))
     povezane_osebe = set()
-    for predmet, oseba in con.execute(sql_osebe, kljuci):
-        predmeti[predmet].setdefault('slusatelji', set()).add(oseba)
-        povezane_osebe.add(oseba)
+    for predmet_id, slusatelji in nalozi_relacijo('slusatelji', 'predmet', 'oseba', kljuci).items():
+        predmeti[predmet_id]['slusatelji'] = slusatelji
+        povezane_osebe |= slusatelji
     osebe = podatki_oseb(list(povezane_osebe))
+
     for predmet in predmeti.values():
         predmet['letniki'] = [
             letniki[letnik] for letnik in predmet.get('letniki', set())
@@ -108,13 +106,18 @@ def podatki_predmetov(kljuci=[]):
         predmet['slusatelji'] = [
             osebe[oseba] for oseba in predmet.get('slusatelji', set())
         ]
+        predmet['opis_letnikov'] = '; '.join(
+            '{smer}, {leto}. letnik'.format(**letnik) if letnik['leto'] else letnik['smer']
+            for
+            letnik
+            in
+            predmet.get('letniki', [])
+        )
+
     return predmeti
 
 def podatki_srecanj(kljuci=[]):
     srecanja = nalozi_podatke('srecanje', kljuci, vrstni_red=('dan', 'ura'))
-    sql = '''
-        SELECT predmet, letnik FROM predmet_letnik WHERE predmet IN ({}) 
-    '''.format(vprasaji(kljuci))
     povezani_predmeti = set()
     povezane_osebe = set()
     povezane_ucilnice = set()
@@ -166,81 +169,34 @@ def kljuci_relevantnih_oseb():
 ##########################################################################
 
 def shrani_osebo(oseba):
-    return shrani_podatke('oseba', oseba)
+    shrani_podatke('oseba', oseba)
 
 def shrani_ucilnico(ucilnica):
-    return shrani_podatke('ucilnica', ucilnica)
+    shrani_podatke('ucilnica', ucilnica)
 
 def shrani_letnik(letnik):
-    return shrani_podatke('letnik', letnik)
+    shrani_podatke('letnik', letnik)
 
 def shrani_srecanje(srecanje):
-    return shrani_podatke('srecanje', srecanje)
+    shrani_podatke('srecanje', srecanje)
 
-def uredi_predmet(predmet, ime, kratica, stevilo_studentov, letniki, slusatelji):
-    sql = '''
-        UPDATE predmet
-        SET ime = ?, kratica = ?, stevilo_studentov = ?
-        WHERE id = ?
-    '''
-    con.execute(sql, [ime, kratica, stevilo_studentov, predmet])
-    sql = '''
-        DELETE FROM predmet_letnik
-        WHERE predmet = ? AND letnik NOT IN ({})
-    '''.format(vprasaji(letniki))
-    con.execute(sql, [predmet] + letniki)
-    sql = '''
-        INSERT INTO predmet_letnik
-        (predmet, letnik)
-        SELECT ?, id
-        FROM letnik
-        WHERE id NOT in (SELECT letnik FROM predmet_letnik WHERE predmet = ?) AND id IN ({})
-    '''.format(vprasaji(letniki))
-    con.execute(sql, [predmet, predmet] + letniki)
-    sql = '''
-        DELETE FROM slusatelji
-        WHERE predmet = ? AND oseba NOT IN ({})
-    '''.format(vprasaji(slusatelji))
-    con.execute(sql, [predmet] + slusatelji)
-    sql = '''
-        INSERT INTO slusatelji
-        (predmet, oseba)
-        SELECT ?, id
-        FROM oseba
-        WHERE id NOT in (SELECT oseba FROM slusatelji WHERE predmet = ?) AND id IN ({})
-    '''.format(vprasaji(slusatelji))
-    con.execute(sql, [predmet, predmet] + slusatelji)
+def shrani_predmet(predmet):
+    letniki = predmet.pop('letniki')
+    slusatelji = predmet.pop('slusatelji')
+    kljuc = shrani_podatke('predmet', predmet)
+    shrani_relacijo('predmet_letnik', 'predmet', 'letnik', kljuc, letniki)
+    shrani_relacijo('slusatelji', 'predmet', 'oseba', kljuc, slusatelji)
     con.commit()
-
-
-##########################################################################
-# USTVARJANJE
-##########################################################################
-
-def ustvari_predmet(ime, kratica, stevilo_studentov, letniki, slusatelji):
-    sql = '''
-        INSERT INTO predmet
-        (ime, kratica, stevilo_studentov)
-        VALUES
-        (?, ?, ?)
-    '''
-    cur = con.execute(sql, [ime, kratica, stevilo_studentov])
-    predmet = cur.lastrowid
-    con.commit()
-    uredi_predmet(predmet, ime, kratica, stevilo_studentov, letniki, slusatelji)
 
 ##########################################################################
 # UREJANJE SREČANJ
 ##########################################################################
 
 def nastavi_trajanje(srecanje, trajanje):
-    sql = '''
-        UPDATE srecanje
-        SET trajanje = ?
-        WHERE id = ?
-    '''
-    con.execute(sql, [trajanje, srecanje])
-    con.commit()
+    shrani_srecanje({
+        'id': srecanje,
+        'trajanje': trajanje
+    })
 
 
 def izbrisi_srecanje(srecanje):
@@ -254,34 +210,28 @@ def izbrisi_srecanje(srecanje):
 
 def podvoji_srecanje(id_srecanja):
     srecanje = podatki_srecanja(id_srecanja)
-    sql = '''
-        INSERT INTO srecanje
-        (ucitelj, ucilnica, predmet, ura, dan, trajanje, tip)
-        VALUES
-        (?, ?, ?, ?, ?, ?, ?)'''
-    con.execute(sql, [srecanje['ucitelj']['id'], srecanje['ucilnica']['id'], srecanje['predmet']['id'],
-                      srecanje['ura'], srecanje['dan'], srecanje['trajanje'], srecanje['tip']])
-    con.commit()
+    del srecanje['id']
+    srecanje['ucilnica'] = srecanje['ucilnica']['id']
+    srecanje['ucitelj'] = srecanje['ucitelj']['id']
+    srecanje['predmet'] = srecanje['predmet']['id']
+    shrani_srecanje(srecanje)
 
 
-def premakni_srecanje(srecanje, dan, ura, ucilnica):
-    sql = '''
-        UPDATE srecanje
-        SET dan = ?, ura = ?, ucilnica = ?
-        WHERE id = ?
-    '''
-    con.execute(sql, [dan, ura, ucilnica, srecanje])
-    con.commit()
+def premakni_srecanje(id_srecanja, dan, ura, ucilnica):
+    shrani_srecanje({
+        'id': id_srecanja,
+        'dan': dan,
+        'ura': ura,
+        'ucilnica': ucilnica,
+    })
 
 
 def odlozi_srecanje(srecanje):
-    sql = '''
-        UPDATE srecanje
-        SET dan = NULL, ura = NULL
-        WHERE id = ?
-    '''
-    con.execute(sql, [srecanje])
-    con.commit()
+    shrani_srecanje({
+        'id': srecanje,
+        'dan': None,
+        'ura': None,
+    })
 
 
 ##########################################################################
