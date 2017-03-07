@@ -77,7 +77,7 @@
             </thead>
             <tbody>
                 %crke = 'ABCČDEFGHIJKLMNOPQRSŠTUVWXYZŽ'
-                %for oseba in sorted(osebe.values(), key=lambda oseba: (crke.index(oseba['priimek'][0]), oseba['priimek'], oseba['ime'])):
+                %for oseba in sorted(osebe.values(), key=lambda oseba: (crke.index(oseba['priimek'][:1]), oseba['priimek'], oseba['ime'])):
                 %if oseba['priimek'] != 'X':
                 <tr>
                     <td style="padding: 5px">
