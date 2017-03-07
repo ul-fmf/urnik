@@ -1,46 +1,28 @@
 % rebase('osnova.tpl')
 <div class="container">
 <div class="row">
+    % for stolpec in stolpci_smeri:
     <div class="col s3">
         <table class="highlight">
-            % for smer in [smer for i, smer in enumerate(sorted(smeri)) if i % 2 == 0]:
+            % for smer in stolpec:
             <thead>
                 <tr>
-                    <th>{{smer}}</th>
+                    <th>{{smer['ime']}}</th>
                 </tr>
             </thead>
             <tbody>
-                % for id, opis in smeri[smer]:
+                % for letnik in smer['letniki']:
                 <tr>
                     <td style="padding: 5px">
-                        <a href="/letnik/{{id}}/">{{opis}}</a>
+                        <a href="/letnik/{{letnik['id']}}/">{{letnik['opis']}}</a>
                     </td>
                 </tr>
-                %end
+                % end
             </tbody>
             % end
         </table>
     </div>
-    <div class="col s3">
-        <table class="highlight">
-            % for smer in [smer for i, smer in enumerate(sorted(smeri)) if i % 2 == 1]:
-            <thead>
-                <tr>
-                    <th>{{smer}}</th>
-                </tr>
-            </thead>
-            <tbody>
-                % for id, opis in smeri[smer]:
-                <tr>
-                    <td style="padding: 5px">
-                        <a href="/letnik/{{id}}/">{{opis}}</a>
-                    </td>
-                </tr>
-                %end
-            </tbody>
-            % end
-        </table>
-    </div>
+    % end
     <div class="col s2">
         <table class="highlight">
             <thead>
@@ -49,8 +31,7 @@
                 </tr>
             </thead>
             <tbody>
-                %for ucilnica in ucilnice.values():
-                %if not ucilnica['skrita'] and ucilnica['oznaka'] != 'X':
+                %for ucilnica in ucilnice:
                 <tr>
                     <td style="padding: 5px">
                         <a href="/ucilnica/{{ucilnica['id']}}/">
@@ -64,7 +45,6 @@
                     </td>
                 </tr>
                 %end
-                %end
             </tbody>
         </table>
     </div>
@@ -76,9 +56,7 @@
                 </tr>
             </thead>
             <tbody>
-                %crke = 'ABCČDEFGHIJKLMNOPQRSŠTUVWXYZŽ'
-                %for oseba in sorted(osebe.values(), key=lambda oseba: (crke.index(oseba['priimek'][:1]), oseba['priimek'], oseba['ime'])):
-                %if oseba['priimek'] != 'X':
+                %for oseba in osebe:
                 <tr>
                     <td style="padding: 5px">
                         <a href="/oseba/{{oseba['id']}}/">
@@ -86,7 +64,6 @@
                         </a>
                     </td>
                 </tr>
-                %end
                 %end
             </tbody>
         </table>

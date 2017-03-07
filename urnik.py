@@ -29,15 +29,30 @@ def zacetna_stran():
             letnik['opis'] = letnik['smer']
         try:
             smer, opis = letnik['opis'].split(',')
-            smeri.setdefault(smer, []).append((letnik['id'], opis))
+            letnik['opis'] = opis
+            smeri.setdefault(smer, []).append(letnik)
         except:
             pass
+    osebe = [
+        oseba for oseba in modeli.podatki_oseb(kljuci=modeli.kljuci_relevantnih_oseb()).values()
+        if oseba['priimek'] != 'X'
+    ]
+    ucilnice = [
+        ucilnica for ucilnica in modeli.podatki_ucilnic().values()
+        if not ucilnica['skrita'] and ucilnica['oznaka'] != 'X'
+    ]
+    stolpci_smeri = ([], [])
+    for i, (smer, letniki) in enumerate(sorted(smeri.items())):
+        stolpci_smeri[i % 2].append({
+            'ime': smer,
+            'letniki': letniki
+        })
     return template(
         'zacetna_stran',
-        smeri=smeri,
+        stolpci_smeri=stolpci_smeri,
         letniki=modeli.podatki_letnikov(),
-        osebe=modeli.podatki_oseb(kljuci=modeli.kljuci_relevantnih_oseb()),
-        ucilnice=modeli.podatki_ucilnic(),
+        osebe=osebe,
+        ucilnice=ucilnice,
     )
 
 @route('/uredi/')

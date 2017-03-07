@@ -82,7 +82,13 @@ def podatki_letnikov(kljuci=[]):
     return nalozi_podatke('letnik', kljuci, vrstni_red=('smer', 'leto'))
 
 def podatki_oseb(kljuci=[]):
-    return nalozi_podatke('oseba', kljuci, vrstni_red=('priimek', 'ime'))
+    crke = 'ABCČDEFGHIJKLMNOPQRSŠTUVWXYZŽ'
+    osebe = nalozi_podatke('oseba', kljuci, vrstni_red=('priimek', 'ime'))
+    urejene_osebe = OrderedDict()
+    kljuc = lambda oseba: (crke.index(oseba[1]['priimek'][:1]), oseba[1]['priimek'], oseba[1]['ime'])
+    for id_osebe, oseba in sorted(osebe.items(), key=kljuc):
+        urejene_osebe[id_osebe] = oseba
+    return urejene_osebe
 
 def podatki_predmetov(kljuci=[]):
     predmeti = nalozi_podatke('predmet', kljuci, vrstni_red=('ime',))
