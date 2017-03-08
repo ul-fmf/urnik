@@ -1,31 +1,4 @@
-% rebase('osnova.tpl', domov='/uredi/')
-
-% min_ura, max_ura = 7, 20
-% enota_visine = 1 / (max_ura - min_ura)
-% dnevi = ('ponedeljek', 'torek', 'sreda', 'četrtek', 'petek')
-% enota_sirine = 1 / len(dnevi)
-
-<div id="urnik">
-<div id="dnevi">
-    % for indeks_dneva, dan in enumerate(dnevi):
-    % left = indeks_dneva * enota_sirine
-    % style = 'left: {:.2%}'.format(left)
-    <div class="dan" style="{{ style }}">
-        {{dan}}
-    </div>
-    % end
-</div>
-<div id="ure">
-    % for ura in range(min_ura, max_ura):
-    % bottom = (max_ura - ura) * enota_visine
-    % style = 'bottom: {:.2%}'.format(bottom)
-    <div class="ura" style="{{ style }}">
-        <span>{{ura if ura >= min_ura else ''}}</span>
-    </div>
-    % end
-</div>
-<div id="srecanja">
-    % for srecanje in srecanja:
+% if vrsta == 'urejanje':
     % left = (srecanje['dan'] - 1 + srecanje['zamik']) * enota_sirine
     % top = (srecanje['ura'] - min_ura) * enota_visine
     % height = srecanje['trajanje'] * enota_visine
@@ -85,33 +58,8 @@
             </a>
         </div>
     </div>
-    % end
-    % import modeli
-    % for (dan, ura), termin in get('prosti_termini', {}).items():
-    % left = (dan - 1) * enota_sirine
-    % top = (ura - min_ura) * enota_visine
-    % height = enota_visine
-    % width = enota_sirine
-    % style = 'position: absolute; left: {:.2%}; width: {:.2%}; top: {:.2%}; height: {:.2%}'.format(left, width, top, height)
-    <div class="termin {{termin['zasedenost']}}" style="{{style}}">
-        <div class="izbira_ucilnice">
-        % for ucilnica in termin['ucilnice']:
-            <form method="post" class="izbrana_ucilnica {{ucilnica['zasedenost']}} {{ucilnica['ustreznost']}}">
-                <input type="hidden" name="next" value="{{next}}">
-                <input value="{{dan}}" name="dan" type="hidden">
-                <input value="{{ura}}" name="ura" type="hidden">
-                <input value="{{ucilnica['id']}}" name="ucilnica" type="hidden">
-                <button class="">{{ucilnica['oznaka']}}<br><small>{{ucilnica['velikost']}}</small></button>
-            </form>
-        % end
-        </div>
-    </div>
-    % end
-</div>
-</div>
-<div id='informacije'>
-<h5><i class="material-icons">inbox</i> Odložišče</h5>
-    % for srecanje in odlozena_srecanja:
+% elif vrsta == 'odlozisce':
+
     <div class="srecanje">
         <div class="predmet">
             {{srecanje['predmet']['ime']}} {{srecanje['tip']}}{{srecanje['oznaka'] if srecanje['oznaka'] else ''}}
@@ -161,41 +109,27 @@
             </a>
         </div>
     </div>
+
+% elif vrsta == 'ogled':
+% left = (srecanje['dan'] - 1 + srecanje['zamik']) * enota_sirine
+% top = (srecanje['ura'] - min_ura) * enota_visine
+% height = srecanje['trajanje'] * enota_visine
+% width = srecanje['sirina'] * enota_sirine
+% style = 'left: {:.2%}; width: {:.2%}; top: {:.2%}; height: {:.2%}'.format(left, width, top, height)
+<div class="srecanje" style="{{ style }};">
+    <div class="predmet">
+        <a href="/predmet/{{srecanje['predmet']['id']}}/">{{srecanje['predmet']['ime'] if (srecanje['sirina'] >= 0.5 and len(srecanje['predmet']['ime']) < 45 and srecanje['trajanje'] > 1) or srecanje['sirina'] == 1 else srecanje['predmet']['kratica']}}</a>
+        <span class="tip">
+             {{srecanje['tip']}}{{srecanje['oznaka'] if srecanje['oznaka'] else ''}}
+        </span>
+    </div>
+    <div class="ucitelj">
+        <a href="/oseba/{{srecanje['ucitelj']['id']}}/">{{srecanje['ucitelj']['priimek']}}</a>
+    </div>
+    % if srecanje['sirina'] >= 0.5:
+    <div class="ucilnica">
+        <a href="/ucilnica/{{srecanje['ucilnica']['id']}}/">{{srecanje['ucilnica']['oznaka']}}</a>
+    </div>
     % end
-%for tip, opis in (('ucilnice', 'Konflikti učilnic'), ('osebe', 'Konflikti oseb'), ('letniki', 'Konflikti smeri')): 
-<h5><i class="material-icons">warning</i> {{opis}}</h5>
-<ul class="collection">
-%for (dan, ura), prekrivanja_po_tipih in prekrivanja.items():
-    % for id, srecanja in prekrivanja_po_tipih.get(tip, {}).items():
-        <li class="collection-item">
-            {{['?', 'PON', 'TOR', 'SRE', 'ČET', 'PET'][dan]}}, {{ura}}h,
-            % if tip == 'ucilnice':
-                {{srecanja[0]['ucilnica']['oznaka']}}:
-            % elif tip == 'osebe':
-                {{srecanja[0]['ucitelj']['ime']}} {{srecanja[0]['ucitelj']['priimek']}}:
-            % elif tip == 'letniki':
-                {{','.join([letnik['smer'] + (', ' + str(letnik['leto']) + '. letnik' if letnik['leto'] else '') for letnik in srecanja[0]['predmet']['letniki'] if letnik['id'] == id])}}:
-            % end
-            <small><ul>
-            % for srecanje in srecanja:
-                <li>
-                    <a href="/uredi/srecanje/{{srecanje['id']}}/premakni/">
-                        <i class="tiny material-icons">open_with</i>
-                    </a>
-                    {{srecanje['predmet']['kratica']}} {{srecanje['tip']}},
-                    % if tip != 'osebe':
-                    {{srecanje['ucitelj']['priimek']}},
-                    % end
-                    % if tip != 'ucilnice':
-                    {{srecanje['ucilnica']['oznaka']}},
-                    % end
-                    {{srecanje['ura']}}–{{srecanje['ura'] + srecanje['trajanje']}},
-                </li>
-            % end
-            </ul></small>
-        </li>
-    % end
-% end
-</ul>
-% end
 </div>
+% end
