@@ -2,11 +2,11 @@
 <h3>Urejanje osebe</h3>
 <form method="post">
     <div class="input-field">
-        <input value="{{oseba['ime']}}" placeholder="Janez" name="ime" type="text" class="validate">
+        <input value="{{oseba['ime'] or ''}}" placeholder="Janez" name="ime" type="text" class="validate">
         <label for="ime">Ime</label>
     </div>
     <div class="input-field">
-        <input value="{{oseba['priimek']}}" placeholder="Novak" name="priimek" type="text" class="validate">
+        <input value="{{oseba['priimek'] or ''}}" placeholder="Novak" name="priimek" type="text" class="validate">
         <label for="priimek">Priimek</label>
     </div>
     <div class="input-field">

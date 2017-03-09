@@ -168,7 +168,8 @@ def uredi_predmet_post(id_predmeta=None):
 @get('/uredi/srecanje/<srecanje:int>/premakni/')
 def premakni_srecanje(srecanje):
     return template(
-        'uredi_urnik',
+        'urnik',
+        uredi=True,
         premaknjeno_srecanje=srecanje,
         odlozena_srecanja=modeli.odlozena_srecanja(),
         srecanja=modeli.povezana_srecanja(srecanje),
