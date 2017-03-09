@@ -1,5 +1,5 @@
 % rebase('osnova.tpl')
-% if uredi:
+% if nacin == 'urejanje':
 
 <div class="row">
     <div class="col s3">

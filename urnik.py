@@ -49,7 +49,7 @@ def zacetna_stran():
         })
     return template(
         'zacetna_stran',
-        uredi=False,
+        nacin='ogled',
         stolpci_smeri=stolpci_smeri,
         letniki=modeli.podatki_letnikov(),
         osebe=osebe,
@@ -61,7 +61,7 @@ def uredi_zacetna_stran():
     return template(
         'zacetna_stran',
         domov='/uredi/',
-        uredi=True,
+        nacin='urejanje',
         letniki=modeli.podatki_letnikov(),
         osebe=modeli.podatki_oseb(),
         ucilnice=modeli.podatki_ucilnic(),
@@ -169,8 +169,8 @@ def uredi_predmet_post(id_predmeta=None):
 def premakni_srecanje(srecanje):
     return template(
         'urnik',
-        uredi=True,
-        premaknjeno_srecanje=srecanje,
+        nacin='premikanje',
+        premaknjeno_srecanje=modeli.podatki_srecanja(srecanje),
         odlozena_srecanja=modeli.odlozena_srecanja(),
         srecanja=modeli.povezana_srecanja(srecanje),
         prosti_termini=modeli.prosti_termini(srecanje),
@@ -245,7 +245,7 @@ def uredi_srecanje_post(srecanje):
 def urnik():
     return template(
         'urnik',
-        uredi=True,
+        nacin='urejanje',
         srecanja=modeli.urnik(
             letniki=[int(letnik) for letnik in request.query.getall('letnik')],
             osebe=[int(oseba) for oseba in request.query.getall('oseba')],
@@ -266,7 +266,7 @@ def urnik(letnik):
         naslov = l['smer']
     return template(
         'urnik',
-        uredi=False,
+        nacin='ogled',
         srecanja=modeli.urnik(
             letniki=[letnik],
             osebe=[],
@@ -281,7 +281,7 @@ def urnik(oseba):
     naslov = '{} {}'.format(l['ime'], l['priimek'])
     return template(
         'urnik',
-        uredi=False,
+        nacin='ogled',
         srecanja=modeli.urnik(
             letniki=[],
             osebe=[oseba],
@@ -296,7 +296,7 @@ def urnik(ucilnica):
     naslov = 'Učilnica {}'.format(l['oznaka'])
     return template(
         'urnik',
-        uredi=False,
+        nacin='ogled',
         srecanja=modeli.urnik(
             letniki=[],
             osebe=[],
@@ -311,7 +311,7 @@ def urnik(predmet):
     naslov = l['ime']
     return template(
         'urnik',
-        uredi=False,
+        nacin='ogled',
         srecanja=modeli.urnik(
             letniki=[],
             osebe=[],
@@ -325,7 +325,7 @@ def urnik(predmet):
 def fiziki():
     return template(
         'urnik',
-        uredi=True,
+        nacin='urejanje',
         srecanja=modeli.fiziki(),
         odlozena_srecanja=[],
         prekrivanja={},

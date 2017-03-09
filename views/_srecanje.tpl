@@ -1,4 +1,4 @@
-% if vrsta == 'urejanje':
+% if nacin == 'urejanje':
     % left = (srecanje['dan'] - 1 + srecanje['zamik']) * enota_sirine
     % top = (srecanje['ura'] - min_ura) * enota_visine
     % height = srecanje['trajanje'] * enota_visine
@@ -58,7 +58,7 @@
             </a>
         </div>
     </div>
-% elif vrsta == 'odlozisce':
+% elif nacin == 'odlozisce':
 
     <div class="srecanje">
         <div class="predmet">
@@ -110,7 +110,7 @@
         </div>
     </div>
 
-% elif vrsta == 'ogled':
+% elif nacin == 'ogled':
 % left = (srecanje['dan'] - 1 + srecanje['zamik']) * enota_sirine
 % top = (srecanje['ura'] - min_ura) * enota_visine
 % height = srecanje['trajanje'] * enota_visine

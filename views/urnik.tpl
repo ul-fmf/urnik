@@ -1,11 +1,11 @@
-% rebase('osnova.tpl', domov='/uredi/' if uredi else '/')
+% rebase('osnova.tpl', domov='/' if nacin == 'ogled' else '/uredi/')
 
 % min_ura, max_ura = 7, 20
 % enota_visine = 1 / (max_ura - min_ura)
 % dnevi = ('ponedeljek', 'torek', 'sreda', 'četrtek', 'petek')
 % enota_sirine = 1 / len(dnevi)
 
-<div id="urnik" class="{{ '' if uredi else 'cel' }}">
+<div id="urnik" class="{{ 'cel' if nacin == 'ogled' else '' }}">
 <div id="dnevi">
     % for indeks_dneva, dan in enumerate(dnevi):
     % left = indeks_dneva * enota_sirine
@@ -25,33 +25,37 @@
     % end
 </div>
 
-% if uredi:
+% if nacin == 'urejanje' or nacin == 'premikanje':
 
 <div id="srecanja">
     % for srecanje in srecanja:
-    % include('_srecanje.tpl', vrsta='urejanje')
+    % include('_srecanje.tpl', nacin='urejanje')
     % end
     % import modeli
     % for (dan, ura), termin in get('prosti_termini', {}).items():
     % include('_prosti_termin.tpl')
     % end
 </div>
-% else:
+% elif nacin == 'ogled':
 <div id="srecanja">
     % for srecanje in srecanja:
-    % include('_srecanje.tpl', vrsta='ogled')
+    % include('_srecanje.tpl', nacin='ogled')
     % end
 </div>
 % end
 </div>
 
-% if uredi:
+% if nacin == 'urejanje' or nacin == 'premikanje':
 <div id='informacije'>
+% if nacin == 'urejanje':
 <h5><i class="material-icons">inbox</i> Odložišče</h5>
     % for srecanje in odlozena_srecanja:
-    % include('_srecanje.tpl', vrsta='odlozisce')
+    % include('_srecanje.tpl', nacin='odlozisce')
     % end
 % include('_konflikti.tpl')
+% elif nacin == 'premikanje':
+<h5><i class="material-icons">inbox</i> Premikanje srečanja</h5>
+% include('_srecanje.tpl', nacin='odlozisce', srecanje=premaknjeno_srecanje)
 </div>
 
 % end
