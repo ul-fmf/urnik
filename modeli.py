@@ -160,7 +160,7 @@ def podatki_osebe(kljuc):
         return poberi_edinega(podatki_oseb([kljuc]))
 
 def podatki_ucilnic(kljuci=[]):
-    return nalozi_podatke('ucilnica', kljuci, vrstni_red=('skrita', 'oznaka'))
+    return nalozi_podatke('ucilnica', kljuci, vrstni_red=('oznaka',))
 
 def podatki_ucilnice(kljuc):
     if kljuc is None:

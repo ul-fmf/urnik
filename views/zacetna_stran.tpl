@@ -118,17 +118,12 @@
                 %for ucilnica in ucilnice.values():
                 <tr>
                     <td>
-                        <a href="/uredi/urnik?ucilnica={{ucilnica['id']}}">
+                        <a href="/uredi/urnik?ucilnica={{ucilnica['id']}}" class="{{'skrita' if ucilnica['skrita'] else ''}}">
                             {{ucilnica['oznaka']}}
                         </a>
                         <small>{{ucilnica['velikost'] if ucilnica['velikost'] else '?'}}</small>
                         %if ucilnica['racunalniska']:
                         <i class="tiny material-icons">computer</i>
-                        %end
-                        %if ucilnica['skrita']:
-                        <i class="tiny material-icons">visibility_off</i>
-                        %else:
-                        <i class="tiny material-icons">visibility</i>
                         %end
                         <a href="/uredi/ucilnica/{{ucilnica['id']}}/">
                             <i class="tiny material-icons">edit</i>

@@ -86,6 +86,9 @@ body {
     height: 4em;
     margin-right: 1em;
 }
+a.skrita {
+    color: #777;
+}
 .ucitelj, .ucilnica, .tip {
     color: #777;
     font-weight: normal;
