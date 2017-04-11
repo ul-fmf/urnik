@@ -1,5 +1,6 @@
-% rebase('osnova.tpl')
-% if nacin == 'urejanje':
+{% extends 'osnova.tpl' %}
+{% block content %}
+{% if nacin == 'urejanje' %}
 
 <div class="row">
     <div class="col s3">
@@ -18,21 +19,21 @@
                         </a>
                     </td>
                 </tr>
-                %for letnik in letniki.values():
+                {% for letnik in letniki %}
                 <tr>
                     <td>
-                        <a href="/uredi/urnik?letnik={{letnik['id']}}">
-                            {{letnik['smer']}}{{', {}. letnik'.format(letnik['leto']) if letnik['leto'] else ''}}
+                        <a href="/uredi/urnik?letnik={{letnik.id}}">
+                            {{letnik}}
                         </a>
-                        <a href="/uredi/letnik/{{letnik['id']}}/">
+                        <a href="/uredi/letnik/{{letnik.id}}/">
                             <i class="tiny material-icons">edit</i>
                         </a>
-                        <a href="/uredi/pobrisi/letnik/{{letnik['id']}}/">
+                        <a href="/uredi/pobrisi/letnik/{{letnik.id}}/">
                             <i class="tiny material-icons">delete</i>
                         </a>
                     </td>
                 </tr>
-                %end
+                {% endfor %}
             </tbody>
         </table>
     </div>
@@ -52,21 +53,21 @@
                         </a>
                     </td>
                 </tr>
-                %for oseba in osebe.values():
+                {% for oseba in osebe %}
                 <tr>
                     <td>
-                        <a href="/uredi/urnik?oseba={{oseba['id']}}">
-                            {{oseba['ime']}} {{oseba['priimek']}}
+                        <a href="/uredi/urnik?oseba={{oseba.id}}">
+                            {{oseba.ime}} {{oseba.priimek}}
                         </a>
-                        <a href="/uredi/oseba/{{oseba['id']}}/">
+                        <a href="/uredi/oseba/{{oseba.id}}/">
                             <i class="tiny material-icons">edit</i>
                         </a>
-                        <a href="/uredi/pobrisi/oseba/{{oseba['id']}}/">
+                        <a href="/uredi/pobrisi/oseba/{{oseba.id}}/">
                             <i class="tiny material-icons">delete</i>
                         </a>
                     </td>
                 </tr>
-                %end
+                {% endfor %}
             </tbody>
         </table>
     </div>
@@ -86,25 +87,25 @@
                         </a>
                     </td>
                 </tr>
-                %for predmet in predmeti.values():
+                {% for predmet in predmeti %}
                 <tr>
                     <td>
-                        <a href="/uredi/urnik?predmet={{predmet['id']}}">
-                            {{predmet['ime']}}
+                        <a href="/uredi/urnik?predmet={{predmet.id}}">
+                            {{predmet.ime}}
                         </a>
                         <small>
-                            {{predmet['kratica']}} /
-                            {{predmet['stevilo_studentov'] or '?'}} /
-                        {{', '.join((str(letnik['leto']) + 'L ' if letnik['leto'] else '') + letnik['smer'] for letnik in predmet['letniki'] )}}</small>
-                        <a href="/uredi/predmet/{{predmet['id']}}/">
+                            {{predmet.kratica}} /
+                            {{predmet.stevilo_studentov|default:'?'}}
+                        </small>
+                        <a href="/uredi/predmet/{{predmet.id}}/">
                             <i class="tiny material-icons">edit</i>
                         </a>
-                        <a href="/uredi/pobrisi/predmet/{{predmet['id']}}/">
+                        <a href="/uredi/pobrisi/predmet/{{predmet.id}}/">
                             <i class="tiny material-icons">delete</i>
                         </a>
                     </td>
                 </tr>
-                %end
+                {% endfor %}
             </tbody>
         </table>
     </div>
@@ -124,56 +125,56 @@
                         </a>
                     </td>
                 </tr>
-                %for ucilnica in ucilnice.values():
+                {% for ucilnica in ucilnice %}
                 <tr>
                     <td>
-                        <a href="/uredi/urnik?ucilnica={{ucilnica['id']}}" class="{{'skrita' if ucilnica['skrita'] else ''}}">
-                            {{ucilnica['oznaka']}}
+                        <a href="/uredi/urnik?ucilnica={{ucilnica.id}}" class="{{ucilnica.vidna|yesno:',skrita'}}">
+                            {{ucilnica.oznaka}}
                         </a>
-                        <small>{{ucilnica['velikost'] if ucilnica['velikost'] else '?'}}</small>
-                        %if ucilnica['racunalniska']:
+                        <small>{{ucilnica.velikost|default:'?'}}</small>
+                        %if ucilnica.racunalniska:
                         <i class="tiny material-icons">computer</i>
                         %end
-                        <a href="/uredi/ucilnica/{{ucilnica['id']}}/">
+                        <a href="/uredi/ucilnica/{{ucilnica.id}}/">
                             <i class="tiny material-icons">edit</i>
                         </a>
-                        <a href="/uredi/pobrisi/ucilnica/{{ucilnica['id']}}/">
+                        <a href="/uredi/pobrisi/ucilnica/{{ucilnica.id}}/">
                             <i class="tiny material-icons">delete</i>
                         </a>
                     </td>
                 </tr>
-                %end
+                {% endfor %}
             </tbody>
         </table>
     </div>
 </div>
 
-% else:
+{% else %}
 
 <div class="container">
 <div class="row">
-    % for stolpec in stolpci_smeri:
+    {% for stolpec in stolpci_smeri %}
     <div class="col s3">
         <table class="highlight">
-            % for smer in stolpec:
+            {% for smer in stolpec %}
             <thead>
                 <tr>
-                    <th>{{smer['ime']}}</th>
+                    <th>{{smer.ime}}</th>
                 </tr>
             </thead>
             <tbody>
-                % for letnik in smer['letniki']:
+                {% for letnik in smer.letniki %}
                 <tr>
                     <td style="padding: 5px">
-                        <a href="/letnik/{{letnik['id']}}/">{{letnik['opis']}}</a>
+                        <a href="/letnik/{{letnik.id}}/">{{letnik.opis}}</a>
                     </td>
                 </tr>
-                % end
+                {% endfor %}
             </tbody>
-            % end
+            {% endfor %}
         </table>
     </div>
-    % end
+    {% endfor %}
     <div class="col s2">
         <table class="highlight">
             <thead>
@@ -182,20 +183,20 @@
                 </tr>
             </thead>
             <tbody>
-                %for ucilnica in ucilnice:
+                {% for ucilnica in ucilnice %}
                 <tr>
                     <td style="padding: 5px">
-                        <a href="/ucilnica/{{ucilnica['id']}}/">
-                            {{ucilnica['oznaka']}}
+                        <a href="/ucilnica/{{ucilnica.id}}/">
+                            {{ucilnica.oznaka}}
                         </a>
                         <small>
-                        %if ucilnica['racunalniska']:
+                        {% if ucilnica.racunalniska %}
                         <i class="tiny material-icons">computer</i>
-                        %end
-                        ({{ucilnica['velikost'] or '?'}} mest)</small>
+                        {% endif %}
+                        ({{ucilnica.velikost|default:'?'}} mest)</small>
                     </td>
                 </tr>
-                %end
+                {% endfor %}
             </tbody>
         </table>
     </div>
@@ -207,19 +208,20 @@
                 </tr>
             </thead>
             <tbody>
-                %for oseba in osebe:
+                {% for oseba in osebe %}
                 <tr>
                     <td style="padding: 5px">
-                        <a href="/oseba/{{oseba['id']}}/">
-                            {{oseba['ime']}} <strong>{{oseba['priimek']}}</strong>
+                        <a href="/oseba/{{oseba.id}}/">
+                            {{oseba.ime}} <strong>{{oseba.priimek}}</strong>
                         </a>
                     </td>
                 </tr>
-                %end
+                {% endfor %}
             </tbody>
         </table>
     </div>
 </div>
 </div>
+{% endif %}
 
-% end
+{% endblock content %}
