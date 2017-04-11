@@ -159,6 +159,53 @@ def uredi_predmet_post(id_predmeta=None):
     modeli.shrani_predmet(predmet)
     redirect('/uredi/')
 
+##########################################################################
+# BRISANJE
+##########################################################################
+
+
+@get('/uredi/pobrisi/letnik/<id_letnika:int>/')
+def pobrisi_letnik(id_letnika=None):
+    return template('pobrisi_letnik', letnik=modeli.podatki_letnika(id_letnika))
+
+
+@post('/uredi/pobrisi/letnik/<id_letnika:int>/')
+def pobrisi_letnik_post(id_letnika):
+    modeli.pobrisi_letnik(id_letnika)
+    redirect('/uredi/')
+
+
+@get('/uredi/pobrisi/oseba/<id_osebe:int>/')
+def pobrisi_osebo(id_osebe=None):
+    return template('pobrisi_osebo', oseba=modeli.podatki_osebe(id_osebe))
+
+
+@post('/uredi/pobrisi/oseba/<id_osebe:int>/')
+def pobrisi_osebo_post(id_osebe):
+    modeli.pobrisi_osebo(id_osebe)
+    redirect('/uredi/')
+
+
+@get('/uredi/pobrisi/ucilnica/<id_ucilnice:int>/')
+def pobrisi_ucilnico(id_ucilnice=None):
+    return template('pobrisi_ucilnico', ucilnica=modeli.podatki_ucilnice(id_ucilnice))
+
+
+@post('/uredi/pobrisi/ucilnica/<id_ucilnice:int>/')
+def pobrisi_ucilnico_post(id_ucilnice):
+    modeli.pobrisi_ucilnico(id_ucilnice)
+    redirect('/uredi/')
+
+
+@get('/uredi/pobrisi/predmet/<id_predmeta:int>/')
+def pobrisi_predmet(id_predmeta=None):
+    return template('pobrisi_predmet', predmet=modeli.podatki_predmeta(id_predmeta))
+
+
+@post('/uredi/pobrisi/predmet/<id_predmeta:int>/')
+def pobrisi_predmet_post(id_predmeta):
+    modeli.pobrisi_predmet(id_predmeta)
+    redirect('/uredi/')
 
 ##########################################################################
 # UREJANJE SREČANJ
@@ -190,7 +237,7 @@ def premakni_srecanje(srecanje):
 
 @post('/uredi/srecanje/<srecanje:int>/izbrisi/')
 def izbrisi(srecanje):
-    modeli.izbrisi_srecanje(srecanje)
+    modeli.pobrisi_srecanje(srecanje)
     redirect(request.headers.get('referer') or '/uredi/')
 
 

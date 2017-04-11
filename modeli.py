@@ -30,6 +30,16 @@ def nalozi_relacijo(tabela, prvi_kljuc, drugi_kljuc, kljuci):
         relacija.setdefault(prvi, set()).add(drugi)
     return relacija
 
+def pobrisi_podatke(tabela, kljuc, ime_kljuca='id'):
+    sql = 'DELETE FROM {} WHERE {} = ?'.format(tabela, ime_kljuca)
+    con.execute(sql, (kljuc,))
+    con.commit()
+
+def nastavi_na_null(tabela, kljuc, ime_kljuca='id'):
+    sql = 'UPDATE {} SET {} = NULL WHERE {} = ?'.format(tabela, ime_kljuca, ime_kljuca)
+    con.execute(sql, (kljuc,))
+    con.commit()
+
 def poberi_edinega(slovarji):
     assert len(slovarji) == 1
     return list(slovarji.values())[0]
@@ -201,6 +211,7 @@ def kljuci_relevantnih_oseb():
                srecanje.ucitelj IS NOT NULL
     '''
     return [vrstica['id'] for vrstica in con.execute(sql)]
+
 ##########################################################################
 # UREJANJE
 ##########################################################################
@@ -208,14 +219,28 @@ def kljuci_relevantnih_oseb():
 def shrani_osebo(oseba):
     shrani_podatke('oseba', oseba)
 
+def pobrisi_osebo(oseba):
+    pobrisi_podatke('slusatelji', oseba, 'oseba')
+    nastavi_na_null('srecanje', oseba, 'ucitelj')
+    pobrisi_podatke('oseba', oseba)
+
 def shrani_ucilnico(ucilnica):
     shrani_podatke('ucilnica', ucilnica)
+
+def pobrisi_ucilnico(ucilnica):
+    pobrisi_podatke('ucilnica', ucilnica)
 
 def shrani_letnik(letnik):
     shrani_podatke('letnik', letnik)
 
+def pobrisi_letnik(letnik):
+    pobrisi_podatke('letnik', letnik)
+
 def shrani_srecanje(srecanje):
     shrani_podatke('srecanje', srecanje)
+
+def pobrisi_srecanje(srecanje):
+    pobrisi_podatke('srecanje', srecanje)
 
 def shrani_predmet(predmet):
     letniki = predmet.pop('letniki')
@@ -224,6 +249,12 @@ def shrani_predmet(predmet):
     shrani_relacijo('predmet_letnik', 'predmet', 'letnik', kljuc, letniki)
     shrani_relacijo('slusatelji', 'predmet', 'oseba', kljuc, slusatelji)
     con.commit()
+
+def pobrisi_predmet(predmet):
+    pobrisi_podatke('predmet_letnik', predmet, 'predmet')
+    pobrisi_podatke('slusatelji', predmet, 'predmet')
+    pobrisi_podatke('srecanje', predmet, 'predmet')
+    pobrisi_podatke('predmet', predmet)
 
 ##########################################################################
 # UREJANJE SREČANJ
@@ -234,15 +265,6 @@ def nastavi_trajanje(srecanje, trajanje):
         'id': srecanje,
         'trajanje': trajanje
     })
-
-
-def izbrisi_srecanje(srecanje):
-    sql = '''
-        DELETE FROM srecanje
-        WHERE id = ?
-    '''
-    con.execute(sql, [srecanje])
-    con.commit()
 
 
 def podvoji_srecanje(id_srecanja):

@@ -27,6 +27,9 @@
                         <a href="/uredi/letnik/{{letnik['id']}}/">
                             <i class="tiny material-icons">edit</i>
                         </a>
+                        <a href="/uredi/pobrisi/letnik/{{letnik['id']}}/">
+                            <i class="tiny material-icons">delete</i>
+                        </a>
                     </td>
                 </tr>
                 %end
@@ -57,6 +60,9 @@
                         </a>
                         <a href="/uredi/oseba/{{oseba['id']}}/">
                             <i class="tiny material-icons">edit</i>
+                        </a>
+                        <a href="/uredi/pobrisi/oseba/{{oseba['id']}}/">
+                            <i class="tiny material-icons">delete</i>
                         </a>
                     </td>
                 </tr>
@@ -93,6 +99,9 @@
                         <a href="/uredi/predmet/{{predmet['id']}}/">
                             <i class="tiny material-icons">edit</i>
                         </a>
+                        <a href="/uredi/pobrisi/predmet/{{predmet['id']}}/">
+                            <i class="tiny material-icons">delete</i>
+                        </a>
                     </td>
                 </tr>
                 %end
@@ -127,6 +136,9 @@
                         %end
                         <a href="/uredi/ucilnica/{{ucilnica['id']}}/">
                             <i class="tiny material-icons">edit</i>
+                        </a>
+                        <a href="/uredi/pobrisi/ucilnica/{{ucilnica['id']}}/">
+                            <i class="tiny material-icons">delete</i>
                         </a>
                     </td>
                 </tr>
