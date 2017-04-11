@@ -8,11 +8,13 @@
         <div class="predmet">
             {{srecanje['predmet']['ime']}} {{srecanje['tip']}}{{srecanje['oznaka'] if srecanje['oznaka'] else ''}}
         </div>
+        % if srecanje['ucitelj']:
         <div class="ucitelj">
             <a href="/uredi/urnik?oseba={{srecanje['ucitelj']['id']}}">
                 {{srecanje['ucitelj']['priimek']}}
             </a>
         </div>
+        % end
         <div class="ucilnica">
             <a href="/uredi/urnik?ucilnica={{srecanje['ucilnica']['id']}}">
                 {{srecanje['ucilnica']['oznaka']}}
@@ -64,11 +66,13 @@
         <div class="predmet">
             {{srecanje['predmet']['ime']}} {{srecanje['tip']}}{{srecanje['oznaka'] if srecanje['oznaka'] else ''}}
         </div>
+        % if srecanje['ucitelj']:
         <div class="ucitelj">
             <a href="/uredi/urnik?oseba={{srecanje['ucitelj']['id']}}">
                 {{srecanje['ucitelj']['priimek']}}
             </a>
         </div>
+        % end
         <div class="ucilnica">
             <a href="/uredi/urnik?ucilnica={{srecanje['ucilnica']['id']}}">
                 {{srecanje['ucilnica']['oznaka']}}
@@ -123,9 +127,11 @@
              {{srecanje['tip']}}{{srecanje['oznaka'] if srecanje['oznaka'] else ''}}
         </span>
     </div>
+    % if srecanje['ucitelj']:
     <div class="ucitelj">
         <a href="/oseba/{{srecanje['ucitelj']['id']}}/">{{srecanje['ucitelj']['priimek']}}</a>
     </div>
+    % end
     % if srecanje['sirina'] >= 0.5:
     <div class="ucilnica">
         <a href="/ucilnica/{{srecanje['ucilnica']['id']}}/">{{srecanje['ucilnica']['oznaka']}}</a>

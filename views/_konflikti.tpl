@@ -19,7 +19,7 @@
                         <i class="tiny material-icons">open_with</i>
                     </a>
                     {{srecanje['predmet']['kratica']}} {{srecanje['tip']}},
-                    % if tip != 'osebe':
+                    % if tip != 'osebe' and srecanje['ucitelj']:
                     {{srecanje['ucitelj']['priimek']}},
                     % end
                     % if tip != 'ucilnice':

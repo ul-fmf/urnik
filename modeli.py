@@ -249,7 +249,7 @@ def podvoji_srecanje(id_srecanja):
     srecanje = podatki_srecanja(id_srecanja)
     del srecanje['id']
     srecanje['ucilnica'] = srecanje['ucilnica']['id']
-    srecanje['ucitelj'] = srecanje['ucitelj']['id']
+    srecanje['ucitelj'] = srecanje['ucitelj']['id'] if srecanje['ucitelj'] else None
     srecanje['predmet'] = srecanje['predmet']['id']
     shrani_srecanje(srecanje)
 
