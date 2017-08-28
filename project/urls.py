@@ -19,5 +19,5 @@ import urnik.views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^$', urnik.views.zacetna_stran),
+    url(r'^$', urnik.views.zacetna_stran, name='zacetna_stran'),
 ]

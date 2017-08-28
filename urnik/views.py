@@ -19,8 +19,7 @@ def zacetna_stran(request):
             'ime': smer,
             'letniki': letniki
         })
-    return render(request, 'zacetna_stran.tpl', {
-        'nacin': 'ogled',
+    return render(request, 'zacetna_stran.html', {
         'stolpci_smeri': stolpci_smeri,
         'letniki': Letnik.objects.all(),
         'osebe': osebe,

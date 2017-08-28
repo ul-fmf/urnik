@@ -1,0 +1,76 @@
+{% extends 'osnova.html' %}
+{% block content %}
+
+<div class="container">
+<div class="row">
+    {% for stolpec in stolpci_smeri %}
+    <div class="col s3">
+        <table class="highlight">
+            {% for smer in stolpec %}
+            <thead>
+                <tr>
+                    <th>{{ smer.ime }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for letnik in smer.letniki %}
+                <tr>
+                    <td style="padding: 5px">
+                        <a href="/letnik/{{ letnik.id }}/">{{ letnik.opis }}</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            {% endfor %}
+        </table>
+    </div>
+    {% endfor %}
+    <div class="col s2">
+        <table class="highlight">
+            <thead>
+                <tr>
+                    <th>Učilnica</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ucilnica in ucilnice %}
+                <tr>
+                    <td style="padding: 5px">
+                        <a href="/ucilnica/{{ ucilnica.id }}/">
+                            {{ ucilnica.oznaka }}
+                        </a>
+                        <small>
+                        {% if ucilnica.racunalniska %}
+                        <i class="tiny material-icons">computer</i>
+                        {% endif %}
+                        ({{ ucilnica.velikost|default:'?' }} mest)</small>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="col s4">
+        <table class="highlight">
+            <thead>
+                <tr>
+                    <th>Oseba</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for oseba in osebe %}
+                <tr>
+                    <td style="padding: 5px">
+                        <a href="/oseba/{{ oseba.id }}/">
+                            {{ oseba.ime }} <strong>{{ oseba.priimek }}</strong>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
+
+{% endblock content %}
