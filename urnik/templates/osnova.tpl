@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -6,9 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/css/materialize.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Urnik OM FMF {{ naslov|yesno:'- ' }}{{ naslov }} – poletni semester 2016/17</title>
-    <style>
-    % include('stil.css')
-    </style>
+    <link rel="stylesheet" href="{% static 'stil.css' %}">
 </head>
 
 <body>
