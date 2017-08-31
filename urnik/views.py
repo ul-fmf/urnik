@@ -21,7 +21,6 @@ def zacetna_stran(request):
         })
     return render(request, 'zacetna_stran.html', {
         'stolpci_smeri': stolpci_smeri,
-        'letniki': Letnik.objects.all(),
         'osebe': osebe,
         'ucilnice': ucilnice,
     })

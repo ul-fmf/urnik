@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 def blankify(x):
     return x if x else ''
 
-con = sqlite3.connect('../Archive/urnik/urnik.sqlite3')
+con = sqlite3.connect('urnik.sqlite3')
 con.row_factory = sqlite3.Row
 management.call_command('flush', verbosity=1, interactive=False)
 management.call_command('migrate', verbosity=1, interactive=False)
