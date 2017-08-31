@@ -20,4 +20,8 @@ import urnik.views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', urnik.views.zacetna_stran, name='zacetna_stran'),
+    url(r'^oseba/(?P<oseba_id>\d+)/$', urnik.views.urnik_osebe, name='urnik_osebe'),
+    url(r'^letnik/(?P<letnik_id>\d+)/$', urnik.views.urnik_letnika, name='urnik_letnika'),
+    url(r'^ucilnica/(?P<ucilnica_id>\d+)/$', urnik.views.urnik_ucilnice, name='urnik_ucilnice'),
+    url(r'^predmet/(?P<predmet_id>\d+)/$', urnik.views.urnik_predmeta, name='urnik_predmeta'),
 ]

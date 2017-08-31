@@ -39,6 +39,9 @@ class Letnik(models.Model):
         else:
             return self.smer
 
+    def srecanja(self):
+        return Srecanje.objects.filter(predmet__letniki=self).distinct()
+
 
 class UcilnicaQuerySet(models.QuerySet):
     def ustrezne(self, stevilo_studentov=None, racunalniska=False):

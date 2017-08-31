@@ -16,7 +16,7 @@
                 {% for letnik in smer.letniki %}
                 <tr>
                     <td style="padding: 5px">
-                        <a href="/letnik/{{ letnik.id }}/">{{ letnik.opis }}</a>
+                        <a href="{% url 'urnik_letnika' letnik.id %}">{{ letnik.opis }}</a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -36,7 +36,7 @@
                 {% for ucilnica in ucilnice %}
                 <tr>
                     <td style="padding: 5px">
-                        <a href="/ucilnica/{{ ucilnica.id }}/">
+                        <a href="{% url 'urnik_ucilnice' ucilnica.id %}">
                             {{ ucilnica.oznaka }}
                         </a>
                         <small>
@@ -61,7 +61,7 @@
                 {% for oseba in osebe %}
                 <tr>
                     <td style="padding: 5px">
-                        <a href="/oseba/{{ oseba.id }}/">
+                        <a href="{% url 'urnik_osebe' oseba.id %}">
                             {{ oseba.ime }} <strong>{{ oseba.priimek }}</strong>
                         </a>
                     </td>
