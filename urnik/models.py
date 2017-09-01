@@ -46,12 +46,10 @@ class Letnik(models.Model):
 class UcilnicaQuerySet(models.QuerySet):
     def ustrezne(self, stevilo_studentov=None, racunalniska=False):
         ucilnice = self.filter(velikost__isnull=False, racunalniska__gte=racunalniska)
-        print(ucilnice)
         if stevilo_studentov:
             ucilnice = list(ucilnice.filter(velikost__gt=2 / 3 * stevilo_studentov))
         else:
             ucilnice = list(ucilnice)
-        print(ucilnice)
         for ucilnica in ucilnice:
             if not stevilo_studentov or ucilnica.velikost / stevilo_studentov <= 3/4:
                 ucilnica.ustreznost = 'morebiti'
@@ -176,6 +174,16 @@ class Srecanje(models.Model):
         self.ura = None
         self.save()
 
+    def nastavi_trajanje(self, trajanje):
+        self.trajanje = trajanje
+        self.save()
+
+    def premakni(self, dan, ura, ucilnica):
+        self.dan = dan
+        self.ura = ura
+        self.ucilnica = ucilnica
+        self.save()
+
     def povezana_srecanja(self):
         letniki_poslusajo = Srecanje.objects.filter(predmet__letniki__in=self.predmet.letniki.all())
         ucitelj_uci = Srecanje.objects.filter(ucitelj=self.ucitelj)
@@ -183,68 +191,3 @@ class Srecanje(models.Model):
         return (letniki_poslusajo | ucitelj_uci | ucitelj_poslusa).exclude(
             pk=self.pk
         ).distinct()
-
-
-
-    def prosti_termini(self):
-        def oznaci_zasedenost(izbrano_srecanje, ucilnice):
-            zasedene = {}
-            for zasedenost in Srecanje.objects.filter(ucilnica__in=ucilnice, pk__ne=izbrano_srecanje.pk):
-                dan = zasedenost.dan
-                for ura in range(zasedenost.ura, zasedenost.ura + zasedenost.trajanje):
-                    zasedene.setdefault((dan, ura), set()).add(zasedenost.ucilnica)
-
-            def prosta(ucilnica, dan, ura):
-                return ucilnica not in zasedene.get((dan, ura), [])
-
-            termini = {}
-            for dan in range(1, 6):
-                for zacetek in range(7, 20 - izbrano_srecanje['trajanje'] + 1):
-                    termin = termini.setdefault((dan, zacetek), {
-                        'ucilnice': deepcopy(ucilnice),
-                        'zasedenost': 'zaseden'
-                    })
-                    ure = range(zacetek, zacetek + izbrano_srecanje['trajanje'])
-                    proste_prave = False
-                    deloma_prave = False
-                    proste_alternative = False
-                    deloma_alternative = False
-                    for ucilnica in termin['ucilnice']:
-                        if all(prosta(ucilnica, dan, ura) for ura in ure):
-                            ucilnica['zasedenost'] = 'prosta'
-                            if ucilnica['ustreznost'] == 'ustrezna':
-                                proste_prave = True
-                            else:
-                                proste_alternative = True
-                        elif any(prosta(ucilnica, dan, ura) for ura in ure):
-                            ucilnica['zasedenost'] = 'deloma_prosta'
-                            if ucilnica['ustreznost'] == 'ustrezna':
-                                deloma_prave = True
-                            else:
-                                deloma_alternative = True
-                        else:
-                            ucilnica['zasedenost'] = 'zasedena'
-                    if proste_prave:
-                        termin['zasedenost'] = 'prosto'
-                    elif deloma_prave and proste_alternative:
-                        termin['zasedenost'] = 'proste_le_alternative'
-                    elif deloma_prave and deloma_alternative:
-                        termin['zasedenost'] = 'vse_mogoce'
-                    elif deloma_prave:
-                        termin['zasedenost'] = 'deloma'
-                    elif proste_alternative:
-                        termin['zasedenost'] = 'proste_alternative'
-                    elif deloma_alternative:
-                        termin['zasedenost'] = 'deloma_proste_alternative'
-
-            return termini
-        ucilnice = Ucilnica.objects.ustrezne(stevilo_studentov=self.predmet.stevilo_studentov)
-        for ucilnica in ucilnice:
-            if ucilnica == self.ucilnica:
-                break
-        else:
-            ucilnica = self.ucilnica
-            ucilnica.ustreznost = 'ustrezna'
-            ucilnice = [ucilnica] + ucilnice
-        ucilnice = oznaci_zasedenost(izbrano_srecanje, ucilnice)
-        return ucilnice

@@ -32,12 +32,14 @@ def urnik(request, srecanja, naslov):
 
 def urnik_osebe(request, oseba_id):
     oseba = get_object_or_404(Oseba, id=oseba_id)
-    return urnik(request, oseba.srecanja.all(), oseba)
+    naslov = str(oseba)
+    return urnik(request, oseba.srecanja.all(), naslov)
 
 
 def urnik_letnika(request, letnik_id):
     letnik = get_object_or_404(Letnik, id=letnik_id)
-    return urnik(request, letnik.srecanja().all(), letnik)
+    naslov = str(letnik)
+    return urnik(request, letnik.srecanja().all(), naslov)
 
 
 def urnik_ucilnice(request, ucilnica_id):
@@ -48,4 +50,5 @@ def urnik_ucilnice(request, ucilnica_id):
 
 def urnik_predmeta(request, predmet_id):
     predmet = get_object_or_404(Predmet, id=predmet_id)
-    return urnik(request, predmet.srecanja.all(), predmet)
+    naslov = str(predmet)
+    return urnik(request, predmet.srecanja.all(), naslov)
