@@ -1,6 +1,12 @@
+from collections import defaultdict
 from copy import deepcopy
 from django.db import models
 from .layout import nastavi_sirine_srecanj
+
+MIN_URA, MAX_URA = 7, 20
+ENOTA_VISINE = 1 / (MAX_URA - MIN_URA)
+DNEVI = ('ponedeljek', 'torek', 'sreda', 'četrtek', 'petek')
+ENOTA_SIRINE = 1 / len(DNEVI)
 
 
 class OsebaQuerySet(models.QuerySet):
@@ -103,31 +109,50 @@ class SrecanjeQuerySet(models.QuerySet):
         return self.filter(dan__isnull=False, ura__isnull=False)
 
     def prekrivanja(self):
-        ucilnice = {}
-        osebe = {}
-        smeri = {}
-        for srecanje in self.neodlozena().select_related('ucilnica', 'ucitelj').prefetch_related('predmet__letniki', 'predmet__slusatelji'):
+        prekrivanja_ucilnic = defaultdict(set)
+        prekrivanja_oseb = defaultdict(set)
+        prekrivanja_letnikov = defaultdict(set)
+        srecanja = self.neodlozena().select_related(
+            'ucilnica',
+            'ucitelj'
+        ).prefetch_related(
+            'predmet__letniki',
+            'predmet__slusatelji'
+        )
+        for srecanje in srecanja:
             for ura in range(srecanje.ura, srecanje.ura + srecanje.trajanje):
-                osebe.setdefault((srecanje.ucitelj, srecanje.dan, ura), set()).add(srecanje)
+                prekrivanja_oseb[(srecanje.ucitelj, srecanje.dan, ura)].add(srecanje)
                 for slusatelj in srecanje.predmet.slusatelji.all():
-                    osebe.setdefault((slusatelj, srecanje.dan, ura), set()).add(srecanje)
-                ucilnice.setdefault((srecanje.ucilnica, srecanje.dan, ura), set()).add(srecanje)
+                    prekrivanja_oseb[(slusatelj, srecanje.dan, ura)].add(srecanje)
+                prekrivanja_ucilnic[(srecanje.ucilnica, srecanje.dan, ura)].add(srecanje)
                 for letnik in srecanje.predmet.letniki.all():
-                    smeri.setdefault((letnik, srecanje.dan, ura), set()).add(srecanje)
+                    prekrivanja_letnikov[(letnik, srecanje.dan, ura)].add(srecanje)
         prekrivanja_po_tipih = {
-            'Konflikti učilnic': ucilnice,
-            'Konflikti oseb': osebe,
-            'Konflikti smeri': smeri,
+            'Prekrivanja učilnic': prekrivanja_ucilnic,
+            'Prekrivanja oseb': prekrivanja_oseb,
+            'Prekrivanja letnikov': prekrivanja_letnikov,
         }
         return {
-            opis: {konflikt: srecanja for konflikt, srecanja in prekrivanja.items() if len(srecanja) > 1}
-            for opis, prekrivanja in prekrivanja_po_tipih.items()
+            opis_tipa: {
+                prekrivanje: srecanja
+                for prekrivanje, srecanja in prekrivanja_tipa.items()
+                if len(srecanja) > 1
+            }
+            for opis_tipa, prekrivanja_tipa in prekrivanja_po_tipih.items()
         }
 
     def urnik(self, skrij_rezervacije=False):
         if skrij_rezervacije:
             self = self.exclude(predmet__kratica='REZ')
-        return nastavi_sirine_srecanj(self.neodlozena().order_by('dan', 'ura', 'trajanje').distinct().select_related('ucilnica', 'ucitelj', 'predmet'))
+        self = self.neodlozena(
+        ).order_by(
+            'dan', 'ura', 'trajanje'
+        ).distinct(
+        ).select_related(
+            'ucilnica', 'ucitelj', 'predmet'
+        )
+        nastavi_sirine_srecanj(self)
+        return self
 
     def fiziki(self):
         FIZIKALNE_UCILNICE = (
@@ -144,21 +169,54 @@ class SrecanjeQuerySet(models.QuerySet):
 class Termin:
     ZASEDEN = 'zaseden'
 
-    def __init__(self, dan, ura, ucilnice, zasedenost=ZASEDEN):
+    def __init__(self, dan, ura, ucilnice, zasedenost_ucilnic, srecanje):
         self.dan = dan
         self.ura = ura
-        self.ucilnice = ucilnice
-        self.zasedenost = zasedenost
+        self.ucilnice = deepcopy(ucilnice)
+        self.zasedenost = self.ZASEDEN
+        ure = range(self.ura, self.ura + srecanje.trajanje)
+        proste_prave = False
+        deloma_prave = False
+        proste_alternative = False
+        deloma_alternative = False
+
+        def prosta(zasedenost_ucilnic, ucilnica, dan, ura):
+            return ucilnica not in zasedenost_ucilnic.get((dan, ura), [])
+
+        for ucilnica in self.ucilnice:
+            if all(prosta(zasedenost_ucilnic, ucilnica, dan, ura) for ura in ure):
+                ucilnica.zasedenost = 'prosta'
+                if ucilnica.ustreznost == 'ustrezna':
+                    proste_prave = True
+                else:
+                    proste_alternative = True
+            elif any(prosta(zasedenost_ucilnic, ucilnica, dan, ura) for ura in ure):
+                ucilnica.zasedenost = 'deloma_prosta'
+                if ucilnica.ustreznost == 'ustrezna':
+                    deloma_prave = True
+                else:
+                    deloma_alternative = True
+            else:
+                ucilnica.zasedenost = 'zasedena'
+
+        if proste_prave:
+            self.zasedenost = 'prosto'
+        elif deloma_prave and proste_alternative:
+            self.zasedenost = 'proste_le_alternative'
+        elif deloma_prave and deloma_alternative:
+            self.zasedenost = 'vse_mogoce'
+        elif deloma_prave:
+            self.zasedenost = 'deloma'
+        elif proste_alternative:
+            self.zasedenost = 'proste_alternative'
+        elif deloma_alternative:
+            self.zasedenost = 'deloma_proste_alternative'
 
     def style(self):
-        min_ura, max_ura = 7, 20
-        enota_visine = 1 / (max_ura - min_ura)
-        dnevi = ('ponedeljek', 'torek', 'sreda', 'četrtek', 'petek')
-        enota_sirine = 1 / len(dnevi)
-        left = (self.dan - 1) * enota_sirine
-        top = (self.ura - min_ura) * enota_visine
-        height = enota_visine
-        width = enota_sirine
+        left = (self.dan - 1) * ENOTA_SIRINE
+        top = (self.ura - MIN_URA) * ENOTA_VISINE
+        height = ENOTA_VISINE
+        width = ENOTA_SIRINE
         return 'position: absolute; left: {:.2%}; width: {:.2%}; top: {:.2%}; height: {:.2%}'.format(left, width, top, height)
 
 
@@ -168,23 +226,18 @@ class Srecanje(models.Model):
         (PREDAVANJA, 'predavanja'), (SEMINAR, 'seminar'),
         (VAJE, 'vaje'), (LABORATORIJSKE_VAJE, 'laboratorijske vaje'),
     )
-    PONEDELJEK, TOREK, SREDA, CETRTEK, PETEK = 1, 2, 3, 4, 5
-    DAN = (
-        (PONEDELJEK, 'ponedeljek'), (TOREK, 'torek'), (SREDA, 'sreda'),
-        (CETRTEK, 'četrtek'), (PETEK, 'petek'),
-    )
     predmet = models.ForeignKey('urnik.Predmet', null=True, blank=True, on_delete=models.CASCADE)
     tip = models.CharField(max_length=1, choices=TIP, blank=True)
     oznaka = models.CharField(max_length=64, blank=True)
     ucitelj = models.ForeignKey('urnik.Oseba', null=True, blank=True, on_delete=models.SET_NULL)
-    dan = models.PositiveSmallIntegerField(choices=DAN, blank=True, null=True)
+    dan = models.PositiveSmallIntegerField(choices=enumerate(DNEVI), blank=True, null=True)
     ura = models.PositiveSmallIntegerField(blank=True, null=True)
     trajanje = models.PositiveSmallIntegerField(null=True)
     ucilnica = models.ForeignKey('urnik.Ucilnica', null=True, blank=True, on_delete=models.SET_NULL)
     objects = SrecanjeQuerySet.as_manager()
 
     class Meta:
-        verbose_name_plural = 'srecanja'
+        verbose_name_plural = 'srečanja'
         default_related_name = 'srecanja'
         ordering = ('predmet', 'tip', 'oznaka', 'ucitelj', 'dan', 'ura', 'trajanje')
 
@@ -224,8 +277,7 @@ class Srecanje(models.Model):
         return self.trajanje > 1
 
     def lahko_podaljsam(self):
-        max_ura = 20
-        return not self.ura or self.ura + self.trajanje < max_ura
+        return not self.ura or self.ura + self.trajanje < MAX_URA
 
     def lahko_odlozim(self):
         return self.dan and self.ura
@@ -246,14 +298,10 @@ class Srecanje(models.Model):
 
     def style(self):
         if self.dan and self.ura and 'sirina' in vars(self):
-            min_ura, max_ura = 7, 20
-            enota_visine = 1 / (max_ura - min_ura)
-            dnevi = ('ponedeljek', 'torek', 'sreda', 'četrtek', 'petek')
-            enota_sirine = 1 / len(dnevi)
-            left = (self.dan - 1 + self.zamik) * enota_sirine
-            top = (self.ura - min_ura) * enota_visine
-            height = self.trajanje * enota_visine
-            width = self.sirina * enota_sirine
+            left = (self.dan - 1 + self.zamik) * ENOTA_SIRINE
+            top = (self.ura - MIN_URA) * ENOTA_VISINE
+            height = self.trajanje * ENOTA_VISINE
+            width = self.sirina * ENOTA_SIRINE
             return 'left: {:.2%}; width: {:.2%}; top: {:.2%}; height: {:.2%}'.format(
                 left, width, top, height
             )
@@ -261,66 +309,24 @@ class Srecanje(models.Model):
             return ''
 
     def prosti_termini(self):
-        def oznaci_zasedenost(izbrano_srecanje, ucilnice):
-            zasedene = {}
-            for zasedenost in Srecanje.objects.neodlozena().filter(ucilnica__in=ucilnice).exclude(pk=izbrano_srecanje.pk).select_related('ucilnica'):
-                dan = zasedenost.dan
-                for ura in range(zasedenost.ura, zasedenost.ura + zasedenost.trajanje):
-                    zasedene.setdefault((dan, ura), set()).add(zasedenost.ucilnica)
-
-            def prosta(ucilnica, dan, ura):
-                return ucilnica not in zasedene.get((dan, ura), [])
-
-            termini = {}
-            for dan in range(1, 6):
-                for zacetek in range(7, 20 - izbrano_srecanje.trajanje + 1):
-                    termin = termini.setdefault((dan, zacetek), Termin(
-                        dan=dan,
-                        ura=zacetek,
-                        ucilnice=deepcopy(ucilnice),
-                        zasedenost=Termin.ZASEDEN
-                    ))
-                    ure = range(zacetek, zacetek + izbrano_srecanje.trajanje)
-                    proste_prave = False
-                    deloma_prave = False
-                    proste_alternative = False
-                    deloma_alternative = False
-                    for ucilnica in termin.ucilnice:
-                        if all(prosta(ucilnica, dan, ura) for ura in ure):
-                            ucilnica.zasedenost = 'prosta'
-                            if ucilnica.ustreznost == 'ustrezna':
-                                proste_prave = True
-                            else:
-                                proste_alternative = True
-                        elif any(prosta(ucilnica, dan, ura) for ura in ure):
-                            ucilnica.zasedenost = 'deloma_prosta'
-                            if ucilnica.ustreznost == 'ustrezna':
-                                deloma_prave = True
-                            else:
-                                deloma_alternative = True
-                        else:
-                            ucilnica.zasedenost = 'zasedena'
-                    if proste_prave:
-                        termin.zasedenost = 'prosto'
-                    elif deloma_prave and proste_alternative:
-                        termin.zasedenost = 'proste_le_alternative'
-                    elif deloma_prave and deloma_alternative:
-                        termin.zasedenost = 'vse_mogoce'
-                    elif deloma_prave:
-                        termin.zasedenost = 'deloma'
-                    elif proste_alternative:
-                        termin.zasedenost = 'proste_alternative'
-                    elif deloma_alternative:
-                        termin.zasedenost = 'deloma_proste_alternative'
-
-            return termini
         ucilnice = Ucilnica.objects.ustrezne(stevilo_studentov=self.predmet.stevilo_studentov)
-        for ucilnica in ucilnice:
-            if ucilnica == self.ucilnica:
-                break
-        else:
-            ucilnica = self.ucilnica
-            ucilnica.ustreznost = 'ustrezna'
-            ucilnice = [ucilnica] + ucilnice
-        ucilnice = oznaci_zasedenost(self, ucilnice)
-        return ucilnice
+        if self.ucilnica not in ucilnice:
+            self.ucilnica.ustreznost = 'ustrezna'
+            ucilnice.insert(0, self.ucilnica)
+
+        zasedenost_ucilnic = defaultdict(set)
+        for srecanje in Srecanje.objects.neodlozena().filter(ucilnica__in=ucilnice).exclude(pk=self.pk).select_related('ucilnica'):
+            for ura in range(srecanje.ura, srecanje.ura + srecanje.trajanje):
+                zasedenost_ucilnic[(srecanje.dan, ura)].add(srecanje.ucilnica)
+
+        termini = {}
+        for dan in range(1, 6):
+            for ura in range(MIN_URA, MAX_URA - self.trajanje + 1):
+                termini[(dan, ura)] = Termin(
+                    dan=dan,
+                    ura=ura,
+                    ucilnice=ucilnice,
+                    zasedenost_ucilnic=zasedenost_ucilnic,
+                    srecanje=self,
+                )
+        return termini

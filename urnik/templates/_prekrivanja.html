@@ -1,9 +1,9 @@
 {% for opis_tipa, prekrivanja_tipa in prekrivanja_po_tipih.items %}
-<h5><i class="material-icons">warning</i> {{opis_tipa}}</h5>
+<h5><i class="material-icons">warning</i> {{ opis_tipa }}</h5>
 <ul class="collection">
-{% for konflikt, srecanja in prekrivanja_tipa.items %}
+{% for prekrivanje, srecanja in prekrivanja_tipa.items %}
     <li class="collection-item">
-        {{ konflikt.0 }}
+        {{ prekrivanje.0 }}
         <small><ul>
         {% for srecanje in srecanja %}
             <li>

@@ -32,7 +32,7 @@
     {% for srecanje in odlozena_srecanja %}
     {% include '_srecanje.html' with nacin='odlozisce' %}
     {% endfor %}
-    {% include '_konflikti.html' %}
+    {% include '_prekrivanja.html' %}
 
     {% elif nacin == 'premikanje' %}
     <h5><i class="material-icons">inbox</i> Premikanje srečanja</h5>
