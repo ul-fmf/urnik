@@ -139,6 +139,27 @@ class SrecanjeQuerySet(models.QuerySet):
         return (fizikalne_ucilnice | fizikalni_letniki).distinct()
 
 
+class Termin:
+    ZASEDEN = 'zaseden'
+    def __init__(self, dan, ura, ucilnice, zasedenost=ZASEDEN):
+        self.dan = dan
+        self.ura = ura
+        self.ucilnice = ucilnice
+        self.zasedenost = zasedenost
+
+    def style(self):
+        min_ura, max_ura = 7, 20
+        enota_visine = 1 / (max_ura - min_ura)
+        dnevi = ('ponedeljek', 'torek', 'sreda', 'četrtek', 'petek')
+        enota_sirine = 1 / len(dnevi)
+        left = (self.dan - 1) * enota_sirine
+        top = (self.ura - min_ura) * enota_visine
+        height = enota_visine
+        width = enota_sirine
+        return 'position: absolute; left: {:.2%}; width: {:.2%}; top: {:.2%}; height: {:.2%}'.format(left, width, top, height)
+
+
+
 class Srecanje(models.Model):
     PREDAVANJA, SEMINAR, VAJE, LABORATORIJSKE_VAJE = 'P', 'S', 'V', 'L'
     TIP = (
@@ -232,16 +253,18 @@ class Srecanje(models.Model):
             termini = {}
             for dan in range(1, 6):
                 for zacetek in range(7, 20 - izbrano_srecanje.trajanje + 1):
-                    termin = termini.setdefault((dan, zacetek), {
-                        'ucilnice': deepcopy(ucilnice),
-                        'zasedenost': 'zaseden'
-                    })
+                    termin = termini.setdefault((dan, zacetek), Termin(
+                        dan=dan,
+                        ura=zacetek,
+                        ucilnice=deepcopy(ucilnice),
+                        zasedenost=Termin.ZASEDEN
+                    ))
                     ure = range(zacetek, zacetek + izbrano_srecanje.trajanje)
                     proste_prave = False
                     deloma_prave = False
                     proste_alternative = False
                     deloma_alternative = False
-                    for ucilnica in termin['ucilnice']:
+                    for ucilnica in termin.ucilnice:
                         if all(prosta(ucilnica, dan, ura) for ura in ure):
                             ucilnica.zasedenost = 'prosta'
                             if ucilnica.ustreznost == 'ustrezna':
@@ -257,17 +280,17 @@ class Srecanje(models.Model):
                         else:
                             ucilnica.zasedenost = 'zasedena'
                     if proste_prave:
-                        termin['zasedenost'] = 'prosto'
+                        termin.zasedenost = 'prosto'
                     elif deloma_prave and proste_alternative:
-                        termin['zasedenost'] = 'proste_le_alternative'
+                        termin.zasedenost = 'proste_le_alternative'
                     elif deloma_prave and deloma_alternative:
-                        termin['zasedenost'] = 'vse_mogoce'
+                        termin.zasedenost = 'vse_mogoce'
                     elif deloma_prave:
-                        termin['zasedenost'] = 'deloma'
+                        termin.zasedenost = 'deloma'
                     elif proste_alternative:
-                        termin['zasedenost'] = 'proste_alternative'
+                        termin.zasedenost = 'proste_alternative'
                     elif deloma_alternative:
-                        termin['zasedenost'] = 'deloma_proste_alternative'
+                        termin.zasedenost = 'deloma_proste_alternative'
 
             return termini
         ucilnice = Ucilnica.objects.ustrezne(stevilo_studentov=self.predmet.stevilo_studentov)

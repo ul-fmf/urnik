@@ -1,0 +1,13 @@
+<div class="termin {{termin.zasedenost}}" style="{{termin.style}}">
+    <div class="izbira_ucilnice">
+    {% for ucilnica in termin.ucilnice %}
+        <form method="post" class="izbrana_ucilnica {{ucilnica.zasedenost}} {{ucilnica.ustreznost}}">
+            <input type="hidden" name="next" value="{{next}}">
+            <input value="{{termin.dan}}" name="dan" type="hidden">
+            <input value="{{termin.ura}}" name="ura" type="hidden">
+            <input value="{{ucilnica.id}}" name="ucilnica" type="hidden">
+            <button class="">{{ucilnica.oznaka}}<br><small>{{ucilnica.velikost}}</small></button>
+        </form>
+    {% endfor %}
+    </div>
+</div>

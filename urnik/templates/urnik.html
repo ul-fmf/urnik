@@ -12,8 +12,8 @@
     {% for srecanje in srecanja %}
     {% render_bottle '_srecanje.tpl' nacin='urejanje' %}
     {% endfor %}
-    {% for ter, termin in prosti_termini.items %}
-    {% render_bottle '_prosti_termin.tpl' dan=ter.0 ura=ter.1 %}
+    {% for termin in prosti_termini.values %}
+    {% include '_prosti_termin.html' %}
     {% endfor %}
 </div>
 {% elif nacin == 'ogled' %}
