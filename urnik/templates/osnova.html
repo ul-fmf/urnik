@@ -21,6 +21,16 @@
       <ul>
         <li id="domov"><a href="{% url 'zacetna_stran' %}"><i class="material-icons left">home</i>Urnik OM FMF – poletni semester 2016/17</a></li>
       </ul>
+      {% if user.is_authenticated %}
+      <ul class="right">
+        <li><a href="{% url 'preklopi_urejanje' %}">
+          {% if request.session.urejanje %}
+          <i class="material-icons right">edit</i>uredi urnik
+          {% else %}
+          <i class="material-icons right">visibility</i>izklopi urejanje
+          {% endif %}
+        </a></li>
+      {% endif %}
     </div>
   </nav>
 

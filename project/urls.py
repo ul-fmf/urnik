@@ -28,4 +28,5 @@ urlpatterns = [
     url(r'^srecanje/(?P<srecanje_id>\d+)/podvoji/$', urnik.views.podvoji_srecanje, name='podvoji_srecanje'),
     url(r'^srecanje/(?P<srecanje_id>\d+)/odlozi/$', urnik.views.odlozi_srecanje, name='odlozi_srecanje'),
     url(r'^srecanje/(?P<srecanje_id>\d+)/trajanje/$', urnik.views.nastavi_trajanje_srecanja, name='nastavi_trajanje_srecanja'),
+    url(r'^preklopi_urejanje/$', urnik.views.preklopi_urejanje, name='preklopi_urejanje'),
 ]
