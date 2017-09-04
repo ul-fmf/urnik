@@ -15,10 +15,12 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+from django.contrib.auth import views as auth_views
 import urnik.views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'^accounts/logout/$', auth_views.logout, name='logout'),
     url(r'^$', urnik.views.zacetna_stran, name='zacetna_stran'),
     url(r'^oseba/(?P<oseba_id>\d+)/$', urnik.views.urnik_osebe, name='urnik_osebe'),
     url(r'^letnik/(?P<letnik_id>\d+)/$', urnik.views.urnik_letnika, name='urnik_letnika'),
