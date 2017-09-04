@@ -218,6 +218,17 @@ class Srecanje(models.Model):
         self.ucilnica = ucilnica
         self.save()
 
+    def lahko_podaljsam(self):
+        max_ura = 20
+        return self.ura and self.ura + self.trajanje < max_ura
+
+    def po_potrebi_okrajsano_ime_predmeta(self):
+        if (self.sirina >= 0.5 and len(self.predmet.ime) < 45 and self.trajanje > 1) or self.sirina == 1:
+            return self.predmet.ime
+        else:
+            return self.predmet.kratica
+
+
     def povezana_srecanja(self):
         letniki_poslusajo = Srecanje.objects.filter(predmet__letniki__in=self.predmet.letniki.all())
         ucitelj_uci = Srecanje.objects.filter(ucitelj=self.ucitelj)

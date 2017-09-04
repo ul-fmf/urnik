@@ -1,43 +1,39 @@
-% min_ura, max_ura = 7, 20
-% enota_visine = 1 / (max_ura - min_ura)
-% dnevi = ('ponedeljek', 'torek', 'sreda', 'četrtek', 'petek')
-% enota_sirine = 1 / len(dnevi)
-% if nacin == 'urejanje':
-    <div class="srecanje" style="{{ srecanje.style() }};">
+{% if nacin == 'urejanje' %}
+    <div class="srecanje" style="{{ srecanje.style }};">
         <div class="predmet">
-            {{srecanje.predmet.ime}} {{srecanje.tip}}{{srecanje.oznaka if srecanje.oznaka else ''}}
+            {{srecanje.predmet.ime}} {{srecanje.tip}}{{srecanje.oznaka}}
         </div>
-        % if srecanje.ucitelj:
+        {% if srecanje.ucitelj %}
         <div class="ucitelj">
             <a href="/oseba/{{srecanje.ucitelj.id}}/">
                 {{srecanje.ucitelj.priimek}}
             </a>
         </div>
-        % end
+        {% endif %}
         <div class="ucilnica">
             <a href="/ucilnica/{{srecanje.ucilnica.id}}/">
                 {{srecanje.ucilnica.oznaka}}
             </a>
         </div>
         <div class="urejanje">
-            % if srecanje.trajanje > 1:
+            {% if srecanje.trajanje > 1 %}
             <form method="post" action="/srecanje/{{srecanje.id}}/trajanje/">
                 <input type="hidden" name="next" value="{{next}}">
-                <input type="hidden" name="trajanje" value="{{srecanje.trajanje - 1}}">
+                <input type="hidden" name="trajanje" value="{{srecanje.trajanje|add:-1}}">
                 <button>
                     <i class="tiny material-icons">file_upload</i> skrajšaj
                 </button>
             </form>
-            % end
-            % if nacin == 'urejanje' and srecanje.ura + srecanje.trajanje < max_ura:
+            {% endif %}
+            {% if nacin == 'urejanje' and srecanje.lahko_podaljsam %}
             <form method="post" action="/srecanje/{{srecanje.id}}/trajanje/">
                 <input type="hidden" name="next" value="{{next}}">
-                <input type="hidden" name="trajanje" value="{{srecanje.trajanje + 1}}">
+                <input type="hidden" name="trajanje" value="{{srecanje.trajanje|add:1}}">
                 <button>
                     <i class="tiny material-icons">file_download</i> podaljšaj
                 </button>
             </form>
-            % end
+            {% endif %}
             <a href="/admin/urnik/srecanje/{{srecanje.id}}/delete/?next={{next}}">
                 <i class="tiny material-icons">delete</i> pobriši
             </a>
@@ -59,43 +55,43 @@
             </a>
         </div>
     </div>
-% elif nacin == 'odlozisce':
+{% elif nacin == 'odlozisce' %}
 
     <div class="srecanje">
         <div class="predmet">
-            {{srecanje.predmet.ime}} {{srecanje.tip}}{{srecanje.oznaka if srecanje.oznaka else ''}}
+            {{srecanje.predmet.ime}} {{srecanje.tip}}{{srecanje.oznaka}}
         </div>
-        % if srecanje.ucitelj:
+        {% if srecanje.ucitelj %}
         <div class="ucitelj">
             <a href="/oseba/{{srecanje.ucitelj.id}}/">
                 {{srecanje.ucitelj.priimek}}
             </a>
         </div>
-        % end
+        {% endif %}
         <div class="ucilnica">
             <a href="/ucilnica/{{srecanje.ucilnica.id}}/">
                 {{srecanje.ucilnica.oznaka}}
             </a>
         </div>
         <div class="urejanje">
-            % if nacin == 'urejanje' and srecanje.trajanje > 1:
+            {% if nacin == 'urejanje' and srecanje.trajanje > 1 %}
             <form method="post" action="/srecanje/{{srecanje.id}}/trajanje/">
                 <input type="hidden" name="next" value="{{next}}">
-                <input type="hidden" name="trajanje" value="{{srecanje.trajanje - 1}}">
+                <input type="hidden" name="trajanje" value="{{srecanje.trajanje|add:-1}}">
                 <button>
                     <i class="tiny material-icons">file_upload</i> skrajšaj
                 </button>
             </form>
-            % end
-            % if nacin == 'urejanje' and srecanje.ura + srecanje.trajanje < max_ura:
+            {% endif %}
+            {% if nacin == 'urejanje' and srecanje.lahko_podaljsam %}
             <form method="post" action="/srecanje/{{srecanje.id}}/trajanje/">
                 <input type="hidden" name="next" value="{{next}}">
-                <input type="hidden" name="trajanje" value="{{srecanje.trajanje + 1}}">
+                <input type="hidden" name="trajanje" value="{{srecanje.trajanje|add:1}}">
                 <button>
                     <i class="tiny material-icons">file_download</i> podaljšaj
                 </button>
             </form>
-            % end
+            {% endif %}
             <form method="post" action="/admin/urnik/srecanje/{{srecanje.id}}/delete/?next={{next}}">
                 <button>
                     <i class="tiny material-icons">delete</i> pobriši
@@ -115,23 +111,23 @@
         </div>
     </div>
 
-% elif nacin == 'ogled':
-<div class="srecanje" style="{{ srecanje.style() }};">
+{% elif nacin == 'ogled' %}
+<div class="srecanje" style="{{ srecanje.style }};">
     <div class="predmet">
-        <a href="/predmet/{{srecanje.predmet.id}}/">{{srecanje.predmet.ime if (srecanje.sirina >= 0.5 and len(srecanje.predmet.ime) < 45 and srecanje.trajanje > 1) or srecanje.sirina == 1 else srecanje.predmet.kratica}}</a>
+        <a href="/predmet/{{srecanje.predmet.id}}/">{{srecanje.po_potrebi_okrajsano_ime_predmeta}}</a>
         <span class="tip">
-             {{srecanje.tip}}{{srecanje.oznaka if srecanje.oznaka else ''}}
+             {{srecanje.tip}}{{srecanje.oznaka}}
         </span>
     </div>
-    % if srecanje.ucitelj:
+    {% if srecanje.ucitelj %}
     <div class="ucitelj">
         <a href="/oseba/{{srecanje.ucitelj.id}}/">{{srecanje.ucitelj.priimek}}</a>
     </div>
-    % end
-    % if srecanje.sirina >= 0.5:
+    {% endif %}
+    {% if srecanje.sirina >= 0.5 %}
     <div class="ucilnica">
         <a href="/ucilnica/{{srecanje.ucilnica.id}}/">{{srecanje.ucilnica.oznaka}}</a>
     </div>
-    % end
+    {% endif %}
 </div>
-% end
+{% endif %}

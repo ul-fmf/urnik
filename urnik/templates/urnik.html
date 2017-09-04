@@ -10,7 +10,7 @@
 {% if nacin == 'urejanje' or nacin == 'premikanje' %}
 <div id="srecanja">
     {% for srecanje in srecanja %}
-    {% render_bottle '_srecanje.tpl' nacin='urejanje' %}
+    {% include '_srecanje.html' with nacin='urejanje' %}
     {% endfor %}
     {% for termin in prosti_termini.values %}
     {% include '_prosti_termin.html' %}
@@ -19,7 +19,7 @@
 {% elif nacin == 'ogled' %}
 <div id="srecanja">
     {% for srecanje in srecanja %}
-    {% render_bottle '_srecanje.tpl' nacin='ogled' %}
+    {% include '_srecanje.html' with nacin='ogled' %}
     {% endfor %}
 </div>
 {% endif %}
@@ -31,13 +31,13 @@
     {% if nacin == 'urejanje' %}
     <h5><i class="material-icons">inbox</i> Odložišče</h5>
     {% for srecanje in odlozena_srecanja %}
-        {% render_bottle '_srecanje.tpl' nacin='odlozisce' %}
+        {% include '_srecanje.html' with nacin='odlozisce' %}
     {% endfor %}
     {% include '_konflikti.html' %}
 
     {% elif nacin == 'premikanje' %}
     <h5><i class="material-icons">inbox</i> Premikanje srečanja</h5>
-        {% render_bottle '_srecanje.tpl' nacin='odlozisce' srecanje=premaknjeno_srecanje %}
+        {% include '_srecanje.html' with nacin='odlozisce' srecanje=premaknjeno_srecanje %}
     </div>
     {% endif %}
 </div>
