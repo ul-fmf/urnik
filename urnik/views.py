@@ -51,19 +51,6 @@ def urnik(request, srecanja, naslov):
         })
 
 
-@login_required
-def premik_srecanja(request, srecanje, naslov):
-    return render(request, 'urnik.html', {
-        'nacin': 'urejanje',
-        'naslov': naslov,
-        'srecanja': srecanje.povezana_srecanja().urnik(),
-        'odlozena_srecanja': Srecanje.objects.odlozena(),
-        'prekrivanja_po_tipih': {},
-        'prosti_termini': srecanje.prosti_termini(),
-        'next': request.META.get('HTTP_REFERER', '/'),
-    })
-
-
 def urnik_osebe(request, oseba_id):
     oseba = get_object_or_404(Oseba, id=oseba_id)
     naslov = str(oseba)
@@ -99,8 +86,15 @@ def premakni_srecanje(request, srecanje_id):
         srecanje.premakni(dan, ura, ucilnica)
         return redirect(request.POST['next'])
     else:
-        naslov = 'Premikanje srečanja'
-        return premik_srecanja(request, srecanje, naslov)
+        return render(request, 'urnik.html', {
+            'nacin': 'urejanje',
+            'naslov': 'Premikanje srečanja',
+            'srecanja': srecanje.povezana_srecanja().urnik(),
+            'odlozena_srecanja': Srecanje.objects.odlozena(),
+            'prekrivanja_po_tipih': {},
+            'prosti_termini': srecanje.prosti_termini(),
+            'next': request.META.get('HTTP_REFERER', '/'),
+        })
 
 
 @csrf_exempt
@@ -128,7 +122,6 @@ def nastavi_trajanje_srecanja(request, srecanje_id):
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
 
-@csrf_exempt
 @login_required
 def preklopi_urejanje(request):
     request.session['urejanje'] = not request.session.get('urejanje', False)
