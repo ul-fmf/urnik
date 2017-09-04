@@ -10,13 +10,13 @@
         </div>
         % if srecanje.ucitelj:
         <div class="ucitelj">
-            <a href="/uredi/urnik?oseba={{srecanje.ucitelj.id}}">
+            <a href="/oseba/{{srecanje.ucitelj.id}}/">
                 {{srecanje.ucitelj.priimek}}
             </a>
         </div>
         % end
         <div class="ucilnica">
-            <a href="/uredi/urnik?ucilnica={{srecanje.ucilnica.id}}">
+            <a href="/ucilnica/{{srecanje.ucilnica.id}}/">
                 {{srecanje.ucilnica.oznaka}}
             </a>
         </div>
@@ -39,11 +39,9 @@
                 </button>
             </form>
             % end
-            <form method="post" action="/uredi/srecanje/{{srecanje.id}}/izbrisi/">
-                <button>
-                    <i class="tiny material-icons">delete</i> pobriši
-                </button>
-            </form>
+            <a href="/admin/urnik/srecanje/{{srecanje.id}}/delete/?next={{next}}">
+                <i class="tiny material-icons">delete</i> pobriši
+            </a>
             <form method="post" action="/srecanje/{{srecanje.id}}/podvoji/">
                 <button>
                     <i class="tiny material-icons">content_copy</i> podvoji
@@ -57,7 +55,7 @@
                     <i class="tiny material-icons">move_to_inbox</i> odloži
                 </button>
             </form>
-            <a href="/uredi/srecanje/{{srecanje.id}}/">
+            <a href="/admin/urnik/srecanje/{{srecanje.id}}/change/?next={{next}}">
                 <i class="tiny material-icons">edit</i> uredi
             </a>
         </div>
@@ -70,13 +68,13 @@
         </div>
         % if srecanje.ucitelj:
         <div class="ucitelj">
-            <a href="/uredi/urnik?oseba={{srecanje.ucitelj.id}}">
+            <a href="/oseba/{{srecanje.ucitelj.id}}/">
                 {{srecanje.ucitelj.priimek}}
             </a>
         </div>
         % end
         <div class="ucilnica">
-            <a href="/uredi/urnik?ucilnica={{srecanje.ucilnica.id}}">
+            <a href="/ucilnica/{{srecanje.ucilnica.id}}/">
                 {{srecanje.ucilnica.oznaka}}
             </a>
         </div>
@@ -99,7 +97,7 @@
                 </button>
             </form>
             % end
-            <form method="post" action="/uredi/srecanje/{{srecanje.id}}/izbrisi/">
+            <form method="post" action="/admin/urnik/srecanje/{{srecanje.id}}/delete/?next={{next}}">
                 <button>
                     <i class="tiny material-icons">delete</i> pobriši
                 </button>
@@ -112,7 +110,7 @@
             <a href="/srecanje/{{srecanje.id}}/premakni/">
                 <i class="tiny material-icons">open_with</i> premakni
             </a>
-            <a href="/uredi/srecanje/{{srecanje.id}}/">
+            <a href="/admin/urnik/srecanje/{{srecanje.id}}/change/?next={{next}}">
                 <i class="tiny material-icons">edit</i>
             </a>
         </div>

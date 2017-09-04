@@ -1,6 +1,7 @@
 from bottle import SimpleTemplate
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.http import urlencode
 from django.views.decorators.csrf import csrf_exempt
 from .models import *
 
@@ -41,17 +42,22 @@ def ogled_urnika(request, srecanja, naslov):
     return render_bottle('urnik.tpl', {
         'nacin': 'ogled',
         'naslov': naslov,
-        'srecanja': srecanja.urnik(),        
+        'srecanja': srecanja.urnik(),
     })
 
 
 def urejanje_urnika(request, srecanja, naslov):
+    if request.META['QUERY_STRING']:
+        next_url = '{}?{}'.format(request.path, request.META['QUERY_STRING'])
+    else:
+        next_url = request.path
     return render_bottle('urnik.tpl', {
         'nacin': 'urejanje',
         'naslov': naslov,
         'srecanja': srecanja.urnik(),
         'odlozena_srecanja': Srecanje.objects.odlozena(),
         'prekrivanja_po_tipih': Srecanje.objects.prekrivanja(),
+        'next': next_url
     })
 
 
@@ -125,4 +131,3 @@ def nastavi_trajanje_srecanja(request, srecanje_id):
     trajanje = int(request.POST['trajanje'])
     srecanje.nastavi_trajanje(trajanje)
     return redirect(request.META.get('HTTP_REFERER', '/'))
-

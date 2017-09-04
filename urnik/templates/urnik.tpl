@@ -1,4 +1,4 @@
-% rebase('osnova.tpl', domov='/' if nacin == 'ogled' else '/uredi/')
+% rebase('osnova.tpl', domov='/')
 
 % min_ura, max_ura = 7, 20
 % enota_visine = 1 / (max_ura - min_ura)

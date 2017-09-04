@@ -166,11 +166,17 @@ class Srecanje(models.Model):
         ordering = ('predmet', 'tip', 'oznaka', 'ucitelj', 'dan', 'ura', 'trajanje')
 
     def __str__(self):
-        return '{}, {}{}, {}, {}, {}–{}, {}'.format(
-            self.predmet, self.tip, self.oznaka, self.ucitelj,
-            self.get_dan_display(), self.ura, self.ura + self.trajanje,
-            self.ucilnica
-        )
+        if self.dan and self.ura:
+            return '{}, {}{}, {}, {}, {}–{}, {}'.format(
+                self.predmet, self.tip, self.oznaka, self.ucitelj,
+                self.get_dan_display(), self.ura, self.ura + self.trajanje,
+                self.ucilnica
+            )
+        else:
+            return '{}, {}{}, {}, odloženo, {}'.format(
+                self.predmet, self.tip, self.oznaka, self.ucitelj,
+                self.ucilnica
+            )
 
     def podvoji(self):
         self.id = None
