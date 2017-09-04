@@ -5,19 +5,19 @@
         </div>
         {% if srecanje.ucitelj %}
         <div class="ucitelj">
-            <a href="/oseba/{{srecanje.ucitelj.id}}/">
+            <a href="{% url 'urnik_osebe' srecanje.ucitelj.id %}">
                 {{srecanje.ucitelj.priimek}}
             </a>
         </div>
         {% endif %}
         <div class="ucilnica">
-            <a href="/ucilnica/{{srecanje.ucilnica.id}}/">
+            <a href="{% url 'urnik_ucilnice' srecanje.ucilnica.id %}">
                 {{srecanje.ucilnica.oznaka}}
             </a>
         </div>
         <div class="urejanje">
             {% if srecanje.trajanje > 1 %}
-            <form method="post" action="/srecanje/{{srecanje.id}}/trajanje/">
+            <form method="post" action="{% url 'nastavi_trajanje_srecanja' srecanje.id %}">
                 <input type="hidden" name="next" value="{{next}}">
                 <input type="hidden" name="trajanje" value="{{srecanje.trajanje|add:-1}}">
                 <button>
@@ -26,7 +26,7 @@
             </form>
             {% endif %}
             {% if nacin == 'urejanje' and srecanje.lahko_podaljsam %}
-            <form method="post" action="/srecanje/{{srecanje.id}}/trajanje/">
+            <form method="post" action="{% url 'nastavi_trajanje_srecanja' srecanje.id %}">
                 <input type="hidden" name="next" value="{{next}}">
                 <input type="hidden" name="trajanje" value="{{srecanje.trajanje|add:1}}">
                 <button>
@@ -34,23 +34,23 @@
                 </button>
             </form>
             {% endif %}
-            <a href="/admin/urnik/srecanje/{{srecanje.id}}/delete/?next={{next}}">
+            <a href="{% url 'admin:urnik_srecanje_delete' srecanje.id %}?next={{next}}">
                 <i class="tiny material-icons">delete</i> pobriši
             </a>
-            <form method="post" action="/srecanje/{{srecanje.id}}/podvoji/">
+            <form method="post" action="{% url 'podvoji_srecanje' srecanje.id %}">
                 <button>
                     <i class="tiny material-icons">content_copy</i> podvoji
                 </button>
             </form>
-            <a href="/srecanje/{{srecanje.id}}/premakni/">
+            <a href="{% url 'premakni_srecanje' srecanje.id %}">
                 <i class="tiny material-icons">open_with</i> premakni
             </a>
-            <form method="post" action="/srecanje/{{srecanje.id}}/odlozi/">
+            <form method="post" action="{% url 'odlozi_srecanje' srecanje.id %}">
                 <button>
                     <i class="tiny material-icons">move_to_inbox</i> odloži
                 </button>
             </form>
-            <a href="/admin/urnik/srecanje/{{srecanje.id}}/change/?next={{next}}">
+            <a href="{% url 'admin:urnik_srecanje_delete' srecanje.id %}?next={{next}}">
                 <i class="tiny material-icons">edit</i> uredi
             </a>
         </div>
@@ -63,19 +63,19 @@
         </div>
         {% if srecanje.ucitelj %}
         <div class="ucitelj">
-            <a href="/oseba/{{srecanje.ucitelj.id}}/">
+            <a href="{% url 'urnik_osebe' srecanje.ucitelj.id %}">
                 {{srecanje.ucitelj.priimek}}
             </a>
         </div>
         {% endif %}
         <div class="ucilnica">
-            <a href="/ucilnica/{{srecanje.ucilnica.id}}/">
+            <a href="{% url 'urnik_ucilnice' srecanje.ucilnica.id %}">
                 {{srecanje.ucilnica.oznaka}}
             </a>
         </div>
         <div class="urejanje">
             {% if nacin == 'urejanje' and srecanje.trajanje > 1 %}
-            <form method="post" action="/srecanje/{{srecanje.id}}/trajanje/">
+            <form method="post" action="{% url 'nastavi_trajanje_srecanja' srecanje.id %}">
                 <input type="hidden" name="next" value="{{next}}">
                 <input type="hidden" name="trajanje" value="{{srecanje.trajanje|add:-1}}">
                 <button>
@@ -84,7 +84,7 @@
             </form>
             {% endif %}
             {% if nacin == 'urejanje' and srecanje.lahko_podaljsam %}
-            <form method="post" action="/srecanje/{{srecanje.id}}/trajanje/">
+            <form method="post" action="{% url 'nastavi_trajanje_srecanja' srecanje.id %}">
                 <input type="hidden" name="next" value="{{next}}">
                 <input type="hidden" name="trajanje" value="{{srecanje.trajanje|add:1}}">
                 <button>
@@ -92,20 +92,18 @@
                 </button>
             </form>
             {% endif %}
-            <form method="post" action="/admin/urnik/srecanje/{{srecanje.id}}/delete/?next={{next}}">
-                <button>
-                    <i class="tiny material-icons">delete</i> pobriši
-                </button>
-            </form>
-            <form method="post" action="/srecanje/{{srecanje.id}}/podvoji/">
+            <a href="{% url 'admin:urnik_srecanje_delete' srecanje.id %}?next={{next}}">
+                <i class="tiny material-icons">delete</i> pobriši
+            </a>
+            <form method="post" action="{% url 'podvoji_srecanje' srecanje.id %}">
                 <button>
                     <i class="tiny material-icons">content_copy</i> podvoji
                 </button>
             </form>
-            <a href="/srecanje/{{srecanje.id}}/premakni/">
+            <a href="{% url 'premakni_srecanje' srecanje.id %}">
                 <i class="tiny material-icons">open_with</i> premakni
             </a>
-            <a href="/admin/urnik/srecanje/{{srecanje.id}}/change/?next={{next}}">
+            <a href="{% url 'admin:urnik_srecanje_change' srecanje.id %}?next={{next}}">
                 <i class="tiny material-icons">edit</i>
             </a>
         </div>
@@ -114,19 +112,19 @@
 {% elif nacin == 'ogled' %}
 <div class="srecanje" style="{{ srecanje.style }};">
     <div class="predmet">
-        <a href="/predmet/{{srecanje.predmet.id}}/">{{srecanje.po_potrebi_okrajsano_ime_predmeta}}</a>
+        <a href="{% url 'urnik_predmeta' srecanje.predmet.id %}">{{srecanje.po_potrebi_okrajsano_ime_predmeta}}</a>
         <span class="tip">
              {{srecanje.tip}}{{srecanje.oznaka}}
         </span>
     </div>
     {% if srecanje.ucitelj %}
     <div class="ucitelj">
-        <a href="/oseba/{{srecanje.ucitelj.id}}/">{{srecanje.ucitelj.priimek}}</a>
+        <a href="{% url 'urnik_osebe' srecanje.ucitelj.id %}">{{srecanje.ucitelj.priimek}}</a>
     </div>
     {% endif %}
     {% if srecanje.sirina >= 0.5 %}
     <div class="ucilnica">
-        <a href="/ucilnica/{{srecanje.ucilnica.id}}/">{{srecanje.ucilnica.oznaka}}</a>
+        <a href="{% url 'urnik_ucilnice' srecanje.ucilnica.id %}">{{srecanje.ucilnica.oznaka}}</a>
     </div>
     {% endif %}
 </div>

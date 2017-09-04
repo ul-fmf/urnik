@@ -7,7 +7,7 @@
         <small><ul>
         {% for srecanje in srecanja %}
             <li>
-                <a href="/srecanje/{{srecanje.id}}/premakni/">
+                <a href="{% url 'premakni_srecanje' srecanje.id %}">
                     <i class="tiny material-icons">open_with</i>
                 </a>
                 {{ srecanje }}
