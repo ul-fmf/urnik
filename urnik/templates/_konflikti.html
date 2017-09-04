@@ -1,0 +1,20 @@
+{% for opis_tipa, prekrivanja_tipa in prekrivanja_po_tipih.items %}
+<h5><i class="material-icons">warning</i> {{opis_tipa}}</h5>
+<ul class="collection">
+{% for konflikt, srecanja in prekrivanja_tipa.items %}
+    <li class="collection-item">
+        {{ konflikt.0 }}
+        <small><ul>
+        {% for srecanje in srecanja %}
+            <li>
+                <a href="/srecanje/{{srecanje.id}}/premakni/">
+                    <i class="tiny material-icons">open_with</i>
+                </a>
+                {{ srecanje }}
+            </li>
+        {% endfor %}
+        </ul></small>
+    </li>
+{% endfor %}
+</ul>
+{% endfor %}

@@ -1,3 +1,7 @@
+% min_ura, max_ura = 7, 20
+% enota_visine = 1 / (max_ura - min_ura)
+% dnevi = ('ponedeljek', 'torek', 'sreda', 'četrtek', 'petek')
+% enota_sirine = 1 / len(dnevi)
 % left = (dan - 1) * enota_sirine
 % top = (ura - min_ura) * enota_visine
 % height = enota_visine

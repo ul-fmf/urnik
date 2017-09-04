@@ -2,6 +2,45 @@
 {% load tags %}
 {% block content %}
 
-{% render_bottle 'urnik.tpl' %}
+<div id="urnik" class="{% if nacin == 'ogled' %}cel{% endif %}">
+
+{% dnevi %}
+{% ure %}
+
+{% if nacin == 'urejanje' or nacin == 'premikanje' %}
+<div id="srecanja">
+    {% for srecanje in srecanja %}
+    {% render_bottle '_srecanje.tpl' nacin='urejanje' %}
+    {% endfor %}
+    {% for ter, termin in prosti_termini.items %}
+    {% render_bottle '_prosti_termin.tpl' dan=ter.0 ura=ter.1 %}
+    {% endfor %}
+</div>
+{% elif nacin == 'ogled' %}
+<div id="srecanja">
+    {% for srecanje in srecanja %}
+    {% render_bottle '_srecanje.tpl' nacin='ogled' %}
+    {% endfor %}
+</div>
+{% endif %}
+</div>
+
+
+{% if nacin == 'urejanje' or nacin == 'premikanje' %}
+<div id='informacije'>
+    {% if nacin == 'urejanje' %}
+    <h5><i class="material-icons">inbox</i> Odložišče</h5>
+    {% for srecanje in odlozena_srecanja %}
+        {% render_bottle '_srecanje.tpl' nacin='odlozisce' %}
+    {% endfor %}
+    {% include '_konflikti.html' %}
+
+    {% elif nacin == 'premikanje' %}
+    <h5><i class="material-icons">inbox</i> Premikanje srečanja</h5>
+        {% render_bottle '_srecanje.tpl' nacin='odlozisce' srecanje=premaknjeno_srecanje %}
+    </div>
+    {% endif %}
+</div>
+{% endif %}
 
 {% endblock content %}
