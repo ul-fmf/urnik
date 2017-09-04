@@ -24,4 +24,8 @@ urlpatterns = [
     url(r'^letnik/(?P<letnik_id>\d+)/$', urnik.views.urnik_letnika, name='urnik_letnika'),
     url(r'^ucilnica/(?P<ucilnica_id>\d+)/$', urnik.views.urnik_ucilnice, name='urnik_ucilnice'),
     url(r'^predmet/(?P<predmet_id>\d+)/$', urnik.views.urnik_predmeta, name='urnik_predmeta'),
+    url(r'^srecanje/(?P<srecanje_id>\d+)/premakni/$', urnik.views.premakni_srecanje, name='premakni_srecanje'),
+    url(r'^srecanje/(?P<srecanje_id>\d+)/podvoji/$', urnik.views.podvoji_srecanje, name='podvoji_srecanje'),
+    url(r'^srecanje/(?P<srecanje_id>\d+)/odlozi/$', urnik.views.odlozi_srecanje, name='odlozi_srecanje'),
+    url(r'^srecanje/(?P<srecanje_id>\d+)/trajanje/$', urnik.views.nastavi_trajanje_srecanja, name='nastavi_trajanje_srecanja'),
 ]

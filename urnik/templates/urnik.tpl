@@ -31,7 +31,6 @@
     % for srecanje in srecanja:
     % include('_srecanje.tpl', nacin='urejanje')
     % end
-    % import modeli
     % for (dan, ura), termin in get('prosti_termini', {}).items():
     % include('_prosti_termin.tpl')
     % end

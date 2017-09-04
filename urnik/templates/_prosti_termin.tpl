@@ -6,12 +6,12 @@
 <div class="termin {{termin['zasedenost']}}" style="{{style}}">
     <div class="izbira_ucilnice">
     % for ucilnica in termin['ucilnice']:
-        <form method="post" class="izbrana_ucilnica {{ucilnica['zasedenost']}} {{ucilnica['ustreznost']}}">
+        <form method="post" class="izbrana_ucilnica {{ucilnica.zasedenost}} {{ucilnica.ustreznost}}">
             <input type="hidden" name="next" value="{{next}}">
             <input value="{{dan}}" name="dan" type="hidden">
             <input value="{{ura}}" name="ura" type="hidden">
-            <input value="{{ucilnica['id']}}" name="ucilnica" type="hidden">
-            <button class="">{{ucilnica['oznaka']}}<br><small>{{ucilnica['velikost']}}</small></button>
+            <input value="{{ucilnica.id}}" name="ucilnica" type="hidden">
+            <button class="">{{ucilnica.oznaka}}<br><small>{{ucilnica.velikost}}</small></button>
         </form>
     % end
     </div>
