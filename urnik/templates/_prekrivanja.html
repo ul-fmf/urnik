@@ -1,20 +1,27 @@
 {% for opis_tipa, prekrivanja_tipa in prekrivanja_po_tipih.items %}
-<h5><i class="material-icons">warning</i> {{ opis_tipa }}</h5>
-<ul class="collection">
-{% for prekrivanje, srecanja in prekrivanja_tipa.items %}
-    <li class="collection-item">
-        {{ prekrivanje.0 }}
-        <small><ul>
-        {% for srecanje in srecanja %}
-            <li>
-                <a href="{% url 'premakni_srecanje' srecanje.id %}">
-                    <i class="tiny material-icons">open_with</i>
-                </a>
-                {{ srecanje }}
+<li>
+    <div class="collapsible-header">
+        <i class="material-icons">warning</i>
+        {{ opis_tipa }} ({{ prekrivanja_tipa|length }})
+    </div>
+    <div class="collapsible-body">
+        <ul class="collection">
+        {% for prekrivanje, srecanja in prekrivanja_tipa.items %}
+            <li class="collection-item">
+                {{ prekrivanje.0 }}
+                <small><ul>
+                {% for srecanje in srecanja %}
+                    <li>
+                        <a href="{% url 'premakni_srecanje' srecanje.id %}">
+                            <i class="tiny material-icons">open_with</i>
+                        </a>
+                        {{ srecanje }}
+                    </li>
+                {% endfor %}
+                </ul></small>
             </li>
         {% endfor %}
-        </ul></small>
-    </li>
-{% endfor %}
-</ul>
+        </ul>
+    </div>
+</li>
 {% endfor %}

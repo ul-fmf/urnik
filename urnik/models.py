@@ -111,12 +111,10 @@ class SrecanjeQuerySet(models.QuerySet):
     def prekrivanja(self):
         prekrivanja_ucilnic = defaultdict(set)
         prekrivanja_oseb = defaultdict(set)
-        prekrivanja_letnikov = defaultdict(set)
         srecanja = self.neodlozena().select_related(
             'ucilnica',
             'ucitelj'
         ).prefetch_related(
-            'predmet__letniki',
             'predmet__slusatelji'
         )
         for srecanje in srecanja:
@@ -125,18 +123,15 @@ class SrecanjeQuerySet(models.QuerySet):
                 for slusatelj in srecanje.predmet.slusatelji.all():
                     prekrivanja_oseb[(slusatelj, srecanje.dan, ura)].add(srecanje)
                 prekrivanja_ucilnic[(srecanje.ucilnica, srecanje.dan, ura)].add(srecanje)
-                for letnik in srecanje.predmet.letniki.all():
-                    prekrivanja_letnikov[(letnik, srecanje.dan, ura)].add(srecanje)
         prekrivanja_po_tipih = {
             'Prekrivanja učilnic': prekrivanja_ucilnic,
             'Prekrivanja oseb': prekrivanja_oseb,
-            'Prekrivanja letnikov': prekrivanja_letnikov,
         }
         return {
             opis_tipa: {
                 prekrivanje: srecanja
                 for prekrivanje, srecanja in prekrivanja_tipa.items()
-                if len(srecanja) > 1
+                if len(srecanja) > 1 and str(prekrivanje[0]).strip() != 'X'
             }
             for opis_tipa, prekrivanja_tipa in prekrivanja_po_tipih.items()
         }
@@ -203,8 +198,6 @@ class Termin:
             self.zasedenost = 'prosto'
         elif deloma_prave and proste_alternative:
             self.zasedenost = 'proste_le_alternative'
-        elif deloma_prave and deloma_alternative:
-            self.zasedenost = 'vse_mogoce'
         elif deloma_prave:
             self.zasedenost = 'deloma'
         elif proste_alternative:

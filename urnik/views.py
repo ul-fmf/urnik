@@ -85,12 +85,13 @@ def premakni_srecanje(request, srecanje_id):
         return redirect(request.POST['next'])
     else:
         return render(request, 'urnik.html', {
-            'nacin': 'urejanje',
+            'nacin': 'premikanje',
             'naslov': 'Premikanje srečanja',
             'srecanja': srecanje.povezana_srecanja().urnik(),
             'odlozena_srecanja': Srecanje.objects.odlozena(),
             'prekrivanja_po_tipih': {},
             'prosti_termini': srecanje.prosti_termini(),
+            'premaknjeno_srecanje': srecanje,
             'next': request.META.get('HTTP_REFERER', '/'),
         })
 
@@ -106,7 +107,7 @@ def podvoji_srecanje(request, srecanje_id):
 def odlozi_srecanje(request, srecanje_id):
     srecanje = get_object_or_404(Srecanje, id=srecanje_id)
     srecanje.odlozi()
-    return redirect(request.META.get('HTTP_REFERER', '/'))
+    return redirect(request.POST['next'] or request.META.get('HTTP_REFERER', '/'))
 
 
 @login_required

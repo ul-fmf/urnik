@@ -27,18 +27,66 @@
     </div>
 </div>
 <div id='informacije'>
-    {% if nacin == 'urejanje' %}
-    <h5><i class="material-icons">inbox</i> Odložišče</h5>
-    {% for srecanje in odlozena_srecanja %}
-    {% include '_srecanje.html' with nacin='odlozisce' %}
-    {% endfor %}
-    {% include '_prekrivanja.html' %}
+    <ul class="collapsible" data-collapsible="expandable">
+        {% if nacin == 'urejanje' %}
+        <li>
+            <div class="collapsible-header active">
+                <i class="material-icons">inbox</i>Odložišče
+            </div>
+            <div class="collapsible-body">
+                {% for srecanje in odlozena_srecanja %}
+                {% include '_srecanje.html' with nacin='odlozisce' %}
+                {% endfor %}
+            </div>
+        </li>
+        {% include '_prekrivanja.html' %}
 
-    {% elif nacin == 'premikanje' %}
-    <h5><i class="material-icons">inbox</i> Premikanje srečanja</h5>
-        {% include '_srecanje.html' with nacin='odlozisce' srecanje=premaknjeno_srecanje %}
-    </div>
-    {% endif %}
+        {% elif nacin == 'premikanje' %}
+        <li>
+            <div class="collapsible-header active">
+                <i class="material-icons">open_with</i> Premikanje srečanja
+            </div>
+            <div class="collapsible-body">
+                {% include '_srecanje.html' with nacin='odlozisce' srecanje=premaknjeno_srecanje %}
+                <form method="post" action="{% url 'odlozi_srecanje' premaknjeno_srecanje.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ next }}">
+                    <a class="btn" style="width: 49%" href="{{ next }}">
+                        <i class="small material-icons">cancel</i>
+                    </a>
+                    <button class="btn" style="width: 49%">
+                        <i class="material-icons">move_to_inbox</i>
+                    </button>
+                </form>
+            </div>
+        </li>
+        <li>
+            <div class="collapsible-header active">
+                <i class="material-icons">line_style</i>Legenda terminov
+            </div>
+            <div class="collapsible-body">
+                <div class="legenda srecanje prosto">proste ustrezne učilnice</div>
+                <div class="legenda srecanje proste_le_alternative">deloma proste ustrezne učilnice &amp; proste kompromisne učilnice</div>
+                <div class="legenda srecanje deloma">deloma proste ustrezne učilnice &amp; brez kompromisnih učilnic</div>
+                <div class="legenda srecanje proste_alternative">brez ustreznih učilnic &amp; proste kompromisne učilnice</div>
+                <div class="legenda srecanje deloma_proste_alternative">brez ustreznih učilnic &amp; deloma proste kompromisne učilnice</div>
+                <div class="legenda srecanje zaseden">brez kakršnihkoli učilnic</div>
+            </div>
+        </li>
+        <li>
+            <div class="collapsible-header active">
+                <i class="material-icons">line_style</i>Legenda učilnic
+            </div>
+            <div class="collapsible-body">
+                <div class="legenda srecanje ustrezna prosta">prosta ustrezna učilnica</div>
+                <div class="legenda srecanje ustrezna deloma_prosta">deloma prosta ustrezna učilnica</div>
+                <div class="legenda srecanje morebiti prosta">prosta kompromisna učilnica</div>
+                <div class="legenda srecanje morebiti deloma_prosta">deloma prosta kompromisna učilnica</div>
+                <div class="legenda srecanje morebiti zasedena">zasedena učilnica</div>
+            </div>
+        </li>
+        {% endif %}
+    </ul>
 </div>
 
 {% endif %}
