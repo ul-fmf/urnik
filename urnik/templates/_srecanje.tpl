@@ -1,10 +1,5 @@
 % if nacin == 'urejanje':
-    % left = (srecanje.dan - 1 + srecanje.zamik) * enota_sirine
-    % top = (srecanje.ura - min_ura) * enota_visine
-    % height = srecanje.trajanje * enota_visine
-    % width = srecanje.sirina * enota_sirine
-    % style = 'left: {:.2%}; width: {:.2%}; top: {:.2%}; height: {:.2%}'.format(left, width, top, height)
-    <div class="srecanje" style="{{ style }};">
+    <div class="srecanje" style="{{ srecanje.style() }};">
         <div class="predmet">
             {{srecanje.predmet.ime}} {{srecanje.tip}}{{srecanje.oznaka if srecanje.oznaka else ''}}
         </div>
@@ -117,12 +112,7 @@
     </div>
 
 % elif nacin == 'ogled':
-% left = (srecanje.dan - 1 + srecanje.zamik) * enota_sirine
-% top = (srecanje.ura - min_ura) * enota_visine
-% height = srecanje.trajanje * enota_visine
-% width = srecanje.sirina * enota_sirine
-% style = 'left: {:.2%}; width: {:.2%}; top: {:.2%}; height: {:.2%}'.format(left, width, top, height)
-<div class="srecanje" style="{{ style }};">
+<div class="srecanje" style="{{ srecanje.style() }};">
     <div class="predmet">
         <a href="/predmet/{{srecanje.predmet.id}}/">{{srecanje.predmet.ime if (srecanje.sirina >= 0.5 and len(srecanje.predmet.ime) < 45 and srecanje.trajanje > 1) or srecanje.sirina == 1 else srecanje.predmet.kratica}}</a>
         <span class="tip">

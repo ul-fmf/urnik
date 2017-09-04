@@ -205,6 +205,19 @@ class Srecanje(models.Model):
             pk=self.pk
         ).distinct()
 
+    def style(self):
+        min_ura, max_ura = 7, 20
+        enota_visine = 1 / (max_ura - min_ura)
+        dnevi = ('ponedeljek', 'torek', 'sreda', 'četrtek', 'petek')
+        enota_sirine = 1 / len(dnevi)
+        left = (self.dan - 1 + self.zamik) * enota_sirine
+        top = (self.ura - min_ura) * enota_visine
+        height = self.trajanje * enota_visine
+        width = self.sirina * enota_sirine
+        return 'left: {:.2%}; width: {:.2%}; top: {:.2%}; height: {:.2%}'.format(
+            left, width, top, height
+        )
+
     def prosti_termini(self):
         def oznaci_zasedenost(izbrano_srecanje, ucilnice):
             zasedene = {}

@@ -1,5 +1,3 @@
-from bottle import SimpleTemplate
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.http import urlencode
 from django.views.decorators.csrf import csrf_exempt
@@ -31,21 +29,13 @@ def zacetna_stran(request):
     })
 
 
-def render_bottle(name, context):
-    template = SimpleTemplate(
-        name=name,
-        lookup=['urnik/static/', 'urnik/templates/']
-    )
-    return HttpResponse(template.render(**context))
-
-
 def urnik(request, srecanja, naslov):
     if request.user.is_authenticated and request.session.get('urejanje', False):
         if request.META['QUERY_STRING']:
             next_url = '{}?{}'.format(request.path, request.META['QUERY_STRING'])
         else:
             next_url = request.path
-        return render_bottle('urnik.tpl', {
+        return render(request, 'urnik.html', {
             'nacin': 'urejanje',
             'naslov': naslov,
             'srecanja': srecanja.urnik(),
@@ -54,7 +44,7 @@ def urnik(request, srecanja, naslov):
             'next': next_url
         })
     else:
-        return render_bottle('urnik.tpl', {
+        return render(request, 'urnik.html', {
             'nacin': 'ogled',
             'naslov': naslov,
             'srecanja': srecanja.urnik(),
@@ -63,7 +53,7 @@ def urnik(request, srecanja, naslov):
 
 @login_required
 def premik_srecanja(request, srecanje, naslov):
-    return render_bottle('urnik.tpl', {
+    return render(request, 'urnik.html', {
         'nacin': 'urejanje',
         'naslov': naslov,
         'srecanja': srecanje.povezana_srecanja().urnik(),
