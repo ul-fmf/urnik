@@ -2,7 +2,9 @@ from copy import deepcopy
 from django.db import models
 from .layout import nastavi_sirine_srecanj
 
+
 class OsebaQuerySet(models.QuerySet):
+
     def aktivni(self):
         slusatelji = self.filter(predmeti__isnull=False)
         ucitelji = self.filter(srecanja__isnull=False)
@@ -45,6 +47,7 @@ class Letnik(models.Model):
 
 
 class UcilnicaQuerySet(models.QuerySet):
+
     def ustrezne(self, stevilo_studentov=None, racunalniska=False):
         ucilnice = self.filter(velikost__isnull=False, racunalniska__gte=racunalniska)
         if stevilo_studentov:
@@ -71,7 +74,6 @@ class Ucilnica(models.Model):
         default_related_name = 'ucilnice'
         ordering = ('oznaka',)
 
-
     def __str__(self):
         return self.oznaka
 
@@ -88,12 +90,12 @@ class Predmet(models.Model):
         default_related_name = 'predmeti'
         ordering = ('ime',)
 
-
     def __str__(self):
         return self.ime
 
 
 class SrecanjeQuerySet(models.QuerySet):
+
     def odlozena(self):
         return self.filter(dan__isnull=True, ura__isnull=True).select_related('ucilnica', 'ucitelj', 'predmet')
 
@@ -141,6 +143,7 @@ class SrecanjeQuerySet(models.QuerySet):
 
 class Termin:
     ZASEDEN = 'zaseden'
+
     def __init__(self, dan, ura, ucilnice, zasedenost=ZASEDEN):
         self.dan = dan
         self.ura = ura
@@ -157,7 +160,6 @@ class Termin:
         height = enota_visine
         width = enota_sirine
         return 'position: absolute; left: {:.2%}; width: {:.2%}; top: {:.2%}; height: {:.2%}'.format(left, width, top, height)
-
 
 
 class Srecanje(models.Model):
@@ -218,16 +220,21 @@ class Srecanje(models.Model):
         self.ucilnica = ucilnica
         self.save()
 
+    def lahko_skrajsam(self):
+        return self.trajanje > 1
+
     def lahko_podaljsam(self):
         max_ura = 20
-        return self.ura and self.ura + self.trajanje < max_ura
+        return not self.ura or self.ura + self.trajanje < max_ura
+
+    def lahko_odlozim(self):
+        return self.dan and self.ura
 
     def po_potrebi_okrajsano_ime_predmeta(self):
-        if (self.sirina >= 0.5 and len(self.predmet.ime) < 45 and self.trajanje > 1) or self.sirina == 1:
+        if 'sirina' in vars(self) and ((self.sirina >= 0.5 and len(self.predmet.ime) < 45 and self.trajanje > 1) or self.sirina == 1):
             return self.predmet.ime
         else:
             return self.predmet.kratica
-
 
     def povezana_srecanja(self):
         letniki_poslusajo = Srecanje.objects.filter(predmet__letniki__in=self.predmet.letniki.all())
@@ -238,17 +245,20 @@ class Srecanje(models.Model):
         ).distinct()
 
     def style(self):
-        min_ura, max_ura = 7, 20
-        enota_visine = 1 / (max_ura - min_ura)
-        dnevi = ('ponedeljek', 'torek', 'sreda', 'četrtek', 'petek')
-        enota_sirine = 1 / len(dnevi)
-        left = (self.dan - 1 + self.zamik) * enota_sirine
-        top = (self.ura - min_ura) * enota_visine
-        height = self.trajanje * enota_visine
-        width = self.sirina * enota_sirine
-        return 'left: {:.2%}; width: {:.2%}; top: {:.2%}; height: {:.2%}'.format(
-            left, width, top, height
-        )
+        if self.dan and self.ura and 'sirina' in vars(self):
+            min_ura, max_ura = 7, 20
+            enota_visine = 1 / (max_ura - min_ura)
+            dnevi = ('ponedeljek', 'torek', 'sreda', 'četrtek', 'petek')
+            enota_sirine = 1 / len(dnevi)
+            left = (self.dan - 1 + self.zamik) * enota_sirine
+            top = (self.ura - min_ura) * enota_visine
+            height = self.trajanje * enota_visine
+            width = self.sirina * enota_sirine
+            return 'left: {:.2%}; width: {:.2%}; top: {:.2%}; height: {:.2%}'.format(
+                left, width, top, height
+            )
+        else:
+            return ''
 
     def prosti_termini(self):
         def oznaci_zasedenost(izbrano_srecanje, ucilnice):

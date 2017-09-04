@@ -1,6 +1,5 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.http import urlencode
-from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from .models import *
 
@@ -75,7 +74,6 @@ def urnik_predmeta(request, predmet_id):
     return urnik(request, predmet.srecanja.all(), naslov)
 
 
-@csrf_exempt
 @login_required
 def premakni_srecanje(request, srecanje_id):
     srecanje = get_object_or_404(Srecanje, id=srecanje_id)
@@ -97,7 +95,6 @@ def premakni_srecanje(request, srecanje_id):
         })
 
 
-@csrf_exempt
 @login_required
 def podvoji_srecanje(request, srecanje_id):
     srecanje = get_object_or_404(Srecanje, id=srecanje_id)
@@ -105,7 +102,6 @@ def podvoji_srecanje(request, srecanje_id):
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
 
-@csrf_exempt
 @login_required
 def odlozi_srecanje(request, srecanje_id):
     srecanje = get_object_or_404(Srecanje, id=srecanje_id)
@@ -113,7 +109,6 @@ def odlozi_srecanje(request, srecanje_id):
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
 
-@csrf_exempt
 @login_required
 def nastavi_trajanje_srecanja(request, srecanje_id):
     srecanje = get_object_or_404(Srecanje, id=srecanje_id)

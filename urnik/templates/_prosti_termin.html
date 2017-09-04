@@ -2,6 +2,7 @@
     <div class="izbira_ucilnice">
     {% for ucilnica in termin.ucilnice %}
         <form method="post" class="izbrana_ucilnica {{ucilnica.zasedenost}} {{ucilnica.ustreznost}}">
+            {% csrf_token %}
             <input type="hidden" name="next" value="{{next}}">
             <input value="{{termin.dan}}" name="dan" type="hidden">
             <input value="{{termin.ura}}" name="ura" type="hidden">

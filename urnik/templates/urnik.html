@@ -2,36 +2,35 @@
 {% load tags %}
 {% block content %}
 
-<div id="urnik" class="{% if nacin == 'ogled' %}cel{% endif %}">
-
-{% dnevi %}
-{% ure %}
-
-{% if nacin == 'urejanje' or nacin == 'premikanje' %}
-<div id="srecanja">
-    {% for srecanje in srecanja %}
-    {% include '_srecanje.html' with nacin='urejanje' %}
-    {% endfor %}
-    {% for termin in prosti_termini.values %}
-    {% include '_prosti_termin.html' %}
-    {% endfor %}
-</div>
-{% elif nacin == 'ogled' %}
-<div id="srecanja">
-    {% for srecanje in srecanja %}
-    {% include '_srecanje.html' with nacin='ogled' %}
-    {% endfor %}
-</div>
-{% endif %}
+{% if nacin == 'ogled' %}
+<div id="urnik" class="cel">
+    {% dnevi %}
+    {% ure %}
+    <div id="srecanja">
+        {% for srecanje in srecanja %}
+        {% include '_srecanje.html' with nacin='ogled' %}
+        {% endfor %}
+    </div>
 </div>
 
-
-{% if nacin == 'urejanje' or nacin == 'premikanje' %}
+{% elif nacin == 'urejanje' or nacin == 'premikanje' %}
+<div id="urnik">
+    {% dnevi %}
+    {% ure %}
+    <div id="srecanja">
+        {% for srecanje in srecanja %}
+        {% include '_srecanje.html' with nacin='urejanje' %}
+        {% endfor %}
+        {% for termin in prosti_termini.values %}
+        {% include '_prosti_termin.html' %}
+        {% endfor %}
+    </div>
+</div>
 <div id='informacije'>
     {% if nacin == 'urejanje' %}
     <h5><i class="material-icons">inbox</i> Odložišče</h5>
     {% for srecanje in odlozena_srecanja %}
-        {% include '_srecanje.html' with nacin='odlozisce' %}
+    {% include '_srecanje.html' with nacin='odlozisce' %}
     {% endfor %}
     {% include '_konflikti.html' %}
 
@@ -41,6 +40,7 @@
     </div>
     {% endif %}
 </div>
+
 {% endif %}
 
 {% endblock content %}

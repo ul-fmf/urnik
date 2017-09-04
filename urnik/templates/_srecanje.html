@@ -1,131 +1,67 @@
-{% if nacin == 'urejanje' %}
-    <div class="srecanje" style="{{ srecanje.style }};">
-        <div class="predmet">
-            {{srecanje.predmet.ime}} {{srecanje.tip}}{{srecanje.oznaka}}
-        </div>
-        {% if srecanje.ucitelj %}
-        <div class="ucitelj">
-            <a href="{% url 'urnik_osebe' srecanje.ucitelj.id %}">
-                {{srecanje.ucitelj.priimek}}
-            </a>
-        </div>
-        {% endif %}
-        <div class="ucilnica">
-            <a href="{% url 'urnik_ucilnice' srecanje.ucilnica.id %}">
-                {{srecanje.ucilnica.oznaka}}
-            </a>
-        </div>
-        <div class="urejanje">
-            {% if srecanje.trajanje > 1 %}
-            <form method="post" action="{% url 'nastavi_trajanje_srecanja' srecanje.id %}">
-                <input type="hidden" name="next" value="{{next}}">
-                <input type="hidden" name="trajanje" value="{{srecanje.trajanje|add:-1}}">
-                <button>
-                    <i class="tiny material-icons">file_upload</i> skrajšaj
-                </button>
-            </form>
-            {% endif %}
-            {% if nacin == 'urejanje' and srecanje.lahko_podaljsam %}
-            <form method="post" action="{% url 'nastavi_trajanje_srecanja' srecanje.id %}">
-                <input type="hidden" name="next" value="{{next}}">
-                <input type="hidden" name="trajanje" value="{{srecanje.trajanje|add:1}}">
-                <button>
-                    <i class="tiny material-icons">file_download</i> podaljšaj
-                </button>
-            </form>
-            {% endif %}
-            <a href="{% url 'admin:urnik_srecanje_delete' srecanje.id %}?next={{next}}">
-                <i class="tiny material-icons">delete</i> pobriši
-            </a>
-            <form method="post" action="{% url 'podvoji_srecanje' srecanje.id %}">
-                <button>
-                    <i class="tiny material-icons">content_copy</i> podvoji
-                </button>
-            </form>
-            <a href="{% url 'premakni_srecanje' srecanje.id %}">
-                <i class="tiny material-icons">open_with</i> premakni
-            </a>
-            <form method="post" action="{% url 'odlozi_srecanje' srecanje.id %}">
-                <button>
-                    <i class="tiny material-icons">move_to_inbox</i> odloži
-                </button>
-            </form>
-            <a href="{% url 'admin:urnik_srecanje_delete' srecanje.id %}?next={{next}}">
-                <i class="tiny material-icons">edit</i> uredi
-            </a>
-        </div>
-    </div>
-{% elif nacin == 'odlozisce' %}
-
-    <div class="srecanje">
-        <div class="predmet">
-            {{srecanje.predmet.ime}} {{srecanje.tip}}{{srecanje.oznaka}}
-        </div>
-        {% if srecanje.ucitelj %}
-        <div class="ucitelj">
-            <a href="{% url 'urnik_osebe' srecanje.ucitelj.id %}">
-                {{srecanje.ucitelj.priimek}}
-            </a>
-        </div>
-        {% endif %}
-        <div class="ucilnica">
-            <a href="{% url 'urnik_ucilnice' srecanje.ucilnica.id %}">
-                {{srecanje.ucilnica.oznaka}}
-            </a>
-        </div>
-        <div class="urejanje">
-            {% if nacin == 'urejanje' and srecanje.trajanje > 1 %}
-            <form method="post" action="{% url 'nastavi_trajanje_srecanja' srecanje.id %}">
-                <input type="hidden" name="next" value="{{next}}">
-                <input type="hidden" name="trajanje" value="{{srecanje.trajanje|add:-1}}">
-                <button>
-                    <i class="tiny material-icons">file_upload</i> skrajšaj
-                </button>
-            </form>
-            {% endif %}
-            {% if nacin == 'urejanje' and srecanje.lahko_podaljsam %}
-            <form method="post" action="{% url 'nastavi_trajanje_srecanja' srecanje.id %}">
-                <input type="hidden" name="next" value="{{next}}">
-                <input type="hidden" name="trajanje" value="{{srecanje.trajanje|add:1}}">
-                <button>
-                    <i class="tiny material-icons">file_download</i> podaljšaj
-                </button>
-            </form>
-            {% endif %}
-            <a href="{% url 'admin:urnik_srecanje_delete' srecanje.id %}?next={{next}}">
-                <i class="tiny material-icons">delete</i> pobriši
-            </a>
-            <form method="post" action="{% url 'podvoji_srecanje' srecanje.id %}">
-                <button>
-                    <i class="tiny material-icons">content_copy</i> podvoji
-                </button>
-            </form>
-            <a href="{% url 'premakni_srecanje' srecanje.id %}">
-                <i class="tiny material-icons">open_with</i> premakni
-            </a>
-            <a href="{% url 'admin:urnik_srecanje_change' srecanje.id %}?next={{next}}">
-                <i class="tiny material-icons">edit</i>
-            </a>
-        </div>
-    </div>
-
-{% elif nacin == 'ogled' %}
-<div class="srecanje" style="{{ srecanje.style }};">
+<div class="srecanje" style="{{ srecanje.style }}">
     <div class="predmet">
-        <a href="{% url 'urnik_predmeta' srecanje.predmet.id %}">{{srecanje.po_potrebi_okrajsano_ime_predmeta}}</a>
+        <a href="{% url 'urnik_predmeta' srecanje.predmet.id %}">
+            {{srecanje.po_potrebi_okrajsano_ime_predmeta}}
+        </a>
         <span class="tip">
              {{srecanje.tip}}{{srecanje.oznaka}}
         </span>
     </div>
+
     {% if srecanje.ucitelj %}
     <div class="ucitelj">
         <a href="{% url 'urnik_osebe' srecanje.ucitelj.id %}">{{srecanje.ucitelj.priimek}}</a>
     </div>
     {% endif %}
-    {% if srecanje.sirina >= 0.5 %}
+
+    {% if srecanje.sirina >= 0.5 or nacin == 'urejanje' or nacin == 'odlozisce' %}
     <div class="ucilnica">
         <a href="{% url 'urnik_ucilnice' srecanje.ucilnica.id %}">{{srecanje.ucilnica.oznaka}}</a>
     </div>
     {% endif %}
+    {% if nacin == 'urejanje' or nacin == 'odlozisce' %}
+        <div class="urejanje">
+            {% if srecanje.lahko_skrajsam %}
+            <form method="post" action="{% url 'nastavi_trajanje_srecanja' srecanje.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="trajanje" value="{{srecanje.trajanje|add:-1}}">
+                <button>
+                    <i class="tiny material-icons">file_upload</i> skrajšaj
+                </button>
+            </form>
+            {% endif %}
+            {% if srecanje.lahko_podaljsam %}
+            <form method="post" action="{% url 'nastavi_trajanje_srecanja' srecanje.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="trajanje" value="{{srecanje.trajanje|add:1}}">
+                <button>
+                    <i class="tiny material-icons">file_download</i> podaljšaj
+                </button>
+            </form>
+            {% endif %}
+            <a href="{% url 'admin:urnik_srecanje_delete' srecanje.id %}?next={{next}}">
+                <i class="tiny material-icons">delete</i> pobriši
+            </a>
+            <form method="post" action="{% url 'podvoji_srecanje' srecanje.id %}">
+                {% csrf_token %}
+                <button>
+                    <i class="tiny material-icons">content_copy</i> podvoji
+                </button>
+            </form>
+            <a href="{% url 'premakni_srecanje' srecanje.id %}">
+                <i class="tiny material-icons">open_with</i> premakni
+            </a>
+            {% if srecanje.lahko_odlozim %}
+            <form method="post" action="{% url 'odlozi_srecanje' srecanje.id %}">
+                {% csrf_token %}
+                <button>
+                    <i class="tiny material-icons">move_to_inbox</i> odloži
+                </button>
+            </form>
+            {% endif %}
+            <a href="{% url 'admin:urnik_srecanje_change' srecanje.id %}?next={{next}}">
+                <i class="tiny material-icons">edit</i> uredi
+            </a>
+        </div>
+    {% endif %}
 </div>
-{% endif %}
