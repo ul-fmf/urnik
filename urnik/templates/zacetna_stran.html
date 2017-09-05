@@ -1,6 +1,7 @@
 {% extends 'osnova.html' %}
 {% block content %}
 
+<form action="{% url 'sestavljen_urnik' %}">
 <div class="container">
 <div class="row">
     {% for stolpec in stolpci_smeri %}
@@ -16,7 +17,12 @@
                 {% for letnik in smer.letniki %}
                 <tr>
                     <td style="padding: 5px">
+                        {% if izbira %}
+                        <input type="checkbox" name="letnik" value="{{ letnik.id }}" id="letnik-{{ letnik.id }}"/>
+                        <label for="letnik-{{ letnik.id }}">{{ letnik.opis }}</label>
+                        {% else %}
                         <a href="{% url 'urnik_letnika' letnik.id %}">{{ letnik.opis }}</a>
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}
@@ -36,9 +42,12 @@
                 {% for ucilnica in ucilnice %}
                 <tr>
                     <td style="padding: 5px">
-                        <a href="{% url 'urnik_ucilnice' ucilnica.id %}">
-                            {{ ucilnica.oznaka }}
-                        </a>
+                        {% if izbira %}
+                        <input type="checkbox" name="ucilnica" value="{{ ucilnica.id }}" id="ucilnica-{{ ucilnica.id }}"/>
+                        <label for="ucilnica-{{ ucilnica.id }}">{{ ucilnica.oznaka }}</label>
+                        {% else %}
+                        <a href="{% url 'urnik_ucilnice' ucilnica.id %}">{{ ucilnica.oznaka }}</a>
+                        {% endif %}
                         <small>
                         {% if ucilnica.racunalniska %}
                         <i class="tiny material-icons">computer</i>
@@ -50,7 +59,14 @@
             </tbody>
         </table>
     </div>
-    <div class="col s4">
+    <div class="col s4" style="position: relative">
+        <div style="position: absolute; right: 0; top: 8px">
+        {% if izbira %}
+            <button class="btn-flat"><i class="material-icons left">playlist_play</i>prikaži</button>
+        {% else %}
+            <a class="btn-flat" href="{% url 'zacetna_stran' %}?izbira"><i class="material-icons left">playlist_add_check</i>označi več</a>
+        {% endif %}
+        </div>
         <table class="highlight">
             <thead>
                 <tr>
@@ -61,9 +77,14 @@
                 {% for oseba in osebe %}
                 <tr>
                     <td style="padding: 5px">
+                        {% if izbira %}
+                        <input type="checkbox" name="oseba" value="{{ oseba.id }}" id="oseba-{{ oseba.id }}"/>
+                        <label for="oseba-{{ oseba.id }}">{{ oseba.ime }} <strong>{{ oseba.priimek }}</strong></label>
+                        {% else %}
                         <a href="{% url 'urnik_osebe' oseba.id %}">
                             {{ oseba.ime }} <strong>{{ oseba.priimek }}</strong>
                         </a>
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}
@@ -72,5 +93,6 @@
     </div>
 </div>
 </div>
+</form>
 
 {% endblock content %}

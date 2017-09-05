@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.http import urlencode
 from django.contrib.auth.decorators import login_required
+from django.urls import reverse
 from .models import *
 
 
@@ -21,10 +22,12 @@ def zacetna_stran(request):
             'ime': smer,
             'letniki': letniki
         })
+    print('izbira' in request.GET)
     return render(request, 'zacetna_stran.html', {
         'stolpci_smeri': stolpci_smeri,
         'osebe': osebe,
         'ucilnice': ucilnice,
+        'izbira': 'izbira' in request.GET,
     })
 
 
@@ -74,6 +77,18 @@ def urnik_predmeta(request, predmet_id):
     return urnik(request, predmet.srecanja.all(), naslov)
 
 
+def sestavljen_urnik(request):
+    letniki = Letnik.objects.filter(id__in=request.GET.getlist('letnik'))
+    osebe = Oseba.objects.filter(id__in=request.GET.getlist('oseba'))
+    ucilnice = Ucilnica.objects.filter(id__in=request.GET.getlist('ucilnice'))
+    srecanja_letnikov = Srecanje.objects.filter(predmet__letniki__in=letniki)
+    srecanja_uciteljev = Srecanje.objects.filter(ucitelj__in=osebe)
+    srecanja_slusateljev = Srecanje.objects.filter(predmet__slusatelji__in=osebe)
+    srecanja_ucilnic = Srecanje.objects.filter(ucilnica__in=ucilnice)
+    srecanja = (srecanja_letnikov | srecanja_uciteljev | srecanja_slusateljev | srecanja_ucilnic).distinct()
+    return urnik(request, srecanja, 'Sestavljen urnik')
+
+
 @login_required
 def premakni_srecanje(request, srecanje_id):
     srecanje = get_object_or_404(Srecanje, id=srecanje_id)
@@ -92,7 +107,7 @@ def premakni_srecanje(request, srecanje_id):
             'prekrivanja_po_tipih': {},
             'prosti_termini': srecanje.prosti_termini(),
             'premaknjeno_srecanje': srecanje,
-            'next': request.META.get('HTTP_REFERER', '/'),
+            'next': request.META.get('HTTP_REFERER', reverse('zacetna_stran')),
         })
 
 
@@ -100,14 +115,14 @@ def premakni_srecanje(request, srecanje_id):
 def podvoji_srecanje(request, srecanje_id):
     srecanje = get_object_or_404(Srecanje, id=srecanje_id)
     srecanje.podvoji()
-    return redirect(request.META.get('HTTP_REFERER', '/'))
+    return redirect(request.META.get('HTTP_REFERER', reverse('zacetna_stran')))
 
 
 @login_required
 def odlozi_srecanje(request, srecanje_id):
     srecanje = get_object_or_404(Srecanje, id=srecanje_id)
     srecanje.odlozi()
-    return redirect(request.POST['next'] or request.META.get('HTTP_REFERER', '/'))
+    return redirect(request.POST['next'] or request.META.get('HTTP_REFERER', reverse('zacetna_stran')))
 
 
 @login_required
@@ -115,10 +130,10 @@ def nastavi_trajanje_srecanja(request, srecanje_id):
     srecanje = get_object_or_404(Srecanje, id=srecanje_id)
     trajanje = int(request.POST['trajanje'])
     srecanje.nastavi_trajanje(trajanje)
-    return redirect(request.META.get('HTTP_REFERER', '/'))
+    return redirect(request.META.get('HTTP_REFERER', reverse('zacetna_stran')))
 
 
 @login_required
 def preklopi_urejanje(request):
     request.session['urejanje'] = not request.session.get('urejanje', False)
-    return redirect(request.META.get('HTTP_REFERER', '/'))
+    return redirect(request.META.get('HTTP_REFERER', reverse('zacetna_stran')))
