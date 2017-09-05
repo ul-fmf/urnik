@@ -12,3 +12,9 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+
+MIDDLEWARE.insert(0, 'silk.middleware.SilkyMiddleware')
+
+INSTALLED_APPS += [
+    'silk',
+]

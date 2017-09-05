@@ -13,7 +13,7 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.conf.urls import url
+from django.conf.urls import include, url
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 import urnik.views
@@ -33,3 +33,9 @@ urlpatterns = [
     url(r'^srecanje/(?P<srecanje_id>\d+)/trajanje/$', urnik.views.nastavi_trajanje_srecanja, name='nastavi_trajanje_srecanja'),
     url(r'^preklopi_urejanje/$', urnik.views.preklopi_urejanje, name='preklopi_urejanje'),
 ]
+
+if 'silk' in settings.INSTALLED_APPS:
+    urlpatterns += [
+        url(r'^silk/', include('silk.urls', namespace='silk')),
+    ]
+
