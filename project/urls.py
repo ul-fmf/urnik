@@ -21,6 +21,7 @@ import urnik.views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^accounts/logout/$', auth_views.logout, name='logout'),
+    url(r'^accounts/login/$', auth_views.login,  {'template_name': 'admin/login.html'}, name='login'),
     url(r'^$', urnik.views.zacetna_stran, name='zacetna_stran'),
     url(r'^oseba/(?P<oseba_id>\d+)/$', urnik.views.urnik_osebe, name='urnik_osebe'),
     url(r'^letnik/(?P<letnik_id>\d+)/$', urnik.views.urnik_letnika, name='urnik_letnika'),
