@@ -223,7 +223,7 @@ class Srecanje(models.Model):
     tip = models.CharField(max_length=1, choices=TIP, blank=True)
     oznaka = models.CharField(max_length=64, blank=True)
     ucitelj = models.ForeignKey('urnik.Oseba', null=True, blank=True, on_delete=models.SET_NULL)
-    dan = models.PositiveSmallIntegerField(choices=enumerate(DNEVI), blank=True, null=True)
+    dan = models.PositiveSmallIntegerField(choices=enumerate(DNEVI, 1), blank=True, null=True)
     ura = models.PositiveSmallIntegerField(blank=True, null=True)
     trajanje = models.PositiveSmallIntegerField(null=True)
     ucilnica = models.ForeignKey('urnik.Ucilnica', null=True, blank=True, on_delete=models.SET_NULL)
