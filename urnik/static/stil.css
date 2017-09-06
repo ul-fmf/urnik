@@ -1,3 +1,9 @@
+.srecanje a {
+    color: #333;
+}
+.srecanje a:hover {
+    color: #039be5;
+}
 body {
     /*background: #ddd;*/
 }
@@ -86,10 +92,10 @@ body {
     height: 4em;
 }
 a.skrita {
-    color: #777;
+    color: #555;
 }
 .ucitelj, .ucilnica, .tip {
-    color: #777;
+    color: #555;
     font-weight: normal;
 }
 .ucitelj, .ucilnica {

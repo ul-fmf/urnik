@@ -1,3 +1,11 @@
+def nastavi_barve(srecanja, barve):
+    for srecanje in srecanja:
+        srecanje.barve = set()
+        for i, barva in enumerate(barve):
+            if barva in ({srecanje.ucitelj, srecanje.ucilnica} | set(srecanje.predmet.letniki.all()) | set(srecanje.predmet.slusatelji.all())):
+                srecanje.barve.add(i)
+        print(srecanje, srecanje.barve)
+
 def razdeli_srecanja_po_dneh(srecanja):
     dnevi = {}
     for srecanje in srecanja:

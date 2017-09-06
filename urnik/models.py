@@ -1,7 +1,7 @@
 from collections import defaultdict
 from copy import deepcopy
 from django.db import models
-from .layout import nastavi_sirine_srecanj
+from .layout import nastavi_sirine_srecanj, nastavi_barve
 
 MIN_URA, MAX_URA = 7, 20
 ENOTA_VISINE = 1 / (MAX_URA - MIN_URA)
@@ -136,7 +136,7 @@ class SrecanjeQuerySet(models.QuerySet):
             for opis_tipa, prekrivanja_tipa in prekrivanja_po_tipih.items()
         }
 
-    def urnik(self, skrij_rezervacije=False):
+    def urnik(self, skrij_rezervacije=False, barve=[]):
         if skrij_rezervacije:
             self = self.exclude(predmet__kratica='REZ')
         self = self.neodlozena(
@@ -145,8 +145,11 @@ class SrecanjeQuerySet(models.QuerySet):
         ).distinct(
         ).select_related(
             'ucilnica', 'ucitelj', 'predmet'
+        ).prefetch_related(
+            'predmet__letniki', 'predmet__slusatelji'
         )
         nastavi_sirine_srecanj(self)
+        nastavi_barve(self, barve)
         return self
 
     def fiziki(self):

@@ -1,10 +1,11 @@
-<div class="srecanje" style="{{ srecanje.style }}">
+{% load tags %}
+<div class="srecanje" style="{{ srecanje.style }}; {% pobarvajvec srecanje.barve %}">
     <div class="predmet">
         <a href="{% url 'urnik_predmeta' srecanje.predmet.id %}">
             {{ srecanje.po_potrebi_okrajsano_ime_predmeta }}
         </a>
         <span class="tip">
-             {{ srecanje.tip }}{{ srecanje.oznaka }}
+             {{ srecanje.tip }}{{ srecanje.oznaka }}{{ srecanje.barva }}
         </span>
     </div>
 

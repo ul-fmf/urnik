@@ -31,7 +31,7 @@ def zacetna_stran(request):
     })
 
 
-def urnik(request, srecanja, naslov):
+def urnik(request, srecanja, naslov, barve=[]):
     if request.user.is_authenticated and request.session.get('urejanje', False):
         if request.META['QUERY_STRING']:
             next_url = '{}?{}'.format(request.path, request.META['QUERY_STRING'])
@@ -40,16 +40,18 @@ def urnik(request, srecanja, naslov):
         return render(request, 'urnik.html', {
             'nacin': 'urejanje',
             'naslov': naslov,
-            'srecanja': srecanja.urnik(),
+            'srecanja': srecanja.urnik(barve=barve),
             'odlozena_srecanja': Srecanje.objects.odlozena(),
             'prekrivanja_po_tipih': Srecanje.objects.prekrivanja(),
-            'next': next_url
+            'next': next_url,
+            'barve': barve,
         })
     else:
         return render(request, 'urnik.html', {
             'nacin': 'ogled',
             'naslov': naslov,
-            'srecanja': srecanja.urnik(),
+            'srecanja': srecanja.urnik(barve=barve),
+            'barve': barve,
         })
 
 
@@ -80,13 +82,13 @@ def urnik_predmeta(request, predmet_id):
 def sestavljen_urnik(request):
     letniki = Letnik.objects.filter(id__in=request.GET.getlist('letnik'))
     osebe = Oseba.objects.filter(id__in=request.GET.getlist('oseba'))
-    ucilnice = Ucilnica.objects.filter(id__in=request.GET.getlist('ucilnice'))
+    ucilnice = Ucilnica.objects.filter(id__in=request.GET.getlist('ucilnica'))
     srecanja_letnikov = Srecanje.objects.filter(predmet__letniki__in=letniki)
     srecanja_uciteljev = Srecanje.objects.filter(ucitelj__in=osebe)
     srecanja_slusateljev = Srecanje.objects.filter(predmet__slusatelji__in=osebe)
     srecanja_ucilnic = Srecanje.objects.filter(ucilnica__in=ucilnice)
     srecanja = (srecanja_letnikov | srecanja_uciteljev | srecanja_slusateljev | srecanja_ucilnic).distinct()
-    return urnik(request, srecanja, 'Sestavljen urnik')
+    return urnik(request, srecanja, 'Sestavljen urnik', barve=list(letniki) + list(osebe) + list(ucilnice))
 
 
 @login_required
