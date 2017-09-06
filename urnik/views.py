@@ -46,11 +46,16 @@ def urnik(request, srecanja, naslov, barve=[]):
             'barve': barve,
         })
     else:
+        legenda = barve
+        if not barve:
+            predmeti = Predmet.objects.filter(srecanja__in=srecanja).distinct()
+            if len(predmeti) <= 7:
+                barve = predmeti
         return render(request, 'urnik.html', {
             'nacin': 'ogled',
             'naslov': naslov,
             'srecanja': srecanja.urnik(barve=barve),
-            'barve': barve,
+            'barve': legenda,
         })
 
 

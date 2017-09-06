@@ -294,10 +294,11 @@ class Srecanje(models.Model):
 
     def style(self):
         if self.dan and self.ura and 'sirina' in vars(self):
-            left = (self.dan - 1 + self.zamik) * ENOTA_SIRINE
+            ODMIK = 0.015
+            left = (self.dan - 1 + ODMIK + self.zamik * (1 - 2 * ODMIK)) * ENOTA_SIRINE
             top = (self.ura - MIN_URA) * ENOTA_VISINE
             height = self.trajanje * ENOTA_VISINE
-            width = self.sirina * ENOTA_SIRINE
+            width = self.sirina * ENOTA_SIRINE * (1 - 2 * ODMIK)
             return 'left: {:.2%}; width: {:.2%}; top: {:.2%}; height: {:.2%}'.format(
                 left, width, top, height
             )
