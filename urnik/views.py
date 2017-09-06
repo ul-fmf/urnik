@@ -22,7 +22,6 @@ def zacetna_stran(request):
             'ime': smer,
             'letniki': letniki
         })
-    print('izbira' in request.GET)
     return render(request, 'zacetna_stran.html', {
         'stolpci_smeri': stolpci_smeri,
         'osebe': osebe,
