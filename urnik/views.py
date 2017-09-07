@@ -16,15 +16,26 @@ def zacetna_stran(request):
             pass
     osebe = Oseba.objects.aktivni().exclude(priimek='X')
     ucilnice = Ucilnica.objects.filter(vidna=True).exclude(oznaka='X')
-    stolpci_smeri = ([], [])
-    for i, (smer, letniki) in enumerate(sorted(smeri.items())):
-        stolpci_smeri[i % 2].append({
-            'ime': smer,
-            'letniki': letniki
-        })
+    matematicni_letniki = []
+    fizikalni_letniki = []
+    for letnik in Letnik.objects.all():
+        letnik.opis = letnik.smer[4:]
+        if letnik.smer.startswith('MAT-'):
+            matematicni_letniki.append(letnik)
+        else:
+            fizikalni_letniki.append(letnik)
     return render(request, 'zacetna_stran.html', {
-        'stolpci_smeri': stolpci_smeri,
-        'osebe': osebe,
+        'stolpci_smeri': (
+            [{
+                'ime': 'Matematika',
+                'letniki': matematicni_letniki,
+            }],
+            [{
+                'ime': 'Fizika',
+                'letniki': fizikalni_letniki,
+            }],
+        ),
+        'osebe': sorted(osebe, key=lambda oseba: oseba.vrstni_red()),
         'ucilnice': ucilnice,
         'izbira': 'izbira' in request.GET,
     })
@@ -91,7 +102,8 @@ def sestavljen_urnik(request):
     srecanja_uciteljev = Srecanje.objects.filter(ucitelj__in=osebe)
     srecanja_slusateljev = Srecanje.objects.filter(predmet__slusatelji__in=osebe)
     srecanja_ucilnic = Srecanje.objects.filter(ucilnica__in=ucilnice)
-    srecanja = (srecanja_letnikov | srecanja_uciteljev | srecanja_slusateljev | srecanja_ucilnic).distinct()
+    srecanja = (srecanja_letnikov | srecanja_uciteljev |
+                srecanja_slusateljev | srecanja_ucilnic).distinct()
     return urnik(request, srecanja, 'Sestavljen urnik', barve=list(letniki) + list(osebe) + list(ucilnice))
 
 
@@ -128,7 +140,7 @@ def podvoji_srecanje(request, srecanje_id):
 def odlozi_srecanje(request, srecanje_id):
     srecanje = get_object_or_404(Srecanje, id=srecanje_id)
     srecanje.odlozi()
-    return redirect(request.POST['next'] or request.META.get('HTTP_REFERER', reverse('zacetna_stran')))
+    return redirect(request.META.get('HTTP_REFERER', reverse('zacetna_stran')))
 
 
 @login_required

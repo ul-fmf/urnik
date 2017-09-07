@@ -1,7 +1,7 @@
 .srecanje a {
     color: #333;
 }
-.srecanje a:hover {
+.srecanje a:hover, .urejanje a {
     color: #039be5;
 }
 body {
@@ -254,7 +254,7 @@ a.skrita {
     background: orange;
 }
 nav {
-    background-color: #85be4e;
+    background-color: #555;
 }
 @media print {
     a {

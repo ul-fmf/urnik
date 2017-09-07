@@ -32,6 +32,9 @@ class Oseba(models.Model):
     def __str__(self):
         return '{} {}'.format(self.ime, self.priimek)
 
+    def vrstni_red(self):
+        return self.priimek.replace('Č', 'Cz').replace('Š', 'Sz').replace('Ž', 'Zz')
+
 
 class Letnik(models.Model):
     smer = models.CharField(max_length=192)
