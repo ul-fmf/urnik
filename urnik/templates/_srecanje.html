@@ -40,8 +40,8 @@
                 </button>
             </form>
             {% endif %}
-            <a href="{% url 'admin:urnik_srecanje_delete' srecanje.id %}?next={{ next }}">
-                <i class="tiny material-icons">delete</i> pobriši
+            <a href="{% url 'admin:urnik_srecanje_change' srecanje.id %}?next={{ next }}">
+                <i class="tiny material-icons">edit</i> uredi
             </a>
             <form method="post" action="{% url 'podvoji_srecanje' srecanje.id %}">
                 {% csrf_token %}
@@ -49,8 +49,8 @@
                     <i class="tiny material-icons">content_copy</i> podvoji
                 </button>
             </form>
-            <a href="{% url 'premakni_srecanje' srecanje.id %}">
-                <i class="tiny material-icons">open_with</i> premakni
+            <a href="{% url 'admin:urnik_srecanje_delete' srecanje.id %}?next={{ next }}">
+                <i class="tiny material-icons">delete</i> pobriši
             </a>
             {% if srecanje.lahko_odlozim %}
             <form method="post" action="{% url 'odlozi_srecanje' srecanje.id %}">
@@ -60,9 +60,35 @@
                 </button>
             </form>
             {% endif %}
-            <a href="{% url 'admin:urnik_srecanje_change' srecanje.id %}?next={{ next }}">
-                <i class="tiny material-icons">edit</i> uredi
-            </a>
+            <div class="premakni_srecanje">
+                <a href="">
+                    <i class="tiny material-icons">open_with</i> premakni
+                </a>
+                <div class="mozne_ucilnice">
+                    <a href="{% url 'premakni_srecanje' srecanje.id %}?tip=velika">
+                        <i class="tiny material-icons">group</i>
+                        velika (&gt;60)
+                    </a>
+                    <a href="{% url 'premakni_srecanje' srecanje.id %}?tip=obicajna">
+                        <i class="tiny material-icons">person</i>
+                        običajna (30-50)
+                    </a>
+                    <a href="{% url 'premakni_srecanje' srecanje.id %}?tip=majhna">
+                        <i class="tiny material-icons">person_outline</i>
+                        majhna (&lt;30)
+                    </a>
+                    <a href="{% url 'premakni_srecanje' srecanje.id %}?tip=racunalniska">
+                        <i class="tiny material-icons">computer</i>
+                        računalniška
+                    </a>
+                    {% if 'fizika' in user.groups.all|join:"," %}
+                    <a href="{% url 'premakni_srecanje' srecanje.id %}?tip=praktikum">
+                        <i class="tiny material-icons">build</i>
+                        praktikum
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     {% endif %}
 </div>

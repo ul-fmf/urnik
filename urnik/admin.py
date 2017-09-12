@@ -23,12 +23,10 @@ class UcilnicaAdmin(admin.ModelAdmin):
     list_display = (
         'oznaka',
         'velikost',
-        'racunalniska',
-        'vidna',
+        'tip',
     )
     list_filter = (
-        'racunalniska',
-        'vidna',
+        'tip',
     )
 
 
@@ -47,7 +45,6 @@ class PredmetAdmin(admin.ModelAdmin):
 
 @admin.register(Srecanje)
 class SrecanjeAdmin(admin.ModelAdmin):
-    exclude = ['dan', 'ura', 'trajanje', 'ucilnica']
 
     def response_change(self, request, obj):
         return redirect(request.GET.get('next', '/'))

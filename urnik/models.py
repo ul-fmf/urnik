@@ -57,25 +57,53 @@ class Letnik(models.Model):
 
 class UcilnicaQuerySet(models.QuerySet):
 
-    def ustrezne(self, stevilo_studentov=None, racunalniska=False):
-        ucilnice = self.filter(velikost__isnull=False, racunalniska__gte=racunalniska)
-        if stevilo_studentov:
-            ucilnice = list(ucilnice.filter(velikost__gt=2 / 3 * stevilo_studentov))
+    def ustrezne(self, tip, oddelek):
+        if oddelek == 'MAT':
+            obicajna = Ucilnica.MATEMATICNA
         else:
-            ucilnice = list(ucilnice)
-        for ucilnica in ucilnice:
-            if not stevilo_studentov or ucilnica.velikost / stevilo_studentov <= 3/4:
-                ucilnica.ustreznost = 'morebiti'
-            else:
-                ucilnica.ustreznost = 'ustrezna'
-        return ucilnice
+            obicajna = Ucilnica.FIZIKALNA
+        print(tip)
+        if tip == 'velika':
+            ustrezne = self.filter(tip=obicajna, velikost__gte=60)
+            alternative = self.filter(velikost__gte=45)
+        elif tip == 'obicajna':
+            ustrezne = self.filter(tip=obicajna, velikost__gte=30, velikost__lt=60)
+            alternative = self.filter(velikost__gte=24, velikost__lt=80)
+        elif tip == 'majhna':
+            ustrezne = self.filter(tip=obicajna, velikost__lt=30)
+            alternative = self.filter(velikost__lt=40)
+        elif tip == 'racunalniska':
+            ustrezne = self.filter(tip=Ucilnica.RACUNALNISKA)
+            alternative = self.none()
+        elif tip == 'praktikum':
+            ustrezne = self.filter(tip=Ucilnica.PRAKTIKUM)
+            alternative = self.none()
+        else:
+            ustrezne = self.none()
+            alternative = self.filter(velikost__isnull=True)
+
+        return list(ustrezne), list(alternative.exclude(pk__in=ustrezne))
+
+    def objavljene(self):
+        return self.filter(tip__in=(
+            Ucilnica.MATEMATICNA,
+            Ucilnica.FIZIKALNA,
+            Ucilnica.RACUNALNISKA,
+            Ucilnica.PRAKTIKUM
+        ))
 
 
 class Ucilnica(models.Model):
+    MATEMATICNA, FIZIKALNA, RACUNALNISKA = 'M', 'F', 'R'
+    PRAKTIKUM, PISARNA, ZUNANJA = 'P', 'K', 'X'
+    TIP = (
+        (MATEMATICNA, 'matematična'), (FIZIKALNA, 'fizikalna'),
+        (RACUNALNISKA, 'računalniška'), (PRAKTIKUM, 'praktikum'),
+        (PISARNA, 'pisarna'), (ZUNANJA, 'zunanja'),
+    )
+    tip = models.CharField(max_length=1, choices=TIP, default=ZUNANJA, blank=True)
     oznaka = models.CharField(max_length=192, unique=True)
     velikost = models.PositiveSmallIntegerField(blank=True, null=True)
-    racunalniska = models.BooleanField(default=False)
-    vidna = models.BooleanField(default=True)
     objects = UcilnicaQuerySet.as_manager()
 
     class Meta:
@@ -170,16 +198,26 @@ class SrecanjeQuerySet(models.QuerySet):
 class Termin:
     ZASEDEN = 'zaseden'
 
-    def __init__(self, dan, ura, ucilnice, zasedenost_ucilnic, srecanje):
+    def __init__(self, dan, ura, ustrezne, alternative, zasedenost_ucilnic, srecanje):
         self.dan = dan
         self.ura = ura
-        self.ucilnice = deepcopy(ucilnice)
+        self.ucilnice = []
         self.zasedenost = self.ZASEDEN
         ure = range(self.ura, self.ura + srecanje.trajanje)
-        proste_prave = False
-        deloma_prave = False
+        proste_ustrezne = False
+        deloma_proste_ustrezne = False
         proste_alternative = False
         deloma_alternative = False
+
+        for ucilnica in alternative:
+            ucilnica = deepcopy(ucilnica)
+            ucilnica.ustreznost = 'alternativa'
+            self.ucilnice.append(ucilnica)
+        for ucilnica in ustrezne:
+            ucilnica = deepcopy(ucilnica)
+            ucilnica.ustreznost = 'ustrezna'
+            self.ucilnice.append(ucilnica)
+        self.ucilnice.sort(key=lambda ucilnica:ucilnica.oznaka)
 
         def prosta(zasedenost_ucilnic, ucilnica, dan, ura):
             return ucilnica not in zasedenost_ucilnic.get((dan, ura), [])
@@ -188,23 +226,23 @@ class Termin:
             if all(prosta(zasedenost_ucilnic, ucilnica, dan, ura) for ura in ure):
                 ucilnica.zasedenost = 'prosta'
                 if ucilnica.ustreznost == 'ustrezna':
-                    proste_prave = True
+                    proste_ustrezne = True
                 else:
                     proste_alternative = True
             elif any(prosta(zasedenost_ucilnic, ucilnica, dan, ura) for ura in ure):
                 ucilnica.zasedenost = 'deloma_prosta'
                 if ucilnica.ustreznost == 'ustrezna':
-                    deloma_prave = True
+                    deloma_proste_ustrezne = True
                 else:
                     deloma_alternative = True
             else:
                 ucilnica.zasedenost = 'zasedena'
 
-        if proste_prave:
+        if proste_ustrezne:
             self.zasedenost = 'prosto'
-        elif deloma_prave and proste_alternative:
+        elif deloma_proste_ustrezne and proste_alternative:
             self.zasedenost = 'proste_le_alternative'
-        elif deloma_prave:
+        elif deloma_proste_ustrezne:
             self.zasedenost = 'deloma'
         elif proste_alternative:
             self.zasedenost = 'proste_alternative'
@@ -308,14 +346,13 @@ class Srecanje(models.Model):
         else:
             return ''
 
-    def prosti_termini(self):
-        ucilnice = Ucilnica.objects.ustrezne(stevilo_studentov=self.predmet.stevilo_studentov)
-        if self.ucilnica not in ucilnice:
-            self.ucilnica.ustreznost = 'ustrezna'
-            ucilnice.insert(0, self.ucilnica)
+    def prosti_termini(self, tip, oddelek):
+        ustrezne, alternative = Ucilnica.objects.ustrezne(tip=tip, oddelek=oddelek)
+        if self.ucilnica not in ustrezne and self.ucilnica not in alternative:
+            ustrezne.insert(0, self.ucilnica)
 
         zasedenost_ucilnic = defaultdict(set)
-        for srecanje in Srecanje.objects.neodlozena().filter(ucilnica__in=ucilnice).exclude(pk=self.pk).select_related('ucilnica'):
+        for srecanje in Srecanje.objects.neodlozena().filter(ucilnica__in=ustrezne + alternative).exclude(pk=self.pk).select_related('ucilnica'):
             for ura in range(srecanje.ura, srecanje.ura + srecanje.trajanje):
                 zasedenost_ucilnic[(srecanje.dan, ura)].add(srecanje.ucilnica)
 
@@ -325,7 +362,8 @@ class Srecanje(models.Model):
                 termini[(dan, ura)] = Termin(
                     dan=dan,
                     ura=ura,
-                    ucilnice=ucilnice,
+                    ustrezne=ustrezne,
+                    alternative=alternative,
                     zasedenost_ucilnic=zasedenost_ucilnic,
                     srecanje=self,
                 )

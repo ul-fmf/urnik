@@ -7,7 +7,7 @@
             <input type="hidden" name="dan" value="{{ termin.dan }}">
             <input type="hidden" name="ura" value="{{ termin.ura }}">
             <input type="hidden" name="ucilnica" value="{{ ucilnica.id }}">
-            <button>{{ ucilnica.oznaka }}<br><small>{{ ucilnica.velikost }}</small></button>
+            <button>{{ ucilnica.oznaka }}<br><small>{{ ucilnica.velikost|default:'?' }}</small></button>
         </form>
     {% endfor %}
     </div>

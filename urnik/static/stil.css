@@ -139,39 +139,51 @@ a.skrita {
     background: repeating-linear-gradient(
       -45deg,
       rgba(0, 128, 0, 0.5),
-      rgba(0, 128, 0, 0.5) 5px,
-      rgba(255, 0, 0, 0.5) 5px,
-      rgba(255, 0, 0, 0.5) 10px
+      rgba(0, 128, 0, 0.5) 50%,
+      rgba(255, 0, 0, 0.5) 50%,
+      rgba(255, 0, 0, 0.5) 100%
     );
 }
 .proste_le_alternative {
     background: repeating-linear-gradient(
       -45deg,
       rgba(255, 165, 0, 0.5),
-      rgba(255, 165, 0, 0.5) 5px,
-      rgba(0, 128, 0, 0.5) 5px,
-      rgba(0, 128, 0, 0.5) 10px
+      rgba(255, 165, 0, 0.5) 50%,
+      rgba(0, 128, 0, 0.5) 50%,
+      rgba(0, 128, 0, 0.5) 100%
     );
 }
 .deloma_proste_alternative {
     background: repeating-linear-gradient(
       -45deg,
       rgba(255, 165, 0, 0.5),
-      rgba(255, 165, 0, 0.5) 5px,
-      rgba(255, 0, 0, 0.5) 5px,
-      rgba(255, 0, 0, 0.5) 10px
+      rgba(255, 165, 0, 0.5) 50%,
+      rgba(255, 0, 0, 0.5) 50%,
+      rgba(255, 0, 0, 0.5) 100%
     );
 }
 .vse_mogoce {
     background: repeating-linear-gradient(
       -45deg,
       rgba(255, 165, 0, 0.5),
-      rgba(255, 165, 0, 0.5) 5px,
-      rgba(255, 0, 0, 0.5) 5px,
-      rgba(255, 0, 0, 0.5) 10px,
-      rgba(0, 128, 0, 0.5) 15px,
-      rgba(0, 128, 0, 0.5) 20px
+      rgba(255, 165, 0, 0.5) 33%,
+      rgba(255, 0, 0, 0.5) 33%,
+      rgba(255, 0, 0, 0.5) 66%,
+      rgba(0, 128, 0, 0.5) 100%,
+      rgba(0, 128, 0, 0.5) 100%
     );
+}
+.mozne_ucilnice {
+    visibility: hidden;
+    position: absolute;
+    left: 20px;
+    /*height: 0;*/
+    background: white;
+    z-index: 100;
+    width: 200px;
+}
+.premakni_srecanje:hover .mozne_ucilnice {
+    visibility: visible;
 }
 .urejanje {
     position: absolute;
@@ -183,6 +195,9 @@ a.skrita {
     background: white;
     /*height: 100%;*/
     z-index: 100;
+}
+.urejanje a {
+    display: block;
 }
 #informacije .urejanje {
     left: 0;
@@ -227,9 +242,9 @@ a.skrita {
     background: repeating-linear-gradient(
       -45deg,
       rgba(0, 128, 0, 1),
-      rgba(0, 128, 0, 1) 5px,
-      rgba(255, 0, 0, 1) 5px,
-      rgba(255, 0, 0, 1) 10px
+      rgba(0, 128, 0, 1) 50%,
+      rgba(255, 0, 0, 1) 50%,
+      rgba(255, 0, 0, 1) 100%
     );
 }
 .ustrezna.zasedena button, .ustrezna.zasedena {
@@ -238,19 +253,19 @@ a.skrita {
 .ustrezna.prosta button, .ustrezna.prosta {
     background: green;
 }
-.morebiti.deloma_prosta button, .morebiti.deloma_prosta {
+.alternativa.deloma_prosta button, .alternativa.deloma_prosta {
     background: repeating-linear-gradient(
       -45deg,
       orange,
-      orange 5px,
-      rgba(255, 0, 0, 1) 5px,
-      rgba(255, 0, 0, 1) 10px
+      orange 50%,
+      rgba(255, 0, 0, 1) 50%,
+      rgba(255, 0, 0, 1) 100%
     );
 }
-.morebiti.zasedena button, .morebiti.zasedena {
+.alternativa.zasedena button, .alternativa.zasedena {
     background: red;
 }
-.morebiti.prosta button, .morebiti.prosta {
+.alternativa.prosta button, .alternativa.prosta {
     background: orange;
 }
 nav {

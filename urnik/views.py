@@ -14,8 +14,8 @@ def zacetna_stran(request):
             smeri.setdefault(smer, []).append(letnik)
         except:
             pass
-    osebe = Oseba.objects.aktivni().exclude(priimek='X')
-    ucilnice = Ucilnica.objects.filter(vidna=True).exclude(oznaka='X')
+    osebe = Oseba.objects.aktivni()
+    ucilnice = Ucilnica.objects.objavljene()
     matematicni_letniki = []
     fizikalni_letniki = []
     for letnik in Letnik.objects.all():
@@ -123,7 +123,7 @@ def premakni_srecanje(request, srecanje_id):
             'srecanja': srecanje.povezana_srecanja().urnik(),
             'odlozena_srecanja': Srecanje.objects.odlozena(),
             'prekrivanja_po_tipih': {},
-            'prosti_termini': srecanje.prosti_termini(),
+            'prosti_termini': srecanje.prosti_termini(request.GET['tip'], 'MAT' if 'matematika' in ','.join(group.name for group in request.user.groups.all()) else 'FIZ'),
             'premaknjeno_srecanje': srecanje,
             'next': request.META.get('HTTP_REFERER', reverse('zacetna_stran')),
         })

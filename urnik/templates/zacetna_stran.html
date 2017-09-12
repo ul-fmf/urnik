@@ -49,8 +49,10 @@
                         <a href="{% url 'urnik_ucilnice' ucilnica.id %}">{{ ucilnica.oznaka }}</a>
                         {% endif %}
                         <small>
-                        {% if ucilnica.racunalniska %}
+                        {% if ucilnica.tip == ucilnica.RACUNALNISKA %}
                         <i class="tiny material-icons">computer</i>
+                        {% elif ucilnica.tip == ucilnica.PRAKTIKUM %}
+                        <i class="tiny material-icons">build</i>
                         {% endif %}
                         ({{ ucilnica.velikost|default:'?' }} mest)</small>
                     </td>
