@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.shortcuts import redirect
-from .models import Oseba, Letnik, Ucilnica, Predmet, Srecanje
+from .models import Oseba, Letnik, Ucilnica, Predmet, Srecanje, Rezervacija
 
 
 @admin.register(Oseba)
@@ -42,6 +42,40 @@ class PredmetAdmin(admin.ModelAdmin):
         'letniki',
     )
 
+
+@admin.register(Rezervacija)
+class RezervacijaAdmin(admin.ModelAdmin):
+    list_display = (
+        'seznam_ucilnic',
+        'seznam_oseb',
+        'od',
+        'do',
+        'opomba',
+    )
+    list_filter = (
+        ('osebe', admin.RelatedOnlyFieldListFilter),
+        ('ucilnice', admin.RelatedOnlyFieldListFilter),
+    )
+    filter_horizontal = (
+        'ucilnice',
+        'osebe',
+    )
+
+    def seznam_oseb(self, obj):
+        return ', '.join(str(oseba) for oseba in obj.osebe.all())
+    seznam_oseb.short_description = 'Osebe'
+    seznam_oseb.admin_order_field = 'osebe'
+
+    def seznam_ucilnic(self, obj):
+        return ', '.join(str(ucilnica) for ucilnica in obj.ucilnice.all())
+    seznam_ucilnic.short_description = 'Učilnice'
+    seznam_ucilnic.admin_order_field = 'ucilnice'
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).prefetch_related(
+            'ucilnice',
+            'osebe',
+        )
 
 @admin.register(Srecanje)
 class SrecanjeAdmin(admin.ModelAdmin):

@@ -371,3 +371,15 @@ class Srecanje(models.Model):
                     srecanje=self,
                 )
         return termini
+
+
+class Rezervacija(models.Model):
+    ucilnice = models.ManyToManyField('urnik.Ucilnica')
+    osebe = models.ManyToManyField('urnik.Oseba', blank=True)
+    od = models.DateTimeField()
+    do = models.DateTimeField()
+    opomba = models.CharField(max_length=192, blank=True)
+
+    class Meta:
+        verbose_name_plural = 'rezervacije'
+        default_related_name = 'rezervacije'
