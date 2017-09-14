@@ -30,7 +30,10 @@ class Oseba(models.Model):
         ordering = ('priimek', 'ime')
 
     def __str__(self):
-        return '{} {}'.format(self.ime, self.priimek)
+        if self.ime:
+            return '{}, {}'.format(self.priimek, self.ime)
+        else:
+            return self.priimek
 
     def vrstni_red(self):
         return self.priimek.replace('Č', 'Cz').replace('Š', 'Sz').replace('Ž', 'Zz')
