@@ -2,7 +2,7 @@
 <div class="srecanje" style="{{ srecanje.style }}; {% pobarvajvec srecanje.barve %}">
     <div class="predmet">
         <a href="{% url 'urnik_predmeta' srecanje.predmet.id %}">
-            {{ srecanje.po_potrebi_okrajsano_ime_predmeta }}
+            {% if nacin == 'ogled' %}{{ srecanje.po_potrebi_okrajsano_ime_predmeta }}{% else %}{{ srecanje.predmet.kratica }}{% endif %}
         </a>
         <span class="tip">
              {{ srecanje.tip }}{{ srecanje.oznaka }}{{ srecanje.barva }}
