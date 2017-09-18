@@ -73,7 +73,7 @@ def urnik(request, srecanja, naslov, barve=[]):
 def urnik_osebe(request, oseba_id):
     oseba = get_object_or_404(Oseba, id=oseba_id)
     naslov = str(oseba)
-    return urnik(request, oseba.srecanja.all(), naslov)
+    return urnik(request, oseba.vsa_srecanja(), naslov)
 
 
 def urnik_letnika(request, letnik_id):

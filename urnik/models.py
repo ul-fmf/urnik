@@ -38,6 +38,9 @@ class Oseba(models.Model):
     def vrstni_red(self):
         return self.priimek.replace('Č', 'Cz').replace('Š', 'Sz').replace('Ž', 'Zz')
 
+    def vsa_srecanja(self):
+        return (self.srecanja.all() | Srecanje.objects.filter(predmet__slusatelji=self)).distinct()
+
 
 class Letnik(models.Model):
     smer = models.CharField(max_length=192)
