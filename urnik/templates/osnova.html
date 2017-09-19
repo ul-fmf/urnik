@@ -6,7 +6,7 @@
     <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/css/materialize.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Urnik OM FMF{% if naslov %} –  {{ naslov }}{% endif %} – zimski semester 2017/18</title>
+    <title>Urnik FMF{% if naslov %} –  {{ naslov }}{% endif %} – zimski semester 2017/18</title>
     <link rel="stylesheet" href="{% static 'stil.css' %}">
 </head>
 
@@ -30,7 +30,7 @@
         {{ naslov|default:'Urnik' }}
       </span>
       <ul>
-        <li id="domov"><a href="{% url 'zacetna_stran' %}"><i class="material-icons left">home</i>Urnik OM FMF – zimski semester 2017/18</a></li>
+        <li id="domov"><a href="{% url 'zacetna_stran' %}"><i class="material-icons left">home</i>Urnik FMF – zimski semester 2017/18</a></li>
       </ul>
       {% if user.is_authenticated %}
       <ul class="right">
