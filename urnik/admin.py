@@ -16,6 +16,20 @@ class LetnikAdmin(admin.ModelAdmin):
     search_fields = (
         'smer',
     )
+    list_display = (
+        '__str__',
+        'smer',
+        'leto',
+        'oddelek',
+    )
+    list_display_links = (
+        '__str__',
+    )
+    list_editable = (
+        'smer',
+        'leto',
+        'oddelek',
+    )
 
 
 @admin.register(Ucilnica)

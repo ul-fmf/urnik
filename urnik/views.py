@@ -7,34 +7,13 @@ from .models import *
 
 def zacetna_stran(request):
     smeri = {}
-    for letnik in Letnik.objects.all():
-        try:
-            smer, opis = str(letnik).split(',')
-            letnik.opis = opis
-            smeri.setdefault(smer, []).append(letnik)
-        except:
-            pass
     osebe = Oseba.objects.aktivni()
     ucilnice = Ucilnica.objects.objavljene()
-    matematicni_letniki = []
-    fizikalni_letniki = []
-    for letnik in Letnik.objects.all():
-        letnik.opis = letnik.smer[4:]
-        if letnik.smer.startswith('MAT-'):
-            matematicni_letniki.append(letnik)
-        else:
-            fizikalni_letniki.append(letnik)
     return render(request, 'zacetna_stran.html', {
-        'stolpci_smeri': (
-            [{
-                'ime': 'Matematika',
-                'letniki': matematicni_letniki,
-            }],
-            [{
-                'ime': 'Fizika',
-                'letniki': fizikalni_letniki,
-            }],
-        ),
+        'stolpci_smeri': [
+            Letnik.objects.filter(oddelek=Letnik.MATEMATIKA),
+            Letnik.objects.filter(oddelek=Letnik.FIZIKA),
+        ],
         'osebe': sorted(osebe, key=lambda oseba: oseba.vrstni_red()),
         'ucilnice': ucilnice,
         'izbira': 'izbira' in request.GET,

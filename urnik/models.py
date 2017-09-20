@@ -43,17 +43,22 @@ class Oseba(models.Model):
 
 
 class Letnik(models.Model):
+    MATEMATIKA, FIZIKA = 'M', 'F'
+    ODDELEK = (
+        (MATEMATIKA, 'matematika'), (FIZIKA, 'fizika'),
+    )
+    oddelek = models.CharField(max_length=1, choices=ODDELEK, blank=True)
     smer = models.CharField(max_length=192)
-    leto = models.PositiveSmallIntegerField(blank=True, null=True)
+    leto = models.CharField(max_length=192, null=True)
 
     class Meta:
         verbose_name_plural = 'letniki'
         default_related_name = 'letniki'
-        ordering = ('smer', 'leto')
+        ordering = ('oddelek', 'smer', 'leto')
 
     def __str__(self):
         if self.leto:
-            return '{}, {}. letnik'.format(self.smer, self.leto)
+            return '{}, {}'.format(self.smer, self.leto)
         else:
             return self.smer
 

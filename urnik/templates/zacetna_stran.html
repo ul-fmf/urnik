@@ -4,24 +4,25 @@
 <form action="{% url 'sestavljen_urnik' %}">
 <div class="container">
 <div class="row">
-    {% for stolpec in stolpci_smeri %}
+    {% for letniki in stolpci_smeri %}
     <div class="col s3">
         <table class="highlight">
-            {% for smer in stolpec %}
+            {% regroup letniki by smer as smeri_list %}
+            {% for smer_l in smeri_list %}
             <thead>
                 <tr>
-                    <th>{{ smer.ime }}</th>
+                    <th>{{ smer_l.grouper }}</th>
                 </tr>
             </thead>
             <tbody>
-                {% for letnik in smer.letniki %}
+                {% for letnik in smer_l.list %}
                 <tr>
                     <td style="padding: 5px">
                         {% if izbira %}
                         <input type="checkbox" name="letnik" value="{{ letnik.id }}" id="letnik-{{ letnik.id }}"/>
-                        <label for="letnik-{{ letnik.id }}">{{ letnik.opis }}</label>
+                        <label for="letnik-{{ letnik.id }}">{{ letnik.leto }}</label>
                         {% else %}
-                        <a href="{% url 'urnik_letnika' letnik.id %}">{{ letnik.opis }}</a>
+                        <a href="{% url 'urnik_letnika' letnik.id %}">{{ letnik.leto }}</a>
                         {% endif %}
                     </td>
                 </tr>
