@@ -20,7 +20,7 @@ def zacetna_stran(request):
     })
 
 
-def urnik(request, srecanja, naslov, barve=[]):
+def urnik(request, srecanja, naslov, barve=None):
     if request.user.is_authenticated and request.session.get('urejanje', False):
         if request.META['QUERY_STRING']:
             next_url = '{}?{}'.format(request.path, request.META['QUERY_STRING'])
@@ -37,10 +37,8 @@ def urnik(request, srecanja, naslov, barve=[]):
         })
     else:
         legenda = barve
-        if not barve:
-            predmeti = Predmet.objects.filter(srecanja__in=srecanja).distinct()
-            if len(predmeti) <= 7:
-                barve = predmeti
+        if barve is None:
+            barve = Predmet.objects.filter(srecanja__in=srecanja).distinct()
         return render(request, 'urnik.html', {
             'nacin': 'ogled',
             'naslov': naslov,
@@ -64,7 +62,7 @@ def urnik_letnika(request, letnik_id):
 def urnik_ucilnice(request, ucilnica_id):
     ucilnica = get_object_or_404(Ucilnica, id=ucilnica_id)
     naslov = 'Učilnica {}'.format(ucilnica.oznaka)
-    return urnik(request, ucilnica.srecanja.all(), naslov)
+    return urnik(request, ucilnica.srecanja.all(), naslov, barve=[])
 
 
 def urnik_predmeta(request, predmet_id):
