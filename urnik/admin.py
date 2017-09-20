@@ -21,6 +21,7 @@ class LetnikAdmin(admin.ModelAdmin):
         'smer',
         'leto',
         'oddelek',
+        'kratica',
     )
     list_display_links = (
         '__str__',
@@ -29,6 +30,7 @@ class LetnikAdmin(admin.ModelAdmin):
         'smer',
         'leto',
         'oddelek',
+        'kratica',
     )
 
 
