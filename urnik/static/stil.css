@@ -98,6 +98,10 @@ a.skrita {
     color: #555;
     font-weight: normal;
 }
+.letniki {
+    font-size: 0.8em;
+    color: green;
+}
 .ucitelj, .ucilnica {
     font-size: 0.8em;
     position: absolute;

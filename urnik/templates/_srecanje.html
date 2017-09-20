@@ -9,6 +9,12 @@
         </span>
     </div>
 
+    <div class="letniki">
+        {% for letnik in srecanje.predmet.letniki.all %}
+        <a href="{% url 'urnik_letnika' letnik.id %}">{{ letnik.kratica }}</a>{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+    </div>
+
     {% if srecanje.ucitelj %}
     <div class="ucitelj">
         <a href="{% url 'urnik_osebe' srecanje.ucitelj.id %}">{{ srecanje.ucitelj.priimek }}</a>

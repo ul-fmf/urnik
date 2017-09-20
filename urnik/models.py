@@ -50,6 +50,7 @@ class Letnik(models.Model):
     oddelek = models.CharField(max_length=1, choices=ODDELEK, blank=True)
     smer = models.CharField(max_length=192)
     leto = models.CharField(max_length=192, null=True)
+    kratica = models.CharField(max_length=64)
 
     class Meta:
         verbose_name_plural = 'letniki'
