@@ -142,11 +142,14 @@ class Predmet(models.Model):
     def __str__(self):
         return self.ime
 
+    def kratice_letnikov(self):
+        return ', '.join(letnik.kratica for letnik in self.letniki.all())
+
 
 class SrecanjeQuerySet(models.QuerySet):
 
     def odlozena(self):
-        return self.filter(dan__isnull=True, ura__isnull=True).select_related('ucilnica', 'ucitelj', 'predmet')
+        return self.filter(dan__isnull=True, ura__isnull=True).select_related('ucilnica', 'predmet').prefetch_related('ucitelji')
 
     def neodlozena(self):
         return self.filter(dan__isnull=False, ura__isnull=False)
@@ -156,13 +159,14 @@ class SrecanjeQuerySet(models.QuerySet):
         prekrivanja_oseb = defaultdict(set)
         srecanja = self.neodlozena().select_related(
             'ucilnica',
-            'ucitelj'
         ).prefetch_related(
+            'ucitelji',
             'predmet__slusatelji'
         )
         for srecanje in srecanja:
             for ura in range(srecanje.ura, srecanje.ura + srecanje.trajanje):
-                prekrivanja_oseb[(srecanje.ucitelj, srecanje.dan, ura)].add(srecanje)
+                for ucitelj in srecanje.ucitelji.all():
+                    prekrivanja_oseb[(ucitelj, srecanje.dan, ura)].add(srecanje)
                 if srecanje.predmet:
                     for slusatelj in srecanje.predmet.slusatelji.all():
                         prekrivanja_oseb[(slusatelj, srecanje.dan, ura)].add(srecanje)
@@ -188,9 +192,9 @@ class SrecanjeQuerySet(models.QuerySet):
             'dan', 'ura', 'trajanje'
         ).distinct(
         ).select_related(
-            'ucilnica', 'ucitelj', 'predmet'
+            'ucilnica', 'predmet'
         ).prefetch_related(
-            'predmet__letniki', 'predmet__slusatelji'
+            'predmet__letniki', 'ucitelji', 'predmet__slusatelji'
         )
         nastavi_sirine_srecanj(self)
         nastavi_barve(self, barve)
@@ -279,7 +283,7 @@ class Srecanje(models.Model):
     predmet = models.ForeignKey('urnik.Predmet', null=True, blank=True, on_delete=models.CASCADE)
     tip = models.CharField(max_length=1, choices=TIP, blank=True)
     oznaka = models.CharField(max_length=64, blank=True)
-    ucitelj = models.ForeignKey('urnik.Oseba', null=True, blank=True, on_delete=models.SET_NULL)
+    ucitelji = models.ManyToManyField('urnik.Oseba', blank=True)
     dan = models.PositiveSmallIntegerField(choices=enumerate(DNEVI, 1), blank=True, null=True)
     ura = models.PositiveSmallIntegerField(blank=True, null=True)
     trajanje = models.PositiveSmallIntegerField(null=True)
@@ -289,18 +293,18 @@ class Srecanje(models.Model):
     class Meta:
         verbose_name_plural = 'srečanja'
         default_related_name = 'srecanja'
-        ordering = ('predmet', 'tip', 'oznaka', 'ucitelj', 'dan', 'ura', 'trajanje')
+        ordering = ('predmet', 'tip', 'oznaka', 'dan', 'ura', 'trajanje')
 
     def __str__(self):
         if self.dan and self.ura:
             return '{}, {}{}, {}, {}, {}–{}, {}'.format(
-                self.predmet, self.tip, self.oznaka, self.ucitelj,
+                self.predmet, self.tip, self.oznaka, ', '.join(str(ucitelj) for ucitelj in self.ucitelji.all()),
                 self.get_dan_display(), self.ura, self.ura + self.trajanje,
                 self.ucilnica
             )
         else:
             return '{}, {}{}, {}, odloženo, {}'.format(
-                self.predmet, self.tip, self.oznaka, self.ucitelj,
+                self.predmet, self.tip, self.oznaka, ', '.join(str(ucitelj) for ucitelj in self.ucitelji.all()),
                 self.ucilnica
             )
 
@@ -340,8 +344,8 @@ class Srecanje(models.Model):
 
     def povezana_srecanja(self):
         letniki_poslusajo = Srecanje.objects.filter(predmet__letniki__in=self.predmet.letniki.all())
-        ucitelj_uci = Srecanje.objects.filter(ucitelj=self.ucitelj)
-        ucitelj_poslusa = Srecanje.objects.filter(predmet__slusatelji=self.ucitelj)
+        ucitelj_uci = Srecanje.objects.filter(ucitelji__in=self.ucitelji.all())
+        ucitelj_poslusa = Srecanje.objects.filter(predmet__slusatelji__in=self.ucitelji.all())
         return (letniki_poslusajo | ucitelj_uci | ucitelj_poslusa).exclude(
             pk=self.pk
         ).distinct()

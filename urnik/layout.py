@@ -3,7 +3,7 @@ def nastavi_barve(srecanja, barve):
         srecanje.barve = set()
         if barve:
             for i, barva in enumerate(barve):
-                if barva in ({srecanje.ucitelj, srecanje.ucilnica, srecanje.predmet} | (set(srecanje.predmet.letniki.all()) if srecanje.predmet else set()) | (set(srecanje.predmet.slusatelji.all()) if srecanje.predmet else set())):
+                if barva in (set(srecanje.ucitelji.all()) | {srecanje.ucilnica, srecanje.predmet} | (set(srecanje.predmet.letniki.all()) if srecanje.predmet else set()) | (set(srecanje.predmet.slusatelji.all()) if srecanje.predmet else set())):
                     srecanje.barve.add(i)
 
 def razdeli_srecanja_po_dneh(srecanja):

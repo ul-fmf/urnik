@@ -76,7 +76,7 @@ def sestavljen_urnik(request):
     osebe = Oseba.objects.filter(id__in=request.GET.getlist('oseba'))
     ucilnice = Ucilnica.objects.filter(id__in=request.GET.getlist('ucilnica'))
     srecanja_letnikov = Srecanje.objects.filter(predmet__letniki__in=letniki)
-    srecanja_uciteljev = Srecanje.objects.filter(ucitelj__in=osebe)
+    srecanja_uciteljev = Srecanje.objects.filter(ucitelji__in=osebe)
     srecanja_slusateljev = Srecanje.objects.filter(predmet__slusatelji__in=osebe)
     srecanja_ucilnic = Srecanje.objects.filter(ucilnica__in=ucilnice)
     srecanja = (srecanja_letnikov | srecanja_uciteljev |

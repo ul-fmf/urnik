@@ -52,11 +52,17 @@ class PredmetAdmin(admin.ModelAdmin):
         'ime',
         'kratica',
         'stevilo_studentov',
+        'kratice_letnikov',
     )
     filter_horizontal = (
         'slusatelji',
         'letniki',
     )
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).prefetch_related(
+            'letniki',
+        )
 
 
 @admin.register(Rezervacija)
@@ -96,6 +102,10 @@ class RezervacijaAdmin(admin.ModelAdmin):
 @admin.register(Srecanje)
 class SrecanjeAdmin(admin.ModelAdmin):
 
+    filter_horizontal = (
+        'ucitelji',
+    )
+
     def response_change(self, request, obj):
         return redirect(request.GET.get('next', '/'))
 
@@ -105,6 +115,7 @@ class SrecanjeAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         return super().get_queryset(request).select_related(
             'predmet',
-            'ucitelj',
             'ucilnica',
+        ).prefetch_related(
+            'ucitelji'
         )
