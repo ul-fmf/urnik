@@ -390,11 +390,9 @@ class Srecanje(models.Model):
 class Rezervacija(models.Model):
     ucilnice = models.ManyToManyField('urnik.Ucilnica')
     osebe = models.ManyToManyField('urnik.Oseba', blank=True)
-    od = models.DateTimeField()
-    do = models.DateTimeField()
     dan = models.DateField()
-    od_ura = models.PositiveSmallIntegerField()
-    do_ura = models.PositiveSmallIntegerField()
+    od = models.PositiveSmallIntegerField()
+    do = models.PositiveSmallIntegerField()
     opomba = models.CharField(max_length=192, blank=True)
 
     class Meta:

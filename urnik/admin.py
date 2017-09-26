@@ -70,6 +70,7 @@ class RezervacijaAdmin(admin.ModelAdmin):
     list_display = (
         'seznam_ucilnic',
         'seznam_oseb',
+        'dan',
         'od',
         'do',
         'opomba',
