@@ -392,6 +392,9 @@ class Rezervacija(models.Model):
     osebe = models.ManyToManyField('urnik.Oseba', blank=True)
     od = models.DateTimeField()
     do = models.DateTimeField()
+    dan = models.DateField()
+    od_ura = models.PositiveSmallIntegerField()
+    do_ura = models.PositiveSmallIntegerField()
     opomba = models.CharField(max_length=192, blank=True)
 
     class Meta:
