@@ -31,7 +31,7 @@ class Oseba(models.Model):
 
     def __str__(self):
         if self.ime:
-            return '{}, {}'.format(self.priimek, self.ime)
+            return '{} {}'.format(self.ime, self.priimek)
         else:
             return self.priimek
 
