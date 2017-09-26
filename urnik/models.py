@@ -163,8 +163,9 @@ class SrecanjeQuerySet(models.QuerySet):
         for srecanje in srecanja:
             for ura in range(srecanje.ura, srecanje.ura + srecanje.trajanje):
                 prekrivanja_oseb[(srecanje.ucitelj, srecanje.dan, ura)].add(srecanje)
-                for slusatelj in srecanje.predmet.slusatelji.all():
-                    prekrivanja_oseb[(slusatelj, srecanje.dan, ura)].add(srecanje)
+                if srecanje.predmet:
+                    for slusatelj in srecanje.predmet.slusatelji.all():
+                        prekrivanja_oseb[(slusatelj, srecanje.dan, ura)].add(srecanje)
                 prekrivanja_ucilnic[(srecanje.ucilnica, srecanje.dan, ura)].add(srecanje)
         prekrivanja_po_tipih = {
             'Prekrivanja učilnic': prekrivanja_ucilnic,
