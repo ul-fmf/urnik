@@ -21,6 +21,7 @@ def zacetna_stran(request):
 
 
 def urnik(request, srecanja, naslov, barve=None):
+    legenda = barve
     if barve is None:
         barve = Predmet.objects.filter(srecanja__in=srecanja).distinct()
     if request.user.is_authenticated and request.session.get('urejanje', False):
@@ -38,7 +39,6 @@ def urnik(request, srecanja, naslov, barve=None):
             'barve': barve,
         })
     else:
-        legenda = barve
         return render(request, 'urnik.html', {
             'nacin': 'ogled',
             'naslov': naslov,
