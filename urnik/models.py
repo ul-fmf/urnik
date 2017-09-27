@@ -309,6 +309,15 @@ class Srecanje(models.Model):
                 self.ucilnica
             )
 
+    @property
+    def od(self):
+        return self.ura
+
+    @property
+    def do(self):
+        if self.ura:
+            return self.ura + self.trajanje
+
     def podvoji(self):
         self.id = None
         self.save()
@@ -412,3 +421,15 @@ class Rezervacija(models.Model):
         start = self.dan - datetime.timedelta(days=self.dan.weekday())
         end = start + datetime.timedelta(days=6)
         return (start, end)
+
+    def konflikti(self):
+        for ucilnica in self.ucilnice.all():
+            for srecanje in ucilnica.srecanja.all():
+                if self.dan.weekday() + 1 != srecanje.dan or not srecanje.od:
+                    continue
+                elif srecanje.do <= self.od:
+                    continue
+                elif self.do <= srecanje.od:
+                    continue
+                else:
+                    yield srecanje

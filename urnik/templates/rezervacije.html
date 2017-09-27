@@ -23,6 +23,15 @@
             {{ rezervacija.od }}–{{ rezervacija.do }},
             {{ rezervacija.ucilnice.all|join:", "}},
             <small>{{ rezervacija.osebe.all|join:", "}}</small>
+            {% if user.is_staff %}
+            {% for konflikt in rezervacija.konflikti %}
+            <span class="new badge red" data-badge-caption="">
+                {{ konflikt.predmet }},
+                {{ konflikt.od }}–{{ konflikt.do }},
+                {{ konflikt.ucitelji.all|join:", "}}
+            </span>
+            {% endfor %}
+            {% endif %}
         </li>
         {% endfor %}
         </ul>

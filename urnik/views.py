@@ -22,7 +22,12 @@ def zacetna_stran(request):
 
 def rezervacije(request):
     return render(request, 'rezervacije.html', {
-        'rezervacije': Rezervacija.objects.prihajajoce()
+        'rezervacije': Rezervacija.objects.prihajajoce().prefetch_related(
+                'ucilnice',
+                'osebe',
+                'ucilnice__srecanja__ucitelji',
+                'ucilnice__srecanja__predmet',
+            )
     })
 
 
