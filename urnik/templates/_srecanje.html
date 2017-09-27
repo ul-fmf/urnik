@@ -11,23 +11,26 @@
         </span>
     </div>
 
+    {% if srecanje.trajanje > 1 %}
     <div class="letniki">
         {% for letnik in srecanje.predmet.letniki.all %}
         <a href="{% url 'urnik_letnika' letnik.id %}">{{ letnik.kratica }}</a>{% if not forloop.last %}, {% endif %}
         {% endfor %}
     </div>
+    {% endif %}
 
+    {% if srecanje.sirina >= 0.5 or nacin == 'urejanje' or nacin == 'odlozisce' %}
     <div class="ucitelj">
         {% for ucitelj in srecanje.ucitelji.all %}
         <a href="{% url 'urnik_osebe' ucitelj.id %}">{{ ucitelj.priimek }}</a>{% if not forloop.last %}, {% endif %}
         {% endfor %}
     </div>
+    {% endif %}
 
-    {% if srecanje.sirina >= 0.5 or nacin == 'urejanje' or nacin == 'odlozisce' %}
     <div class="ucilnica">
         <a href="{% url 'urnik_ucilnice' srecanje.ucilnica.id %}">{{ srecanje.ucilnica.oznaka }}</a>
     </div>
-    {% endif %}
+
     {% if nacin == 'urejanje' or nacin == 'odlozisce' %}
         <div class="urejanje">
             {% if srecanje.lahko_skrajsam %}
