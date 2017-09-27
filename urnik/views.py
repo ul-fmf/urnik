@@ -20,6 +20,12 @@ def zacetna_stran(request):
     })
 
 
+def rezervacije(request):
+    return render(request, 'rezervacije.html', {
+        'rezervacije': Rezervacija.objects.prihajajoce()
+    })
+
+
 def urnik(request, srecanja, naslov, barve=None):
     legenda = barve
     if barve is None:

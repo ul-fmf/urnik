@@ -1,3 +1,4 @@
+import datetime
 from collections import defaultdict
 from copy import deepcopy
 from django.db import models
@@ -387,6 +388,12 @@ class Srecanje(models.Model):
         return termini
 
 
+class RezervacijaQuerySet(models.QuerySet):
+
+    def prihajajoce(self):
+        return self.filter(dan__gte=datetime.date.today())
+
+
 class Rezervacija(models.Model):
     ucilnice = models.ManyToManyField('urnik.Ucilnica')
     osebe = models.ManyToManyField('urnik.Oseba', blank=True)
@@ -394,7 +401,14 @@ class Rezervacija(models.Model):
     od = models.PositiveSmallIntegerField()
     do = models.PositiveSmallIntegerField()
     opomba = models.CharField(max_length=192, blank=True)
+    objects = RezervacijaQuerySet.as_manager()
 
     class Meta:
         verbose_name_plural = 'rezervacije'
         default_related_name = 'rezervacije'
+        ordering = ('dan', 'od', 'do')
+
+    def teden(self):
+        start = self.dan - datetime.timedelta(days=self.dan.weekday())
+        end = start + datetime.timedelta(days=6)
+        return (start, end)

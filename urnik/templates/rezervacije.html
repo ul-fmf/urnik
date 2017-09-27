@@ -1,0 +1,35 @@
+{% extends 'osnova.html' %}
+{% block content %}
+<div class="container">
+
+{% regroup rezervacije by teden as rezervacije_po_tednih %}
+{% for teden in rezervacije_po_tednih %}
+<ul class="collapsible" data-collapsible="expandable">
+<li>
+    <div class="collapsible-header {% if forloop.counter <= 2 %}active{% endif %}">
+        <h5>
+            {{ teden.grouper.0|date:"j. F" }} – {{ teden.grouper.1|date:"j. F Y" }}
+        </h5>
+    </div>
+    <div class="collapsible-body">
+        <ul class="collection with-header">
+        {% for rezervacija in teden.list %}
+        {% ifchanged %}
+        <li class="collection-header">
+            <strong>{{ rezervacija.dan|date:"l, j. F" }}</strong>
+        </li>
+        {% endifchanged %}
+        <li class="collection-item">
+            {{ rezervacija.od }}–{{ rezervacija.do }},
+            {{ rezervacija.ucilnice.all|join:", "}},
+            <small>{{ rezervacija.osebe.all|join:", "}}</small>
+        </li>
+        {% endfor %}
+        </ul>
+    </div>
+</li>
+</ul>
+{% endfor %}
+
+</div>
+{% endblock content %}

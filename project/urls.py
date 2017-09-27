@@ -25,6 +25,7 @@ urlpatterns = [
     url(r'^accounts/login/$', auth_views.login,  {'template_name': 'admin/login.html'}, name='login'),
     url(r'^$', urnik.views.zacetna_stran, name='zacetna_stran'),
     url(r'^urnik/$', urnik.views.sestavljen_urnik, name='sestavljen_urnik'),
+    url(r'^rezervacije/$', urnik.views.rezervacije, name='rezervacije'),
     url(r'^oseba/(?P<oseba_id>\d+)/$', urnik.views.urnik_osebe, name='urnik_osebe'),
     url(r'^letnik/(?P<letnik_id>\d+)/$', urnik.views.urnik_letnika, name='urnik_letnika'),
     url(r'^ucilnica/(?P<ucilnica_id>\d+)/$', urnik.views.urnik_ucilnice, name='urnik_ucilnice'),
