@@ -27,7 +27,8 @@ def rezervacije(request):
                 'osebe',
                 'ucilnice__srecanja__ucitelji',
                 'ucilnice__srecanja__predmet',
-            )
+            ),
+        'naslov': 'Rezervacije učilnic',
     })
 
 

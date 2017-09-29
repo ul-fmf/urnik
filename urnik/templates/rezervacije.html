@@ -2,6 +2,15 @@
 {% block content %}
 <div class="container">
 
+<p class="flow-text">
+    Stran z rezervacijami je še v delu. V kratkem bo omogočen tudi obrazec za rezervacijo.
+</p>
+<p class="flow-text">
+    Če morate rezervacijo narediti takoj, se kot doslej obrnite na referat.
+    <strong>Če ni nujno</strong>, pa vljudno prosimo, da kak teden počakate in
+    prispevate k manjši obremenjenosti referatov.
+</p>
+
 {% regroup rezervacije by teden as rezervacije_po_tednih %}
 {% for teden in rezervacije_po_tednih %}
 <ul class="collapsible" data-collapsible="expandable">

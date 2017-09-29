@@ -30,7 +30,8 @@
         {{ naslov|default:'Urnik' }}
       </span>
       <ul>
-        <li id="domov"><a href="{% url 'zacetna_stran' %}"><i class="material-icons left">home</i>Urnik FMF – zimski semester 2017/18</a></li>
+        <li id="domov"><a href="{% url 'zacetna_stran' %}"><i class="material-icons left">home</i>Urnik FMF</a></li>
+        <li id="rezervacije"><a href="{% url 'rezervacije' %}"><i class="material-icons left">border_color</i>Rezervacije</a></li>
       </ul>
       {% if user.is_authenticated %}
       <ul class="right">
