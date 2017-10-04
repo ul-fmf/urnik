@@ -31,7 +31,10 @@
         <li class="collection-item">
             {{ rezervacija.od }}–{{ rezervacija.do }},
             {{ rezervacija.ucilnice.all|join:", "}},
-            <small>{{ rezervacija.osebe.all|join:", "}}</small>
+            <small>
+                {{ rezervacija.osebe.all|join:", "}}{% if rezervacija.osebe.all and rezervacija.opomba %},{% endif %}
+                {{ rezervacija.opomba }}
+            </small>
             {% if user.is_staff %}
             {% for konflikt in rezervacija.konflikti %}
             <span class="new badge red" data-badge-caption="">
