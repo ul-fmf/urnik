@@ -319,8 +319,11 @@ class Srecanje(models.Model):
             return self.ura + self.trajanje
 
     def podvoji(self):
+        stari_ucitelji = list(self.ucitelji.all())
         self.id = None
         self.save()
+        for ucitelj in stari_ucitelji:
+            self.ucitelji.add(ucitelj)
 
     def odlozi(self):
         self.dan = None
