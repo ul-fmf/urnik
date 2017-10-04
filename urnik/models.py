@@ -2,6 +2,7 @@ import datetime
 from collections import defaultdict
 from copy import deepcopy
 from django.db import models
+from django.core.exceptions import ValidationError
 from .layout import nastavi_sirine_srecanj, nastavi_barve
 
 MIN_URA, MAX_URA = 7, 20
@@ -419,6 +420,11 @@ class Rezervacija(models.Model):
         verbose_name_plural = 'rezervacije'
         default_related_name = 'rezervacije'
         ordering = ('dan', 'od', 'do')
+
+    def clean(self):
+        if not self.osebe.exists() and not self.opomba:
+            raise ValidationError('Rezervaciji dodajte vsaj eno osebo ali vpišite opombo.')
+
 
     def teden(self):
         start = self.dan - datetime.timedelta(days=self.dan.weekday())
