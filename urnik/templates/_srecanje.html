@@ -27,9 +27,11 @@
     </div>
     {% endif %}
 
+    {% if srecanje.ucilnica %}
     <div class="ucilnica">
         <a href="{% url 'urnik_ucilnice' srecanje.ucilnica.id %}">{{ srecanje.ucilnica.oznaka }}</a>
     </div>
+    {% endif %}
 
     {% if nacin == 'urejanje' or nacin == 'odlozisce' %}
         <div class="urejanje">
