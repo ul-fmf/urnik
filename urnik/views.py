@@ -21,14 +21,28 @@ def zacetna_stran(request):
 
 
 def rezervacije(request):
+    rezervacije = []
+    queryset = Rezervacija.objects.prihajajoce().prefetch_related(
+        'ucilnice',
+        'osebe',
+        'ucilnice__srecanja__ucitelji',
+        'ucilnice__srecanja__predmet',
+    )
+    for rezervacija in queryset:
+        for ucilnica in rezervacija.ucilnice.all():
+            rezervacije.append({
+                'ucilnica': ucilnica,
+                'osebe': rezervacija.osebe,
+                'od': rezervacija.od,
+                'do': rezervacija.do,
+                'opomba': rezervacija.opomba,
+                'dan': rezervacija.dan,
+                'teden': rezervacija.teden(),
+            })
+    rezervacije.sort(key=lambda r:(r['dan'], r['ucilnica'].oznaka, r['od']))
     return render(request, 'rezervacije.html', {
-        'rezervacije': Rezervacija.objects.prihajajoce().prefetch_related(
-                'ucilnice',
-                'osebe',
-                'ucilnice__srecanja__ucitelji',
-                'ucilnice__srecanja__predmet',
-            ),
         'naslov': 'Rezervacije učilnic',
+        'rezervacije': rezervacije,
     })
 
 

@@ -29,10 +29,10 @@
         </li>
         {% endifchanged %}
         <li class="collection-item">
+            {{ rezervacija.ucilnica }},
             {{ rezervacija.od }}–{{ rezervacija.do }},
-            {{ rezervacija.ucilnice.all|join:", "}},
             <small>
-                {{ rezervacija.osebe.all|join:", "}}{% if rezervacija.osebe.all and rezervacija.opomba %},{% endif %}
+                {{ rezervacija.osebe.all|join:", "}},
                 {{ rezervacija.opomba }}
             </small>
             {% if user.is_staff %}
