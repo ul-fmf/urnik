@@ -424,7 +424,7 @@ class Rezervacija(models.Model):
     def clean(self):
         if not self.osebe.exists() and not self.opomba:
             raise ValidationError('Rezervaciji dodajte vsaj eno osebo ali vpišite opombo.')
-
+        return self
 
     def teden(self):
         start = self.dan - datetime.timedelta(days=self.dan.weekday())
