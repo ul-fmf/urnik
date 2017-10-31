@@ -2,27 +2,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <link href="//fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Urnik FMF{% if naslov %} –  {{ naslov }}{% endif %} – zimski semester 2017/18</title>
-    <link rel="stylesheet" href="{% static 'stil.css' %}">
+  <meta charset="utf-8">
+  <link href="//fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Urnik FMF{% if naslov %} –  {{ naslov }}{% endif %} – zimski semester 2017/18</title>
+  <link rel="stylesheet" href="{% static 'stil.css' %}">
 </head>
-
 <body>
-    <div class="navbar-fixed">
-<ul id="user-dropdown" class="dropdown-content">
-  <li><a href="{% url 'admin:index' %}"><i class="material-icons">settings</i>administrativni</a></li>
-  <li><a href="{% url 'preklopi_urejanje' %}">
-    {% if request.session.urejanje %}
-      <i class="material-icons">visibility</i>izklopi urejanje
-    {% else %}
-      <i class="material-icons">edit</i>vklopi urejanje
-    {% endif %}
-  </a></li>
-  <li><a href="{% url 'logout' %}"><i class="material-icons">exit_to_app</i>odjavi me</a></li>
-</ul>
+
+<div class="navbar-fixed">
+  <ul id="user-dropdown" class="dropdown-content">
+    <li><a href="{% url 'admin:index' %}"><i class="material-icons">settings</i>administrativni</a></li>
+    <li><a href="{% url 'preklopi_urejanje' %}">
+      {% if request.session.urejanje %}
+        <i class="material-icons">visibility</i>izklopi urejanje
+      {% else %}
+        <i class="material-icons">edit</i>vklopi urejanje
+      {% endif %}
+    </a></li>
+    <li><a href="{% url 'logout' %}"><i class="material-icons">exit_to_app</i>odjavi me</a></li>
+  </ul>
   <nav>
     <div class="nav-wrapper">
       <span class="brand-logo center">
@@ -34,28 +34,29 @@
         <li id="rezervacije"><a href="{% url 'rezervacije' %}"><i class="material-icons left">border_color</i>Rezervacije</a></li>
       </ul>
       {% if user.is_authenticated %}
-      <ul class="right">
-        <li>
-          <a class="dropdown-button" href="#!" data-activates="user-dropdown">
-            {{ user.get_full_name }}
-            <i class="material-icons right">{% if request.session.urejanje %}edit{% else %}visibility{% endif %}</i>
-          </a>
-        </li>
+        <ul class="right">
+          <li>
+            <a class="dropdown-button" href="#!" data-activates="user-dropdown">
+              {{ user.get_full_name }}
+              <i class="material-icons right">{% if request.session.urejanje %}edit{% else %}visibility{% endif %}</i>
+            </a>
+          </li>
+        </ul>
       {% endif %}
     </div>
   </nav>
+</div>
 
-    </div>
-    <div class="container" style="position: absolute; width: 100%; bottom: 0; top: 64px">
-        {% block content %}{% endblock content %}
-    </div>
+<div class="container" style="position: absolute; width: 100%; bottom: 0; top: 64px">
+  {% block content %}{% endblock content %}
+</div>
 
-    <script type="text/javascript" src="//code.jquery.com/jquery-2.1.1.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
-    <script type="text/javascript">
-        $(document).ready(function() {
-            $(".dropdown-button").dropdown();
-        });
-    </script>
+<script type="text/javascript" src="//code.jquery.com/jquery-2.1.1.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".dropdown-button").dropdown();
+    });
+</script>
 </body>
 </html>

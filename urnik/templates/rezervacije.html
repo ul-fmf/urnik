@@ -3,53 +3,53 @@
 <div class="container">
 
 <p class="flow-text">
-    Stran z rezervacijami je še v delu. V kratkem bo omogočen tudi obrazec za rezervacijo.
+  Stran z rezervacijami je še v delu. V kratkem bo omogočen tudi obrazec za rezervacijo.
 </p>
 <p class="flow-text">
-    Če morate rezervacijo narediti takoj, se kot doslej obrnite na referat.
-    <strong>Če ni nujno</strong>, pa vljudno prosimo, da kak teden počakate in
-    prispevate k manjši obremenjenosti referatov.
+  Če morate rezervacijo narediti takoj, se kot doslej obrnite na referat.
+  <strong>Če ni nujno</strong>, pa vljudno prosimo, da kak teden počakate in
+  prispevate k manjši obremenjenosti referatov.
 </p>
 
 {% regroup rezervacije by teden as rezervacije_po_tednih %}
 {% for teden in rezervacije_po_tednih %}
-<ul class="collapsible" data-collapsible="expandable">
-<li>
-    <div class="collapsible-header {% if forloop.counter <= 2 %}active{% endif %}">
+  <ul class="collapsible" data-collapsible="expandable">
+    <li>
+      <div class="collapsible-header {% if forloop.counter <= 2 %}active{% endif %}">
         <h5>
-            {{ teden.grouper.0|date:"j. F" }} – {{ teden.grouper.1|date:"j. F Y" }}
+          {{ teden.grouper.0|date:"j. F" }} – {{ teden.grouper.1|date:"j. F Y" }}
         </h5>
-    </div>
-    <div class="collapsible-body">
+      </div>
+      <div class="collapsible-body">
         <ul class="collection with-header">
-        {% for rezervacija in teden.list %}
-        {% ifchanged %}
-        <li class="collection-header">
-            <strong>{{ rezervacija.dan|date:"l, j. F" }}</strong>
-        </li>
-        {% endifchanged %}
-        <li class="collection-item">
-            {{ rezervacija.ucilnica }},
-            {{ rezervacija.od }}–{{ rezervacija.do }},
-            <small>
-                {{ rezervacija.osebe.all|join:", "}},
+          {% for rezervacija in teden.list %}
+            {% ifchanged %}
+              <li class="collection-header">
+                <strong>{{ rezervacija.dan|date:"l, j. F" }}</strong>
+              </li>
+            {% endifchanged %}
+            <li class="collection-item">
+              {{ rezervacija.ucilnica }},
+              {{ rezervacija.od }}–{{ rezervacija.do }},
+              <small>
+                {{ rezervacija.osebe.all|join:", " }},
                 {{ rezervacija.opomba }}
-            </small>
-            {% if user.is_staff %}
-            {% for konflikt in rezervacija.konflikti %}
-            <span class="new badge red" data-badge-caption="">
-                {{ konflikt.predmet }},
-                {{ konflikt.od }}–{{ konflikt.do }},
-                {{ konflikt.ucitelji.all|join:", "}}
-            </span>
-            {% endfor %}
-            {% endif %}
-        </li>
-        {% endfor %}
+              </small>
+              {% if user.is_staff %}
+                {% for konflikt in rezervacija.konflikti %}
+                  <span class="new badge red" data-badge-caption="">
+            {{ konflikt.predmet }},
+            {{ konflikt.od }}–{{ konflikt.do }},
+            {{ konflikt.ucitelji.all|join:", " }}
+        </span>
+                {% endfor %}
+              {% endif %}
+            </li>
+          {% endfor %}
         </ul>
-    </div>
-</li>
-</ul>
+      </div>
+    </li>
+  </ul>
 {% endfor %}
 
 </div>
