@@ -1,8 +1,6 @@
 Urniki na fakulteti za matematiko in fiziko
 ===========================================
 
-Vzorčna seminarska naloga pri predmetu Podatkovne baze 1.
-
 Namen
 -----
 
@@ -61,3 +59,27 @@ običajno prihaja do sledečih sprememb:
 ali pa prikaže, kaj dela drugi).
 
 4. Dobro bi bilo, če bi lahko osebni urnik urejal vsak sam.
+
+Navodila za razvijalce
+----------------------
+Prenesi repozitorij ali naredi fork
+```
+git clone git@github.com:ul-fmf/urnik.git
+```
+Naredi virtualno okolje in ga aktiviraj
+```
+virtualenv -p python3 venv3
+source venv3/bin/activate
+```
+Namesti potrebne pakete
+```
+pip install -r requirements.txt
+```
+Apliciraj migracije
+```
+python manage.py migrate
+```
+Zaženi strežnik
+```
+python manage.py runserver
+```
