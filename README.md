@@ -68,7 +68,7 @@ git clone git@github.com:ul-fmf/urnik.git
 ```
 Naredi virtualno okolje in ga aktiviraj
 ```
-virtualenv -p python3 venv3
+python3 -m venv venv3
 source venv3/bin/activate
 ```
 Namesti potrebne pakete
