@@ -1,3 +1,14 @@
+# General python stuff
+*.pyc
+__pycahce__
+
+# Project related stuff
 *.sqlite3
 uvoz
 fabfile.py
+
+# Virtualenv
+venv3
+
+# Pycharm
+.idea
