@@ -4,98 +4,100 @@
 <form action="{% url 'sestavljen_urnik' %}">
 <div class="container">
 <div class="row">
-    {% for letniki in stolpci_smeri %}
+  {% for letniki in stolpci_smeri %}
     <div class="col s3">
-        <table class="highlight">
-            {% regroup letniki by smer as smeri_list %}
-            {% for smer_l in smeri_list %}
-            <thead>
-                <tr>
-                    <th>{{ smer_l.grouper }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for letnik in smer_l.list %}
-                <tr>
-                    <td style="padding: 5px">
-                        {% if izbira %}
-                        <input type="checkbox" name="letnik" value="{{ letnik.id }}" id="letnik-{{ letnik.id }}"/>
-                        <label for="letnik-{{ letnik.id }}">{{ letnik.leto }}</label>
-                        {% else %}
-                        <a href="{% url 'urnik_letnika' letnik.id %}">{{ letnik.leto }}</a>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-            {% endfor %}
-        </table>
+      <table class="highlight">
+        {% regroup letniki by smer as smeri_list %}
+        {% for smer_l in smeri_list %}
+          <thead>
+          <tr>
+            <th>{{ smer_l.grouper }}</th>
+          </tr>
+          </thead>
+          <tbody>
+          {% for letnik in smer_l.list %}
+            <tr>
+              <td style="padding: 5px">
+                {% if izbira %}
+                  <input type="checkbox" name="letnik" value="{{ letnik.id }}" id="letnik-{{ letnik.id }}"/>
+                  <label for="letnik-{{ letnik.id }}">{{ letnik.leto }}</label>
+                {% else %}
+                  <a href="{% url 'urnik_letnika' letnik.id %}">{{ letnik.leto }}</a>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        {% endfor %}
+      </table>
     </div>
-    {% endfor %}
-    <div class="col s2">
-        <table class="highlight">
-            <thead>
-                <tr>
-                    <th>Učilnica</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for ucilnica in ucilnice %}
-                <tr>
-                    <td style="padding: 5px">
-                        {% if izbira %}
-                        <input type="checkbox" name="ucilnica" value="{{ ucilnica.id }}" id="ucilnica-{{ ucilnica.id }}"/>
-                        <label for="ucilnica-{{ ucilnica.id }}">{{ ucilnica.oznaka }}</label>
-                        {% else %}
-                        <a href="{% url 'urnik_ucilnice' ucilnica.id %}">{{ ucilnica.oznaka }}</a>
-                        {% endif %}
-                        <small>
-                        {% if ucilnica.tip == ucilnica.RACUNALNISKA %}
-                        <i class="tiny material-icons">computer</i>
-                        {% elif ucilnica.tip == ucilnica.PRAKTIKUM %}
-                        <i class="tiny material-icons">build</i>
-                        {% endif %}
-                        ({{ ucilnica.velikost|default:'?' }} mest)</small>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+  {% endfor %}
+  <div class="col s2">
+    <table class="highlight">
+      <thead>
+      <tr>
+        <th>Učilnica</th>
+      </tr>
+      </thead>
+      <tbody>
+      {% for ucilnica in ucilnice %}
+        <tr>
+          <td style="padding: 5px">
+            {% if izbira %}
+              <input type="checkbox" name="ucilnica" value="{{ ucilnica.id }}" id="ucilnica-{{ ucilnica.id }}"/>
+              <label for="ucilnica-{{ ucilnica.id }}">{{ ucilnica.oznaka }}</label>
+            {% else %}
+              <a href="{% url 'urnik_ucilnice' ucilnica.id %}">{{ ucilnica.oznaka }}</a>
+            {% endif %}
+            <small>
+              {% if ucilnica.tip == ucilnica.RACUNALNISKA %}
+                <i class="tiny material-icons">computer</i>
+              {% elif ucilnica.tip == ucilnica.PRAKTIKUM %}
+                <i class="tiny material-icons">build</i>
+              {% endif %}
+              ({{ ucilnica.velikost|default:'?' }} mest)
+            </small>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="col s4" style="position: relative">
+    <div style="position: absolute; right: 0; top: 8px">
+      {% if izbira %}
+        <button class="btn-flat"><i class="material-icons left">playlist_play</i>prikaži</button>
+      {% else %}
+        <a class="btn-flat" href="{% url 'zacetna_stran' %}?izbira"><i class="material-icons left">playlist_add_check</i>označi
+          več</a>
+      {% endif %}
     </div>
-    <div class="col s4" style="position: relative">
-        <div style="position: absolute; right: 0; top: 8px">
-        {% if izbira %}
-            <button class="btn-flat"><i class="material-icons left">playlist_play</i>prikaži</button>
-        {% else %}
-            <a class="btn-flat" href="{% url 'zacetna_stran' %}?izbira"><i class="material-icons left">playlist_add_check</i>označi več</a>
-        {% endif %}
-        </div>
-        <table class="highlight">
-            <thead>
-                <tr>
-                    <th>Oseba</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for oseba in osebe %}
-                <tr>
-                    <td style="padding: 5px">
-                        {% if izbira %}
-                        <input type="checkbox" name="oseba" value="{{ oseba.id }}" id="oseba-{{ oseba.id }}"/>
-                        <label for="oseba-{{ oseba.id }}">{{ oseba.ime }} <strong>{{ oseba.priimek }}</strong></label>
-                        {% else %}
-                        <a href="{% url 'urnik_osebe' oseba.id %}">
-                            {{ oseba.ime }} <strong>{{ oseba.priimek }}</strong>
-                        </a>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
-</div>
+    <table class="highlight">
+      <thead>
+      <tr>
+        <th>Oseba</th>
+      </tr>
+      </thead>
+      <tbody>
+      {% for oseba in osebe %}
+        <tr>
+          <td style="padding: 5px">
+            {% if izbira %}
+              <input type="checkbox" name="oseba" value="{{ oseba.id }}" id="oseba-{{ oseba.id }}"/>
+              <label for="oseba-{{ oseba.id }}">{{ oseba.ime }} <strong>{{ oseba.priimek }}</strong></label>
+            {% else %}
+              <a href="{% url 'urnik_osebe' oseba.id %}">
+                {{ oseba.ime }} <strong>{{ oseba.priimek }}</strong>
+              </a>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div> <!-- row -->
+</div> <!-- container -->
 </form>
 
 {% endblock content %}
