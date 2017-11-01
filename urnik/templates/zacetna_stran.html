@@ -4,8 +4,15 @@
 <form action="{% url 'sestavljen_urnik' %}">
 <div class="container">
 <div class="row">
+  <div class="oznaci-vec">
+    {% if izbira %}
+      <button class="btn-flat" href="#!"><i class="material-icons left">playlist_play</i>prikaži</button>
+    {% else %}
+      <a class="btn-flat" href="{% url 'zacetna_stran' %}?izbira"><i class="material-icons left">playlist_add_check</i>označi več</a>
+    {% endif %}
+  </div>  <!-- oznaci vec -->
   {% for letniki in stolpci_smeri %}
-    <div class="col s3">
+    <div class="col s6 m3">
       <table class="highlight">
         {% regroup letniki by smer as smeri_list %}
         {% for smer_l in smeri_list %}
@@ -17,7 +24,7 @@
           <tbody>
           {% for letnik in smer_l.list %}
             <tr>
-              <td style="padding: 5px">
+              <td class="padded">
                 {% if izbira %}
                   <input type="checkbox" name="letnik" value="{{ letnik.id }}" id="letnik-{{ letnik.id }}"/>
                   <label for="letnik-{{ letnik.id }}">{{ letnik.leto }}</label>
@@ -30,9 +37,9 @@
           </tbody>
         {% endfor %}
       </table>
-    </div>
+    </div>  <!-- smeri -->
   {% endfor %}
-  <div class="col s2">
+  <div class="col s6 m3">
     <table class="highlight">
       <thead>
       <tr>
@@ -42,7 +49,7 @@
       <tbody>
       {% for ucilnica in ucilnice %}
         <tr>
-          <td style="padding: 5px">
+          <td class="padded">
             {% if izbira %}
               <input type="checkbox" name="ucilnica" value="{{ ucilnica.id }}" id="ucilnica-{{ ucilnica.id }}"/>
               <label for="ucilnica-{{ ucilnica.id }}">{{ ucilnica.oznaka }}</label>
@@ -62,16 +69,8 @@
       {% endfor %}
       </tbody>
     </table>
-  </div>
-  <div class="col s4" style="position: relative">
-    <div style="position: absolute; right: 0; top: 8px">
-      {% if izbira %}
-        <button class="btn-flat"><i class="material-icons left">playlist_play</i>prikaži</button>
-      {% else %}
-        <a class="btn-flat" href="{% url 'zacetna_stran' %}?izbira"><i class="material-icons left">playlist_add_check</i>označi
-          več</a>
-      {% endif %}
-    </div>
+  </div> <!-- ucilnice -->
+  <div class="col s6 m3">
     <table class="highlight">
       <thead>
       <tr>
@@ -81,7 +80,7 @@
       <tbody>
       {% for oseba in osebe %}
         <tr>
-          <td style="padding: 5px">
+          <td class="padded">
             {% if izbira %}
               <input type="checkbox" name="oseba" value="{{ oseba.id }}" id="oseba-{{ oseba.id }}"/>
               <label for="oseba-{{ oseba.id }}">{{ oseba.ime }} <strong>{{ oseba.priimek }}</strong></label>
@@ -95,7 +94,7 @@
       {% endfor %}
       </tbody>
     </table>
-  </div>
+  </div>  <!-- osebe -->
 </div> <!-- row -->
 </div> <!-- container -->
 </form>

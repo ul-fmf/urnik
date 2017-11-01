@@ -1,14 +1,39 @@
-.srecanje a {
-    color: #333;
+/* general */
+.padded {
+    padding: 5px;
 }
-.srecanje a:hover, .urejanje a {
+.vertical-space {
+    height: 2000px;  /* allows zoom out on mobile */
+}
+/* navigation and such */
+nav {
+    background-color: #555;
+}
+#urnik-logo {
+    white-space: nowrap;
+}
+@media only screen and (min-width: 600px) {
+    nav a.button-collapse {
+        display:none;
+    }
+}
+.dropdown-content li > a {
     color: #039be5;
 }
-body {
-    /*background: #ddd;*/
+.dropdown-content li.disabled, .dropdown-content li.disabled > a {
+    color: #5e5e5e;
+    cursor: default;
 }
-.container, .navbar {
+/* urnik */
+.urnik-wrapper {
+    position: absolute;
     min-width: 1024px;
+    min-height: 600px;
+    max-width: 1200px;
+    max-height: 1000px;
+    top: 64px;
+    bottom: 0px;
+    width: 100%;
 }
 #urnik.cel {
     position: absolute;
@@ -17,14 +42,12 @@ body {
     width: 95%;
     height: 95%;
     background: white;
-    min-width: 1024px;
-    min-height: 600px;
 }
 #urnik {
     position: absolute;
     left: 0%;
     top: 0%;
-    width: 80%;
+    width: 95%;
     height: 100%;
     background: white;
 }
@@ -86,6 +109,12 @@ body {
     border: solid 1pt white;
     position: absolute;
     padding: 2pt;
+}
+.srecanje a {
+    color: #333;
+}
+.srecanje a:hover, .urejanje a {
+    color: #039be5;
 }
 #informacije .srecanje {
     position: relative;
@@ -271,9 +300,23 @@ a.skrita {
 .alternativa.prosta button, .alternativa.prosta {
     background: orange;
 }
-nav {
-    background-color: #555;
+/* front page */
+.oznaci-vec {
+    position: relative;
+    float: right;
+    font-weight: normal;
 }
+.oznaci-vec > a, .oznaci-vec > button {
+    position: absolute;
+    right: 0px;
+    top: 6px;
+    white-space: nowrap;
+}
+.oznaci-vec > a > i.material-icons, .oznaci-vec > button > i.material-icons {
+    margin-right: 5px;
+}
+
+/* print */
 @media print {
     a {
         color: black;
