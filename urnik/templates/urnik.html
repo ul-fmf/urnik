@@ -2,6 +2,8 @@
 {% load tags %}
 {% block content %}
 
+<div class="urnik-wrapper">
+
 {% if nacin == 'ogled' %}
   <div id="urnik" class="{% if not barve %}cel{% endif %}">
     {% dnevi %}
@@ -110,7 +112,9 @@
       {% endif %}
     </ul>
   </div>
-
 {% endif %}
+
+</div>
+<div class="vertical-space hide-on-med-and-up"></div>
 
 {% endblock content %}
