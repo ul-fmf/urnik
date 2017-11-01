@@ -29,36 +29,39 @@ nav {
     position: absolute;
     min-width: 1024px;
     min-height: 600px;
-    max-width: 1200px;
-    max-height: 1000px;
     top: 64px;
     bottom: 0px;
     width: 100%;
 }
-#urnik.cel {
+#urnik {
     position: absolute;
     left: 2.5%;
     top: 2.5%;
-    width: 95%;
+    width: 78%;
     height: 95%;
     background: white;
 }
-#urnik {
-    position: absolute;
-    left: 0%;
-    top: 0%;
+#urnik.cel {
     width: 95%;
-    height: 100%;
-    background: white;
 }
 #informacije {
     position: absolute;
-    left: 82%;
+    left: 81.4%;
     top: 0%;
     width: 18%;
     height: 100%;
-    background: #fff;  
-    overflow-y: scroll;
+    background: #fff;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+#informacije .collapsible-header {
+    white-space: nowrap;
+}
+#informacije .collapsible-body {
+    padding: 5px 20px;
+}
+#informacije .collapsible-body .collection-item {
+    padding: 5px 0px;
 }
 #dnevi {
     position: absolute;

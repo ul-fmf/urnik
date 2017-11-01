@@ -69,10 +69,10 @@
             <form method="post" action="{% url 'odlozi_srecanje' premaknjeno_srecanje.id %}">
               {% csrf_token %}
               <input type="hidden" name="next" value="{{ next }}">
-              <a class="btn" style="width: 49%" href="{{ next }}">
+              <a class="btn" style="width: 48%" href="{{ next }}">
                 <i class="small material-icons">cancel</i>
               </a>
-              <button class="btn" style="width: 49%">
+              <button class="btn" style="width: 48%">
                 <i class="material-icons">move_to_inbox</i>
               </button>
             </form>
