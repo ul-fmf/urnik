@@ -2,60 +2,75 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <link href="//fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Urnik FMF{% if naslov %} –  {{ naslov }}{% endif %} – zimski semester 2017/18</title>
-    <link rel="stylesheet" href="{% static 'stil.css' %}">
+  <meta charset="utf-8">
+  <link href="//fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Urnik FMF{% if naslov %} –  {{ naslov }}{% endif %} – zimski semester 2017/18</title>
+  <link rel="stylesheet" href="{% static 'stil.css' %}">
 </head>
 
 <body>
-    <div class="navbar-fixed">
-<ul id="user-dropdown" class="dropdown-content">
-  <li><a href="{% url 'admin:index' %}"><i class="material-icons">settings</i>administrativni</a></li>
-  <li><a href="{% url 'preklopi_urejanje' %}">
-    {% if request.session.urejanje %}
-      <i class="material-icons">visibility</i>izklopi urejanje
-    {% else %}
-      <i class="material-icons">edit</i>vklopi urejanje
-    {% endif %}
-  </a></li>
-  <li><a href="{% url 'logout' %}"><i class="material-icons">exit_to_app</i>odjavi me</a></li>
-</ul>
+<div class="navbar-fixed">
   <nav>
     <div class="nav-wrapper">
-      <span class="brand-logo center">
+      <a href="#!" class="brand-logo center" id="urnik-logo"> <!-- top centred logo -->
         <i class="large material-icons">schedule</i>
         {{ naslov|default:'Urnik' }}
-      </span>
-      <ul>
-        <li id="domov"><a href="{% url 'zacetna_stran' %}"><i class="material-icons left">home</i>Urnik FMF</a></li>
-        <li id="rezervacije"><a href="{% url 'rezervacije' %}"><i class="material-icons left">border_color</i>Rezervacije</a></li>
-      </ul>
+      </a>
+      <a href="#" data-activates="mobile-sidebar" class="button-collapse"><i class="material-icons">menu</i></a>
+      <ul class="left hide-on-small-and-down"> <!-- top menu -->
+        {% include "navigation.html" %}
+      </ul> <!-- top menu -->
       {% if user.is_authenticated %}
-      <ul class="right">
-        <li>
-          <a class="dropdown-button" href="#!" data-activates="user-dropdown">
-            {{ user.get_full_name }}
-            <i class="material-icons right">{% if request.session.urejanje %}edit{% else %}visibility{% endif %}</i>
-          </a>
-        </li>
+        <ul class="right">
+          <li>
+            <a class="dropdown-button" href="#!" data-activates="user-dropdown" style="display: inline-block">
+              <i class="material-icons right" style="margin-left: 5px;">arrow_drop_down</i>
+              <span class="hide-on-small-and-down">{{ user.get_full_name|default:user.get_username }}</span>
+              <i class="material-icons right">{% if request.session.urejanje %}edit{% else %}visibility{% endif %}</i>
+            </a>
+          </li>
+        </ul>
       {% endif %}
-    </div>
+    </div> <!-- nav wrapper -->
+    <ul id="user-dropdown" class="dropdown-content">
+      <li class="disabled hide-on-med-and-up">
+        <a href="#!"><i class="material-icons">person</i>{{ user.get_full_name|default:user.get_username }}</a>
+      </li>
+      <li class="divider hide-on-med-and-up"></li>
+      <li><a href="{% url 'admin:index' %}"><i class="material-icons">settings</i>administracija</a></li>
+      <li><a href="{% url 'preklopi_urejanje' %}">
+        {% if request.session.urejanje %}
+          <i class="material-icons">visibility</i>izklopi urejanje
+        {% else %}
+          <i class="material-icons">edit</i>vklopi urejanje
+        {% endif %}
+      </a></li>
+      <li><a href="{% url 'logout' %}"><i class="material-icons">exit_to_app</i>odjavi me</a></li>
+    </ul>
   </nav>
+</div> <!-- navbar fixed -->
+<ul class="side-nav" id="mobile-sidebar"> <!-- side navigation for mobile -->
+  {% include "navigation.html" %}
+</ul> <!-- side nav -->
 
-    </div>
-    <div class="container" style="position: absolute; width: 100%; bottom: 0; top: 64px">
-        {% block content %}{% endblock content %}
-    </div>
+{% block content %}{% endblock content %}
 
-    <script type="text/javascript" src="//code.jquery.com/jquery-2.1.1.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
-    <script type="text/javascript">
-        $(document).ready(function() {
-            $(".dropdown-button").dropdown();
+<script type="text/javascript" src="//code.jquery.com/jquery-2.1.1.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".dropdown-button").dropdown({
+            constrainWidth: false,
+            belowOrigin: true,
+            inDuration: 300,
+            outDuration: 100,
+            alignment: "right"
         });
-    </script>
+        $(".button-collapse").sideNav();
+    });
+</script>
+
 </body>
 </html>

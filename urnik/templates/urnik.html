@@ -2,109 +2,119 @@
 {% load tags %}
 {% block content %}
 
+<div class="urnik-wrapper">
+
 {% if nacin == 'ogled' %}
-<div id="urnik" class="{% if not barve %}cel{% endif %}">
+  <div id="urnik" class="{% if not barve %}cel{% endif %}">
     {% dnevi %}
     {% ure %}
     <div id="srecanja">
-        {% for srecanje in srecanja %}
+      {% for srecanje in srecanja %}
         {% include '_srecanje.html' with nacin='ogled' %}
-        {% endfor %}
+      {% endfor %}
     </div>
-</div>
-{% if barve %}
-<div id='informacije'>
-    <ul class="collapsible" data-collapsible="expandable">
+  </div>
+  {% if barve %}
+    <div id='informacije'>
+      <ul class="collapsible" data-collapsible="expandable">
         <li>
-            <div class="collapsible-header active">
-                <i class="material-icons">line_style</i>Legenda
-            </div>
-            <div class="collapsible-body">
-                {% for barva in barve %}
-                <div class="legenda srecanje ustrezna" style="{% pobarvaj forloop.counter0 %}">{{ barva }}</div>
-                {% endfor %}
-            </div>
+          <div class="collapsible-header active">
+            <i class="material-icons">line_style</i>Legenda
+          </div>
+          <div class="collapsible-body">
+            {% for barva in barve %}
+              <div class="legenda srecanje ustrezna" style="{% pobarvaj forloop.counter0 %}">{{ barva }}</div>
+            {% endfor %}
+          </div>
         </li>
-    </ul>
-</div>
-{% endif %}
+      </ul>
+    </div>
+  {% endif %}
 
 {% elif nacin == 'urejanje' or nacin == 'premikanje' %}
-<div id="urnik">
+  <div id="urnik">
     {% dnevi %}
     {% ure %}
     <div id="srecanja">
-        {% for srecanje in srecanja %}
+      {% for srecanje in srecanja %}
         {% include '_srecanje.html' with nacin='urejanje' %}
-        {% endfor %}
-        {% for termin in prosti_termini.values %}
+      {% endfor %}
+      {% for termin in prosti_termini.values %}
         {% include '_prosti_termin.html' %}
-        {% endfor %}
+      {% endfor %}
     </div>
-</div>
-<div id='informacije'>
+  </div>
+  <div id='informacije'>
     <ul class="collapsible" data-collapsible="expandable">
-        {% if nacin == 'urejanje' %}
+      {% if nacin == 'urejanje' %}
         <li>
-            <div class="collapsible-header active">
-                <i class="material-icons">inbox</i>Odložišče
-            </div>
-            <div class="collapsible-body">
-                {% for srecanje in odlozena_srecanja %}
-                {% include '_srecanje.html' with nacin='odlozisce' %}
-                {% endfor %}
-            </div>
+          <div class="collapsible-header active">
+            <i class="material-icons">inbox</i>Odložišče
+          </div>
+          <div class="collapsible-body">
+            {% for srecanje in odlozena_srecanja %}
+              {% include '_srecanje.html' with nacin='odlozisce' %}
+            {% endfor %}
+          </div>
         </li>
         {% include '_prekrivanja.html' %}
 
-        {% elif nacin == 'premikanje' %}
+      {% elif nacin == 'premikanje' %}
         <li>
-            <div class="collapsible-header active">
-                <i class="material-icons">open_with</i> Premikanje srečanja
-            </div>
-            <div class="collapsible-body">
-                {% include '_srecanje.html' with nacin='odlozisce' srecanje=premaknjeno_srecanje %}
-                <form method="post" action="{% url 'odlozi_srecanje' premaknjeno_srecanje.id %}">
-                    {% csrf_token %}
-                    <input type="hidden" name="next" value="{{ next }}">
-                    <a class="btn" style="width: 49%" href="{{ next }}">
-                        <i class="small material-icons">cancel</i>
-                    </a>
-                    <button class="btn" style="width: 49%">
-                        <i class="material-icons">move_to_inbox</i>
-                    </button>
-                </form>
-            </div>
+          <div class="collapsible-header active">
+            <i class="material-icons">open_with</i> Premikanje srečanja
+          </div>
+          <div class="collapsible-body">
+            {% include '_srecanje.html' with nacin='odlozisce' srecanje=premaknjeno_srecanje %}
+            <form method="post" action="{% url 'odlozi_srecanje' premaknjeno_srecanje.id %}">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{{ next }}">
+              <a class="btn" style="width: 48%" href="{{ next }}">
+                <i class="small material-icons">cancel</i>
+              </a>
+              <button class="btn" style="width: 48%">
+                <i class="material-icons">move_to_inbox</i>
+              </button>
+            </form>
+          </div>
         </li>
         <li>
-            <div class="collapsible-header active">
-                <i class="material-icons">line_style</i>Legenda terminov
+          <div class="collapsible-header active">
+            <i class="material-icons">line_style</i>Legenda terminov
+          </div>
+          <div class="collapsible-body">
+            <div class="legenda srecanje prosto">proste ustrezne učilnice</div>
+            <div class="legenda srecanje proste_le_alternative">deloma proste ustrezne učilnice &amp; proste
+              kompromisne učilnice
             </div>
-            <div class="collapsible-body">
-                <div class="legenda srecanje prosto">proste ustrezne učilnice</div>
-                <div class="legenda srecanje proste_le_alternative">deloma proste ustrezne učilnice &amp; proste kompromisne učilnice</div>
-                <div class="legenda srecanje deloma">deloma proste ustrezne učilnice &amp; brez kompromisnih učilnic</div>
-                <div class="legenda srecanje proste_alternative">brez ustreznih učilnic &amp; proste kompromisne učilnice</div>
-                <div class="legenda srecanje deloma_proste_alternative">brez ustreznih učilnic &amp; deloma proste kompromisne učilnice</div>
-                <div class="legenda srecanje zaseden">brez kakršnihkoli učilnic</div>
+            <div class="legenda srecanje deloma">deloma proste ustrezne učilnice &amp; brez kompromisnih učilnic</div>
+            <div class="legenda srecanje proste_alternative">brez ustreznih učilnic &amp; proste kompromisne
+              učilnice
             </div>
+            <div class="legenda srecanje deloma_proste_alternative">brez ustreznih učilnic &amp; deloma proste
+              kompromisne učilnice
+            </div>
+            <div class="legenda srecanje zaseden">brez kakršnihkoli učilnic</div>
+          </div>
         </li>
         <li>
-            <div class="collapsible-header active">
-                <i class="material-icons">line_style</i>Legenda učilnic
-            </div>
-            <div class="collapsible-body">
-                <div class="legenda srecanje ustrezna prosta">prosta ustrezna učilnica</div>
-                <div class="legenda srecanje ustrezna deloma_prosta">deloma prosta ustrezna učilnica</div>
-                <div class="legenda srecanje alternativa prosta">prosta alternativna učilnica</div>
-                <div class="legenda srecanje alternativa deloma_prosta">deloma prosta alternativna učilnica</div>
-                <div class="legenda srecanje alternativa zasedena">zasedena učilnica</div>
-            </div>
+          <div class="collapsible-header active">
+            <i class="material-icons">line_style</i>Legenda učilnic
+          </div>
+          <div class="collapsible-body">
+            <div class="legenda srecanje ustrezna prosta">prosta ustrezna učilnica</div>
+            <div class="legenda srecanje ustrezna deloma_prosta">deloma prosta ustrezna učilnica</div>
+            <div class="legenda srecanje alternativa prosta">prosta alternativna učilnica</div>
+            <div class="legenda srecanje alternativa deloma_prosta">deloma prosta alternativna učilnica</div>
+            <div class="legenda srecanje alternativa zasedena">zasedena učilnica</div>
+          </div>
         </li>
-        {% endif %}
+      {% endif %}
     </ul>
-</div>
-
+  </div>
 {% endif %}
+
+</div>
+<div class="vertical-space hide-on-med-and-up"></div>
 
 {% endblock content %}
