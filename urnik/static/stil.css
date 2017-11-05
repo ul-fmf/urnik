@@ -321,36 +321,52 @@ a.skrita {
 
 /* print */
 @media print {
+    @page {
+        size: landscape
+    }
+
     a {
         color: black;
     }
-    #domov {
-        display: none;
-    }
+
     .ura {
-        border-bottom: solid 1px #ccc;
+        border-bottom: ridge 1px #aaa;
     }
+
     .dan {
-        border-left: solid 1px #ccc;
+        border-left: solid 1px #aaa;
     }
+
     .srecanje {
         box-sizing: border-box;
-        border-left: 2px solid rgba(255, 255, 255, 0) !important;
-        border-right: 2px solid rgba(255, 255, 255, 0) !important;
-        border-bottom: 5px solid rgba(255, 255, 255, 0) !important;
-        border-top: 4px solid rgba(255, 255, 255, 0) !important;
+        border: 2px solid rgba(255, 255, 255, 0) !important;
+        border-top-width: 4px !important;
+        border-bottom-width: 5px !important;
         padding: 2px 2px 2px 5px;
         background: #eee !important;
-        background-origin: border-box !important;
+        outline: 1px solid #ddd;
+        outline-offset: -3px;
         background-clip: padding-box !important;
     }
-    .brand-logo {
+
+    #urnik-logo {
         color: black !important;
+        font-size: 24px;
     }
+
     .brand-logo i {
         display: none !important;
     }
+
     nav {
         background: white;
+    }
+
+    nav div.nav-wrapper ul.left, nav div.nav-wrapper ul.right, #mobile-sidebar, a.button-collapse, div.vertical-space {
+        display: none;
+    }
+
+    body {
+        font-size: 12px;
     }
 }
