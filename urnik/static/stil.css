@@ -327,9 +327,22 @@ a.skrita {
     #domov {
         display: none;
     }
+    .ura {
+        border-bottom: solid 1px #ccc;
+    }
+    .dan {
+        border-left: solid 1px #ccc;
+    }
     .srecanje {
-        background: #eee;
-        border: solid 1.5px white;
+        box-sizing: border-box;
+        border-left: 2px solid rgba(255, 255, 255, 0) !important;
+        border-right: 2px solid rgba(255, 255, 255, 0) !important;
+        border-bottom: 5px solid rgba(255, 255, 255, 0) !important;
+        border-top: 4px solid rgba(255, 255, 255, 0) !important;
+        padding: 2px 2px 2px 5px;
+        background: #eee !important;
+        background-origin: border-box !important;
+        background-clip: padding-box !important;
     }
     .brand-logo {
         color: black !important;
