@@ -2,28 +2,29 @@
 .padded {
     padding: 5px;
 }
+
 .vertical-space {
-    height: 2000px;  /* allows zoom out on mobile */
+    height: 2000px; /* allows zoom out on mobile */
 }
+
 /* navigation and such */
 nav {
     background-color: #555;
 }
+
 #urnik-logo {
     white-space: nowrap;
 }
-@media only screen and (min-width: 600px) {
-    nav a.button-collapse {
-        display:none;
-    }
-}
+
 .dropdown-content li > a {
     color: #039be5;
 }
+
 .dropdown-content li.disabled, .dropdown-content li.disabled > a {
     color: #5e5e5e;
     cursor: default;
 }
+
 /* urnik */
 .urnik-wrapper {
     position: absolute;
@@ -33,6 +34,7 @@ nav {
     bottom: 0px;
     width: 100%;
 }
+
 #urnik {
     position: absolute;
     left: 2.5%;
@@ -41,9 +43,11 @@ nav {
     height: 95%;
     background: white;
 }
+
 #urnik.cel {
     width: 95%;
 }
+
 #informacije {
     position: absolute;
     left: 81.4%;
@@ -54,15 +58,19 @@ nav {
     overflow-y: auto;
     overflow-x: hidden;
 }
+
 #informacije .collapsible-header {
     white-space: nowrap;
 }
+
 #informacije .collapsible-body {
     padding: 5px 20px;
 }
+
 #informacije .collapsible-body .collection-item {
     padding: 5px 0px;
 }
+
 #dnevi {
     position: absolute;
     left: 3%;
@@ -71,6 +79,7 @@ nav {
     height: 100%;
     color: #333;
 }
+
 #ure {
     position: absolute;
     left: 0%;
@@ -79,18 +88,21 @@ nav {
     height: 95%;
     color: #333;
 }
-#srecanja {
+
+.poravnaj-na-termine {
     position: absolute;
     left: 3%;
     top: 5%;
     width: 97%;
     height: 95%;
 }
+
 .ura {
     position: absolute;
     border-bottom: solid 1px #eee;
     width: 100%;
 }
+
 .ura span {
     width: 3%;
     text-align: right;
@@ -99,6 +111,7 @@ nav {
     bottom: -1.5em;
     padding-right: 0.25em;
 }
+
 .dan {
     position: absolute;
     text-align: center;
@@ -107,69 +120,87 @@ nav {
     border-left: solid 1px #eee;
     width: 20%;
 }
+
 .srecanje {
     background: #eee;
     border: solid 1pt white;
     position: absolute;
     padding: 2pt;
 }
+
 .srecanje a {
     color: #333;
 }
+
 .srecanje a:hover, .urejanje a {
     color: #039be5;
 }
+
 #informacije .srecanje {
     position: relative;
     height: 4em;
 }
+
 a.skrita {
     color: #555;
 }
+
 .ucitelj, .ucilnica, .tip {
     color: #555;
     font-weight: normal;
 }
+
 .letniki {
     font-size: 0.8em;
 }
+
 .ucitelj, .ucilnica {
     font-size: 0.8em;
     position: absolute;
     bottom: 4pt;
     z-index: 10;
 }
+
 .ucilnica {
     right: 4pt;
 }
+
 .termin {
     position: absolute;
     /*opacity: 0.6;*/
 }
+
 .termin:hover {
     /*opacity: 0.8;*/
 }
+
 .legenda {
     text-align: center;
 }
+
 .termin button {
     border-style: none;
     width: 100%;
     height: 100%;
 }
+
 .predmet {
     font-size: 0.9em;
     font-weight: bold;
 }
+
 .zaseden {
     background: rgba(255, 0, 0, 0.5);
 }
+
 .prosto {
     background: rgba(0, 128, 0, 0.5);
 }
+
 .proste_alternative {
     background: rgba(255, 165, 0, 0.5);
 }
+
 .deloma {
     background: repeating-linear-gradient(
       -45deg,
@@ -300,21 +331,46 @@ a.skrita {
 .alternativa.zasedena button, .alternativa.zasedena {
     background: red;
 }
+
 .alternativa.prosta button, .alternativa.prosta {
     background: orange;
 }
+
+.proste-ucilnice-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    font-size: 0.8em;
+}
+
+ul.proste-ucilnice-list {
+    padding: 5px;
+    margin: 0;
+}
+
+ul.proste-ucilnice-list li {
+    display: inline;
+}
+
+ul.proste-ucilnice-list li.highlight span {
+    background-color: yellow;
+}
+
 /* front page */
 .oznaci-vec {
     position: relative;
     float: right;
     font-weight: normal;
 }
+
 .oznaci-vec > a, .oznaci-vec > button {
     position: absolute;
     right: 0px;
     top: 6px;
     white-space: nowrap;
 }
+
 .oznaci-vec > a > i.material-icons, .oznaci-vec > button > i.material-icons {
     margin-right: 5px;
 }

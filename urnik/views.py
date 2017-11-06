@@ -110,6 +110,24 @@ def sestavljen_urnik(request):
     return urnik(request, srecanja, 'Sestavljen urnik', barve=list(letniki) + list(osebe) + list(ucilnice))
 
 
+def proste_ucilnice(request):
+    zasedene_ucilnice = {(d, u): set() for d, _ in enumerate(DNEVI, 1) for u in range(MIN_URA, MAX_URA)}
+    for srecanje in Srecanje.objects.all():
+        for i in range(srecanje.trajanje):
+            zasedene_ucilnice[srecanje.dan, srecanje.ura+i].add(srecanje.ucilnica_id)
+
+    vse = {ucilnica.pk for ucilnica in Ucilnica.objects.objavljene()}
+    proste_ucilnice = [ProsteUcilnice(d, u, Ucilnica.objects.objavljene().filter(pk__in=vse-zasedene_ucilnice[d, u]))
+                       for d, u in zasedene_ucilnice]
+
+    return render(request, 'urnik.html', {
+        'nacin': 'proste_ucilnice',
+        'naslov': 'Proste učilnice',
+        'proste_ucilnice': proste_ucilnice,
+        'vse_ucilnice': Ucilnica.objects.objavljene(),
+    })
+
+
 @login_required
 def premakni_srecanje(request, srecanje_id):
     srecanje = get_object_or_404(Srecanje, id=srecanje_id)

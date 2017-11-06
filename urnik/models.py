@@ -117,6 +117,7 @@ class Ucilnica(models.Model):
     )
     tip = models.CharField(max_length=1, choices=TIP, default=ZUNANJA, blank=True)
     oznaka = models.CharField(max_length=192, unique=True)
+    kratka_oznaka = models.CharField(max_length=10, unique=True, blank=True)
     velikost = models.PositiveSmallIntegerField(blank=True, null=True)
     objects = UcilnicaQuerySet.as_manager()
 
@@ -126,6 +127,11 @@ class Ucilnica(models.Model):
         ordering = ('oznaka',)
 
     def __str__(self):
+        return self.oznaka
+
+    def kratko_ime(self):
+        if self.kratka_oznaka:
+            return self.kratka_oznaka
         return self.oznaka
 
 
@@ -213,7 +219,6 @@ class SrecanjeQuerySet(models.QuerySet):
         fizikalni_letniki = self.filter(predmet__letniki__smer__in=FIZIKALNE_SMERI)
         return (fizikalne_ucilnice | fizikalni_letniki).distinct()
 
-
 class Termin:
     ZASEDEN = 'zaseden'
 
@@ -267,6 +272,20 @@ class Termin:
             self.zasedenost = 'proste_alternative'
         elif deloma_alternative:
             self.zasedenost = 'deloma_proste_alternative'
+
+    def style(self):
+        left = (self.dan - 1) * ENOTA_SIRINE
+        top = (self.ura - MIN_URA) * ENOTA_VISINE
+        height = ENOTA_VISINE
+        width = ENOTA_SIRINE
+        return 'position: absolute; left: {:.2%}; width: {:.2%}; top: {:.2%}; height: {:.2%}'.format(left, width, top, height)
+
+
+class ProsteUcilnice(object):
+    def __init__(self, dan, ura, proste_ucilnice):
+        self.dan = dan
+        self.ura = ura
+        self.proste_ucilnice = proste_ucilnice
 
     def style(self):
         left = (self.dan - 1) * ENOTA_SIRINE

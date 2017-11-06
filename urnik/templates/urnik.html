@@ -8,7 +8,7 @@
   <div id="urnik" class="{% if not barve %}cel{% endif %}">
     {% dnevi %}
     {% ure %}
-    <div id="srecanja">
+    <div id="srecanja" class="poravnaj-na-termine">
       {% for srecanje in srecanja %}
         {% include '_srecanje.html' with nacin='ogled' %}
       {% endfor %}
@@ -35,7 +35,7 @@
   <div id="urnik">
     {% dnevi %}
     {% ure %}
-    <div id="srecanja">
+    <div id="srecanja" class="poravnaj-na-termine">
       {% for srecanje in srecanja %}
         {% include '_srecanje.html' with nacin='urejanje' %}
       {% endfor %}
@@ -112,6 +112,23 @@
       {% endif %}
     </ul>
   </div>
+{% elif nacin == 'proste_ucilnice' %}
+  <div id="urnik" class="{% if not barve %}cel{% endif %}">
+    {% dnevi %}
+    {% ure %}
+    <div class="poravnaj-na-termine">
+      {% for proste in proste_ucilnice %}
+        {% include '_proste_ucilnice.html' %}
+      {% endfor %}
+    </div>
+  </div>
+  {% load static %}
+  <script src="{% static 'highlight.js' %}"></script>
+  <script>
+      {% for ucilnica in vse_ucilnice %}
+          hoverByClass("ucilnica-{{ ucilnica.pk }}");
+      {% endfor %}
+  </script>
 {% endif %}
 
 </div>

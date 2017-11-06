@@ -19,7 +19,7 @@
         {{ naslov|default:'Urnik' }}
       </a>
       <a href="#" data-activates="mobile-sidebar" class="button-collapse"><i class="material-icons">menu</i></a>
-      <ul class="left hide-on-small-and-down"> <!-- top menu -->
+      <ul class="left hide-on-med-and-down"> <!-- top menu -->
         {% include "navigation.html" %}
       </ul> <!-- top menu -->
       {% if user.is_authenticated %}
@@ -71,6 +71,8 @@
         $(".button-collapse").sideNav();
     });
 </script>
+
+{% block footer %}{% endblock footer %}
 
 </body>
 </html>
