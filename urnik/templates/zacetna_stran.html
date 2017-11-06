@@ -8,7 +8,8 @@
     {% if izbira %}
       <button class="btn-flat" href="#!"><i class="material-icons left">playlist_play</i>prikaži</button>
     {% else %}
-      <a class="btn-flat" href="{% url 'zacetna_stran' %}?izbira"><i class="material-icons left">playlist_add_check</i>označi več</a>
+      <a class="btn-flat" href="{% url 'zacetna_stran' %}?izbira"><i class="material-icons left">playlist_add_check</i>označi
+        več</a>
     {% endif %}
   </div>  <!-- oznaci vec -->
   {% for letniki in stolpci_smeri %}
@@ -74,7 +75,13 @@
     <table class="highlight">
       <thead>
       <tr>
-        <th>Oseba</th>
+        <th>Oseba
+          {% if not izbira %}
+            <div id="search-osebe-wrapper">
+              <input type="text" id="search-osebe" class="autocomplete" title="search"><i class="material-icons">search</i>
+            </div>
+          {% endif %}
+        </th>
       </tr>
       </thead>
       <tbody>
@@ -82,7 +89,7 @@
         <tr>
           <td class="padded">
             {% if izbira %}
-              <input type="checkbox" name="oseba" value="{{ oseba.id }}" id="oseba-{{ oseba.id }}"/>
+              <input type="checkbox" name="oseba" autocomplete="off" value="{{ oseba.id }}" id="oseba-{{ oseba.id }}"/>
               <label for="oseba-{{ oseba.id }}">{{ oseba.ime }} <strong>{{ oseba.priimek }}</strong></label>
             {% else %}
               <a href="{% url 'urnik_osebe' oseba.id %}">
@@ -98,5 +105,30 @@
 </div> <!-- row -->
 </div> <!-- container -->
 </form>
-
 {% endblock content %}
+
+{% block footer %}
+  {% if not izbira %}
+    <script defer>
+        var osebe_urls = {
+            {% for oseba in osebe %}"{{ oseba.ime }} {{ oseba.priimek }}":
+                "{% url 'urnik_osebe' oseba.id %}",{%  endfor %}
+        };
+
+        $(document).ready(function () {
+            $('#search-osebe').autocomplete({
+                data: {
+                    {% for oseba in osebe %}"{{ oseba.ime }} {{ oseba.priimek }}": null,{% endfor %}
+                },
+                limit: 10, // The max amount of results that can be shown at once. Default: Infinity.
+                onAutocomplete: function (val) {
+                    window.location = osebe_urls[val];
+                }
+            });
+            $('#search-osebe').focus(function() {
+               this.value = "";
+            });
+        });
+    </script>
+  {% endif %}
+{% endblock footer %}

@@ -318,6 +318,51 @@ a.skrita {
 .oznaci-vec > a > i.material-icons, .oznaci-vec > button > i.material-icons {
     margin-right: 5px;
 }
+#search-osebe-wrapper {
+    position: relative;
+    margin-top: 5px;
+}
+
+#search-osebe-wrapper i.material-icons {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    font-size: 1.5em;
+    color: #aaa;
+}
+
+#search-osebe-wrapper input {
+    margin: 10px 0px 0px 0px;
+    height: 20px;
+    width: 100%;
+    float: right;
+    font-weight: normal;
+    border-bottom-color: #ccc;
+}
+
+#search-osebe-wrapper input:focus, #search-osebe-wrapper input:active {
+    border-bottom: 1px solid #039be5;
+    -webkit-box-shadow: 0 1px 0 0 #039be5;
+    box-shadow: 0 1px 0 0 #039be5;
+}
+
+#search-osebe-wrapper ul.autocomplete-content {
+    margin-bottom: 0px;
+}
+
+#search-osebe-wrapper ul.autocomplete-content li {
+    min-height: 0px;
+    padding: 5px;
+}
+#search-osebe-wrapper ul.autocomplete-content li > span {
+    font-weight: normal;
+    padding: 3px 5px;
+    font-size: 14px;
+    color: rgba(0,0,0,0.87);
+}
+#search-osebe-wrapper ul.autocomplete-content li > span > span.highlight {
+    color: #039be5;
+}
 
 /* print */
 @media print {
