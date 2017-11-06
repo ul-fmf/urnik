@@ -4,7 +4,6 @@ from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from .models import *
 
-
 def zacetna_stran(request):
     smeri = {}
     osebe = Oseba.objects.aktivni()
@@ -39,7 +38,7 @@ def rezervacije(request):
                 'dan': rezervacija.dan,
                 'teden': rezervacija.teden(),
             })
-    rezervacije.sort(key=lambda r:(r['dan'], r['ucilnica'].oznaka, r['od']))
+    rezervacije.sort(key=lambda r: (r['dan'], r['ucilnica'].oznaka, r['od']))
     return render(request, 'rezervacije.html', {
         'naslov': 'Rezervacije učilnic',
         'rezervacije': rezervacije,
@@ -144,7 +143,8 @@ def premakni_srecanje(request, srecanje_id):
             'srecanja': srecanje.povezana_srecanja().urnik(),
             'odlozena_srecanja': Srecanje.objects.odlozena(),
             'prekrivanja_po_tipih': {},
-            'prosti_termini': srecanje.prosti_termini(request.GET['tip'], 'MAT' if 'matematika' in ','.join(group.name for group in request.user.groups.all()) else 'FIZ'),
+            'prosti_termini': srecanje.prosti_termini(request.GET['tip'], 'MAT' if 'matematika' in ','.join(
+                group.name for group in request.user.groups.all()) else 'FIZ'),
             'premaknjeno_srecanje': srecanje,
             'next': request.META.get('HTTP_REFERER', reverse('zacetna_stran')),
         })
