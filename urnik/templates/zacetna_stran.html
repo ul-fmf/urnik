@@ -109,7 +109,7 @@
 
 {% block footer %}
   {% if not izbira %}
-    <script defer>
+    <script>
         var osebe_urls = {
             {% for oseba in osebe %}"{{ oseba.ime }} {{ oseba.priimek }}":
                 "{% url 'urnik_osebe' oseba.id %}",{%  endfor %}
