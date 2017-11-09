@@ -318,26 +318,100 @@ a.skrita {
 .oznaci-vec > a > i.material-icons, .oznaci-vec > button > i.material-icons {
     margin-right: 5px;
 }
+#search-osebe-wrapper {
+    position: relative;
+    margin-top: 5px;
+}
+
+#search-osebe-wrapper i.material-icons {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    font-size: 1.5em;
+    color: #aaa;
+}
+
+#search-osebe-wrapper input {
+    margin: 10px 0px 0px 0px;
+    height: 20px;
+    width: 100%;
+    float: right;
+    font-weight: normal;
+    border-bottom-color: #ccc;
+}
+
+#search-osebe-wrapper input:focus, #search-osebe-wrapper input:active {
+    border-bottom: 1px solid #039be5;
+    -webkit-box-shadow: 0 1px 0 0 #039be5;
+    box-shadow: 0 1px 0 0 #039be5;
+}
+
+#search-osebe-wrapper ul.autocomplete-content {
+    margin-bottom: 0px;
+}
+
+#search-osebe-wrapper ul.autocomplete-content li {
+    min-height: 0px;
+    padding: 5px;
+}
+#search-osebe-wrapper ul.autocomplete-content li > span {
+    font-weight: normal;
+    padding: 3px 5px;
+    font-size: 14px;
+    color: rgba(0,0,0,0.87);
+}
+#search-osebe-wrapper ul.autocomplete-content li > span > span.highlight {
+    color: #039be5;
+}
 
 /* print */
 @media print {
+    @page {
+        size: landscape
+    }
+
     a {
         color: black;
     }
-    #domov {
-        display: none;
+
+    .ura {
+        border-bottom: ridge 1px #aaa;
     }
+
+    .dan {
+        border-left: solid 1px #aaa;
+    }
+
     .srecanje {
-        background: #eee;
-        border: solid 1.5px white;
+        box-sizing: border-box;
+        border: 2px solid rgba(255, 255, 255, 0) !important;
+        border-top-width: 4px !important;
+        border-bottom-width: 5px !important;
+        padding: 2px 2px 2px 5px;
+        background: #eee !important;
+        outline: 1px solid #ddd;
+        outline-offset: -3px;
+        background-clip: padding-box !important;
     }
-    .brand-logo {
+
+    #urnik-logo {
         color: black !important;
+        font-size: 24px;
     }
+
     .brand-logo i {
         display: none !important;
     }
+
     nav {
         background: white;
+    }
+
+    nav div.nav-wrapper ul.left, nav div.nav-wrapper ul.right, #mobile-sidebar, a.button-collapse, div.vertical-space {
+        display: none;
+    }
+
+    body {
+        font-size: 12px;
     }
 }
