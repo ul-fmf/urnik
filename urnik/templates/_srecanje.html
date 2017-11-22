@@ -1,5 +1,6 @@
 {% load tags %}
-<div class="srecanje" style="{{ srecanje.style }}; {% pobarvajvec srecanje.barve %}">
+<div class="srecanje-absolute-box {{ srecanje.css_classes }}" style="{{ srecanje.style }}">
+<div class="srecanje" style="{% pobarvajvec srecanje.barve %}">
   <div class="predmet">
     {% if srecanje.predmet %}
       <a href="{% url 'urnik_predmeta' srecanje.predmet.id %}">
@@ -104,4 +105,5 @@
       </div>
     </div>
   {% endif %}
+</div>
 </div>
