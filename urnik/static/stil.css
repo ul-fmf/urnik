@@ -107,10 +107,27 @@ nav {
     border-left: solid 1px #eee;
     width: 20%;
 }
+
+.srecanje-absolute-box {
+    position: absolute;   /* spodaj je pixel perfect pozicioniranje boxov */
+    padding-top: 3px;     /* izberi si koliko želiš margin od roba "dneva" */
+    padding-bottom: 4px;  /* = top + 1, ker imamo spodaj 1px borderr */
+    padding-left: 3px;    /* izberi si spacing med srecanji */
+    padding-right: 0px;   /* vazna je samo vsota left + right, zato right = 0  */
+}
+
+.srecanje-absolute-box.leftmost {
+    padding-left: 4px;  /* postavi levi rob od dneva na top + 1 = right + 1, ker imamo 1px borderja */
+}
+.srecanje-absolute-box.rightmost {
+    padding-right: 3px;  /* postavi desni rob od dneva na top */
+}
+
 .srecanje {
     background: #eee;
-    border: solid 1pt white;
-    position: absolute;
+    position: relative;
+    width: 100%;
+    height: 100%;
     padding: 2pt;
 }
 .srecanje a {

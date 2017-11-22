@@ -46,4 +46,6 @@ def nastavi_sirine_srecanj(srecanja):
                 for srecanje in stolpec:
                     srecanje.sirina = 1 / len(blok)
                     srecanje.zamik = i / len(blok)
+                    srecanje.leftmost = (i == 0)
+                    srecanje.rightmost = (i == len(blok) - 1)
     return srecanja
