@@ -99,7 +99,7 @@ nav {
 
 .ura {
     position: absolute;
-    border-bottom: solid 1px #eee;
+    border-bottom: solid 1px #ddd;
     width: 100%;
 }
 
@@ -117,14 +117,31 @@ nav {
     text-align: center;
     top: 0;
     bottom: 0;
-    border-left: solid 1px #eee;
+    border-left: solid 1px #ddd;
     width: 20%;
+}
+
+.srecanje-absolute-box {
+    position: absolute;   /* spodaj je pixel perfect pozicioniranje boxov */
+    padding-top: 3px;     /* izberi si koliko želiš margin od roba "dneva" */
+    padding-bottom: 4px;  /* = top + 1, ker imamo spodaj 1px borderr */
+    padding-left: 3px;    /* izberi si spacing med srecanji */
+    padding-right: 0px;   /* vazna je samo vsota left + right, zato right = 0  */
+}
+
+.srecanje-absolute-box.leftmost {
+    padding-left: 4px;  /* postavi levi rob od dneva na top + 1 = right + 1, ker imamo 1px borderja */
+}
+
+.srecanje-absolute-box.rightmost {
+    padding-right: 3px;  /* postavi desni rob od dneva na top */
 }
 
 .srecanje {
     background: #eee;
-    border: solid 1pt white;
-    position: absolute;
+    position: relative;
+    width: 100%;
+    height: 100%;
     padding: 2pt;
 }
 
@@ -374,55 +391,48 @@ ul.proste-ucilnice-list li.highlight span {
 .oznaci-vec > a > i.material-icons, .oznaci-vec > button > i.material-icons {
     margin-right: 5px;
 }
+#search-osebe-wrapper {
+    position: relative;
+    margin-top: 5px;
+}
 
-/* print */
-@media print {
-    @page {
-        size: landscape
-    }
+#search-osebe-wrapper i.material-icons {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    font-size: 1.5em;
+    color: #aaa;
+}
 
-    a {
-        color: black;
-    }
+#search-osebe-wrapper input {
+    margin: 10px 0px 0px 0px;
+    height: 20px;
+    width: 100%;
+    float: right;
+    font-weight: normal;
+    border-bottom-color: #ccc;
+}
 
-    .ura {
-        border-bottom: ridge 1px #aaa;
-    }
+#search-osebe-wrapper input:focus, #search-osebe-wrapper input:active {
+    border-bottom: 1px solid #039be5;
+    -webkit-box-shadow: 0 1px 0 0 #039be5;
+    box-shadow: 0 1px 0 0 #039be5;
+}
 
-    .dan {
-        border-left: solid 1px #aaa;
-    }
+#search-osebe-wrapper ul.autocomplete-content {
+    margin-bottom: 0px;
+}
 
-    .srecanje {
-        box-sizing: border-box;
-        border: 2px solid rgba(255, 255, 255, 0) !important;
-        border-top-width: 4px !important;
-        border-bottom-width: 5px !important;
-        padding: 2px 2px 2px 5px;
-        background: #eee !important;
-        outline: 1px solid #ddd;
-        outline-offset: -3px;
-        background-clip: padding-box !important;
-    }
-
-    #urnik-logo {
-        color: black !important;
-        font-size: 24px;
-    }
-
-    .brand-logo i {
-        display: none !important;
-    }
-
-    nav {
-        background: white;
-    }
-
-    nav div.nav-wrapper ul.left, nav div.nav-wrapper ul.right, #mobile-sidebar, a.button-collapse, div.vertical-space {
-        display: none;
-    }
-
-    body {
-        font-size: 12px;
-    }
+#search-osebe-wrapper ul.autocomplete-content li {
+    min-height: 0px;
+    padding: 5px;
+}
+#search-osebe-wrapper ul.autocomplete-content li > span {
+    font-weight: normal;
+    padding: 3px 5px;
+    font-size: 14px;
+    color: rgba(0,0,0,0.87);
+}
+#search-osebe-wrapper ul.autocomplete-content li > span > span.highlight {
+    color: #039be5;
 }

@@ -1,0 +1,42 @@
+@page {
+    size: landscape;
+    margin: 0mm;
+}
+
+a {
+    color: black;
+}
+
+.ura {
+    border-bottom: solid 1px #bbb;
+}
+
+.dan {
+    border-left: solid 1px #bbb;
+}
+
+.srecanje {
+    border: 1px #ccc solid;
+    overflow: hidden;
+}
+
+#urnik-logo {
+    color: #333;
+    font-size: 24px;
+}
+
+.brand-logo i {
+    display: none;
+}
+
+nav {
+    background: white;
+}
+
+nav div.nav-wrapper ul.left, nav div.nav-wrapper ul.right, #mobile-sidebar, a.button-collapse, div.vertical-space {
+    display: none;
+}
+
+body {
+    font-size: 12px;
+}
