@@ -380,3 +380,19 @@ a.skrita {
 #search-osebe-wrapper ul.autocomplete-content li > span > span.highlight {
     color: #039be5;
 }
+
+#bug-report {
+    bottom: 15px;
+    right: 15px;
+}
+
+#bug-report ul {
+    bottom: 48px;
+    left: -160px;
+    text-align: right;
+    background-color: #fff;
+}
+
+#bug-report > a > i {
+    font-size: 2rem;
+}

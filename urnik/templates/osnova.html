@@ -56,6 +56,19 @@
   {% include "navigation.html" %}
 </ul> <!-- side nav -->
 
+<div class="fixed-action-btn hide-on-small-and-down" id="bug-report"><!-- bottom right report button -->
+  <a class="btn-floating btn-large" href="https://github.com/ul-fmf/urnik/issues">
+    <i class="large large material-icons">thumbs_up_down</i>
+  </a>
+  <ul>
+    <li>Seznam želja in napak lahko najdete na <a href="https://github.com/ul-fmf/urnik/issues">GitHub-u</a>. Če želite
+      sporočiti željo ali napako, ki je še ni na seznamu, jo pošljite na mail
+      <a href="mailto:matija.pretnar@fmf.uni-lj.si">matija.pretnar@fmf.uni-lj.si</a> ali pa se prijavite na GitHub
+      in jo vpišite kar sami &ndash; v tem primeru lahko tudi sodelujete v diskusiji.
+    </li>
+  </ul>
+</div>
+
 {% block content %}{% endblock content %}
 
 <script type="text/javascript" src="//code.jquery.com/jquery-2.1.1.min.js"></script>
