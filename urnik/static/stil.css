@@ -7,6 +7,33 @@
     height: 2000px; /* allows zoom out on mobile */
 }
 
+.nobr { white-space: nowrap }
+
+.pagination li.active {
+    background-color: #26a69a;
+    cursor: pointer;
+}
+
+.pagination li:not(.disabled):not(.active):hover {
+    background-color: #eee;
+}
+
+.switch a:not(.btn) {
+    margin: 0 !important;
+}
+
+hr.separator {
+    border-top: 1px solid rgba(160,160,160,0.2);
+    height: 0;
+}
+
+.disclaimer {
+    color: #aaa;
+    font-size: 0.6em;
+    line-height: 1.3em;
+    margin-top: -5px;
+}
+
 /* navigation and such */
 nav {
     background-color: #555;
@@ -48,12 +75,15 @@ nav {
     width: 95%;
 }
 
-#informacije {
+.right-panel {
     position: absolute;
     left: 81.4%;
     top: 0%;
     width: 18%;
     height: 100%;
+}
+
+#informacije {
     background: #fff;
     overflow-y: auto;
     overflow-x: hidden;
@@ -162,23 +192,23 @@ a.skrita {
     color: #555;
 }
 
-.ucitelj, .ucilnica, .tip {
+.srecanje .ucitelj, .srecanje .ucilnica, .srecanje .tip {
     color: #555;
     font-weight: normal;
 }
 
-.letniki {
+.srecanje .letniki {
     font-size: 0.8em;
 }
 
-.ucitelj, .ucilnica {
+.srecanje .ucitelj, .srecanje .ucilnica {
     font-size: 0.8em;
     position: absolute;
     bottom: 4pt;
     z-index: 10;
 }
 
-.ucilnica {
+.srecanje .ucilnica {
     right: 4pt;
 }
 
@@ -201,7 +231,7 @@ a.skrita {
     height: 100%;
 }
 
-.predmet {
+.srecanje .predmet {
     font-size: 0.9em;
     font-weight: bold;
 }
@@ -354,24 +384,193 @@ a.skrita {
 }
 
 .proste-ucilnice-container {
+    padding: 2px 5px;
     width: 100%;
     height: 100%;
     position: relative;
-    overflow: hidden;
-    font-size: 0.8em;
+    font-size: 8pt;
+    line-height: 10pt;
 }
 
-ul.proste-ucilnice-list {
-    padding: 5px;
+.proste-ucilnice-container .proste-ucilnice-list {
+    color: #333;
+}
+
+.proste-ucilnice-container .rezervirane-ucilnice-list {
+    color: #777;
+}
+
+.proste-ucilnice-container .zasedene-ucilnice-list {
+    color: #aaa;
+}
+
+.proste-ucilnice-container .ucilnice-list {
     margin: 0;
 }
 
-ul.proste-ucilnice-list li {
+.proste-ucilnice-container .ucilnice-list .ucilnica {
+    position: relative;
     display: inline;
 }
 
-ul.proste-ucilnice-list li.highlight span {
-    background-color: yellow;
+.proste-ucilnice-container .ucilnice-list .ucilnica a {
+    color: inherit;
+}
+
+.proste-ucilnice-container .ucilnice-list .ucilnica .ucilnica-tooltip {
+    display: none;
+    position: absolute;
+    width: 200px;
+    left: -200%;
+    background: #fff;
+    border-radius: 1px;
+    bottom: 20px;
+    font-size: 12px;
+    padding: 10px;
+    color: #333;
+
+    /* shadow box */
+    border-top: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    border-left: 1px solid #ddd;
+    transition: box-shadow .25s, -webkit-box-shadow .25s;
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14),0 1px 5px 0 rgba(0,0,0,0.12),0 3px 1px -2px rgba(0,0,0,0.2);
+    z-index: 998; /* navbar fized = 997 */
+}
+
+.proste-ucilnice-container .ucilnice-list .ucilnica .hover-area {
+    display: none;
+    position: absolute;
+    width: 125px;
+    left: -160%;
+    height: 50px;
+    bottom: 10px;
+    background: transparent;
+}
+
+/*.proste-ucilnice-container .ucilnice-list .ucilnica .ucilnica-ime {*/
+    /*border-radius: 2px;*/
+/*}*/
+
+.proste-ucilnice-container .ucilnice-list .ucilnica.highlight .ucilnica-ime,
+.proste-ucilnice-container .ucilnice-list .ucilnica .ucilnica-ime:hover {
+    background-color: #e0e0e0;
+}
+
+.proste-ucilnice-container .ucilnice-list .ucilnica:hover .ucilnica-tooltip {
+    display: block;
+}
+
+.proste-ucilnice-container .ucilnice-list .ucilnica:hover .hover-area {
+    display: block;
+}
+
+.proste-ucilnice-container .ucilnice-list .ucilnica .ucilnica-tooltip a:hover {
+    text-decoration: underline;
+}
+.proste-ucilnice-container .ucilnice-list .ucilnica .ucilnica-tooltip i {
+    font-size: 12pt;
+    margin-bottom: 1px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+#proste-ucilnice-panel {
+    padding-top: 12px;
+    width: 17.3%;
+}
+
+#proste-ucilnice-panel .card {
+    border-top: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    border-left: 1px solid #ddd;
+}
+
+#proste-ucilnice-panel .card label {
+    color: #333;
+}
+
+#proste-ucilnice-panel .card .card-action,
+#proste-ucilnice-panel .card .card-content {
+    padding: 12px;
+}
+
+
+#proste-ucilnice-panel .card .card-action .input-field {
+    margin-top: 0;
+}
+
+#proste-ucilnice-panel .card .card-action a:not(.btn) {
+    color: #039be5;
+    text-transform: none;
+}
+
+#proste-ucilnice-panel .card .card-action #teden-dropdown-btn {
+    padding: 0 1rem;
+    width: 100%;
+}
+#proste-ucilnice-panel .card .card-action #teden-dropdown-btn i {
+    margin-left: 5px;
+    margin-right: -5px;
+}
+#proste-ucilnice-panel .card .card-action #teden-dropdown-btn span {
+    width: 83%;
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+#proste-ucilnice-panel .card .card-action #teden-dropdown li {
+    min-height: 30px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+#proste-ucilnice-panel .card .card-action #teden-dropdown li a {
+    padding: 6px 0px 6px 15px;
+    margin: 0;
+    color: #333;
+    font-size: 11pt;
+}
+
+#proste-ucilnice-panel .card .card-action .pagination {
+    display: inline-block;
+    margin-left: 15px;
+    margin-top: 0px;
+    margin-bottom:0px;
+    font-size: 14pt;
+}
+
+#proste-ucilnice-panel .card .card-action .pagination a {
+    color: #444;
+    margin-right: 0pt;
+    transition: none;
+    text-transform: uppercase;
+    font-size: 1rem;
+}
+
+#proste-ucilnice-panel .card .card-action .pagination li.active a {
+    color: #fff;
+}
+
+#proste-ucilnice-panel .card .card-action .pagination li.disabled a {
+    color: #999;
+    cursor: default;
+}
+
+#proste-ucilnice-panel input[type="range"] {
+    margin-bottom: -5px;
+    margin-left: 10px;
+}
+
+#proste-ucilnice-panel .switch {
+    margin-left: 15px;
+}
+
+#proste-ucilnice-panel [type="checkbox"] + label {
+    padding-left: 25px;
+    margin-right: 15px;
 }
 
 /* front page */

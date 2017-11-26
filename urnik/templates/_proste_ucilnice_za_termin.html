@@ -1,0 +1,77 @@
+{% load tags %}
+<div class="proste-ucilnice-wrapper" style="{{ termin.style }}">
+  <div class="proste-ucilnice-container">
+    <span class="proste-ucilnice-list ucilnice-list">
+      {# proste učilnice #}
+      {% for ucilnica in termin.proste_ucilnice %}
+        <span class="ucilnica ucilnica-{{ ucilnica.pk }}">
+          <span class="ucilnica-ime">
+            <a href="{% url 'urnik_ucilnice' ucilnica.pk %}">
+              {{ ucilnica.kratko_ime }}</a></span>{% if not forloop.last %},{% endif %}
+          <span class="hover-area"></span>
+          <span class="ucilnica-tooltip">
+            <a href="{% url 'urnik_ucilnice' ucilnica.pk %}">Učilnica {{ ucilnica.oznaka }}</a>
+            je prosta v {{ termin.dan|dan_tozilnik }} od {{ termin.ura }}ih do {{ termin.ura|add:st_ur }}ih.
+{#  TODO: odkomentiraj ko bo narejen obrazec za rezervacije  #}
+{#          <a href="#" class="nobr">Rezerviraj <i class="material-icons">open_in_new</i></a>#}
+          </span>
+        </span>
+      {% empty %}
+        /
+      {% endfor %}
+    </span>
+    <span class="rezervirane-ucilnice-list ucilnice-list">
+      {# rezervirane učilnice #}
+      {% if pokazi_rezervirane %}
+        &nbsp;&bull;&nbsp;
+        {% for ucilnica, razlog in termin.rezervirane_ucilnice %}
+          <span class="ucilnica ucilnica-{{ ucilnica.pk }}">
+            <span class="ucilnica-ime">
+              <a href="{% url 'urnik_ucilnice' ucilnica.pk %}">
+                {{ ucilnica.kratko_ime }}</a></span>{% if not forloop.last %},{% endif %}
+            <span class="hover-area"></span>
+            <span class="ucilnica-tooltip">
+              <a href="{% url 'urnik_ucilnice' ucilnica.pk %}">Učilnico {{ ucilnica.oznaka }}</a>
+              je od {{ razlog.od }}ih do {{ razlog.do }}ih rezervirala oseba
+              {% if razlog.osebe.all.0 %}
+                <a href="{% url 'urnik_osebe' razlog.osebe.all.0.pk %}">{{ razlog.osebe.all.0 }}</a>
+              {% else %}
+                neznan
+              {% endif %}
+              z razlogom: &quot;{{ razlog.opomba|default:"neznan" }}&quot;.
+            </span>
+          </span>
+        {% empty %}
+          /
+        {% endfor %}
+      {% endif %}
+    </span>
+
+    <span class="zasedene-ucilnice-list ucilnice-list">
+      {# zasedene učilnice #}
+      {% if pokazi_zasedene %}
+        &nbsp;&bull;&nbsp;
+        {% for ucilnica, razlog in termin.zasedene_ucilnice %}
+          <span class="ucilnica ucilnica-{{ ucilnica.pk }}">
+            <span class="ucilnica-ime">
+              <a href="{% url 'urnik_ucilnice' ucilnica.pk %}">{{ ucilnica.kratko_ime }}</a></span>{% if not forloop.last %},{% endif %}
+            <span class="hover-area"></span>
+            <span class="ucilnica-tooltip">
+              <a href="{% url 'urnik_ucilnice' ucilnica.pk %}">Učilnica {{ ucilnica.oznaka }}</a>
+              je zasedena v {{ razlog.dan | dan_tozilnik }} ob {{ razlog.ura }}ih
+              saj je tam predmet <a href="{% url 'urnik_predmeta' razlog.predmet.pk %}">
+              &quot;{{ razlog.predmet }}&quot;</a>, ki ga izvaja
+              {% if razlog.ucitelji.all.0 %}
+                <a href="{% url 'urnik_osebe' razlog.ucitelji.all.0.pk %}">{{ razlog.ucitelji.all.0 }}</a>.
+              {% else %}
+                neznana oseba.
+              {% endif %}
+            </span>
+          </span>
+        {% empty %}
+          /
+        {% endfor %}
+      {% endif %}
+    </span>
+  </div>
+</div>

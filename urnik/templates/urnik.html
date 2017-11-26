@@ -1,8 +1,6 @@
-{% extends 'osnova.html' %}
+{% extends 'urnik_osnova.html' %}
 {% load tags %}
-{% block content %}
-
-<div class="urnik-wrapper">
+{% block urnik_content %}
 
 {% if nacin == 'ogled' %}
   <div id="urnik" class="{% if not barve %}cel{% endif %}">
@@ -15,7 +13,7 @@
     </div>
   </div>
   {% if barve %}
-    <div id='informacije'>
+    <div class='right-panel' id='informacije'>
       <ul class="collapsible" data-collapsible="expandable">
         <li>
           <div class="collapsible-header active">
@@ -44,7 +42,7 @@
       {% endfor %}
     </div>
   </div>
-  <div id='informacije'>
+  <div class='right-panel' id='informacije'>
     <ul class="collapsible" data-collapsible="expandable">
       {% if nacin == 'urejanje' %}
         <li>
@@ -112,26 +110,6 @@
       {% endif %}
     </ul>
   </div>
-{% elif nacin == 'proste_ucilnice' %}
-  <div id="urnik" class="{% if not barve %}cel{% endif %}">
-    {% dnevi %}
-    {% ure %}
-    <div class="poravnaj-na-termine">
-      {% for proste in proste_ucilnice %}
-        {% include '_proste_ucilnice.html' %}
-      {% endfor %}
-    </div>
-  </div>
-  {% load static %}
-  <script src="{% static 'highlight.js' %}"></script>
-  <script>
-      {% for ucilnica in vse_ucilnice %}
-          hoverByClass("ucilnica-{{ ucilnica.pk }}");
-      {% endfor %}
-  </script>
 {% endif %}
 
-</div>
-<div class="vertical-space hide-on-med-and-up"></div>
-
-{% endblock content %}
+{% endblock urnik_content %}

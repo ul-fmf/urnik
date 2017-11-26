@@ -1,0 +1,125 @@
+{% extends 'urnik_osnova.html' %}
+{% load tags %}
+
+{% block urnik_content %}
+
+<div id="urnik">
+  {% dnevi %}
+  {% ure %}
+  <div class="poravnaj-na-termine">
+    {% for termin in termini %}
+      {% include '_proste_ucilnice_za_termin.html' %}
+    {% endfor %}
+  </div>
+</div>
+
+<div class='right-panel' id='proste-ucilnice-panel'>
+  <div class="card">
+    <div class="card-content">
+      <span class="card-title">Izberi teden</span>
+      Če želite, da se upoštevajo rezervacije, izberite teden. Če teden ni na izbiro, tisti teden še ni rezervacij.
+    </div>
+    <div class="card-action">
+      <a class="teden-dropdown-button btn" id="teden-dropdown-btn" href="#" data-activates='teden-dropdown'>
+        <span>
+          {% if not teden %}
+            Splošen teden
+          {% else %}
+            {{ teden | fmt_teden }}
+          {% endif %}
+        </span>
+        <i class="material-icons right">arrow_drop_down</i>
+      </a>
+      <ul id='teden-dropdown' class='dropdown-content'>
+        {% if teden %}
+          <li><a href="{% add_get teden=None %}">Splošen teden</a></li>
+        {% endif %}
+        {% for mozen_teden in mozni_tedni %}
+          {% if mozen_teden.0|date:"Y-m-d" != teden %}
+            <li><a href="{% add_get teden=mozen_teden.0|date:"Y-m-d" %}">{{ mozen_teden.0 | fmt_teden }}</a></li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <form action="{% url 'proste_filter' %}" method="post">{% csrf_token %}
+      <input type="hidden" name="qstring" value="{{ request.GET.urlencode }}">
+      <div class="card-content">
+        <span class="card-title">Izberi učilnico</span>
+        Če vam ustrezajo le nekatere učilnice, filtrirajte tukaj.
+        <hr class="separator">
+        {% for id, name in tipi_ucilnic %}
+          <input type="checkbox" id="{{ id }}" name="{{ id }}" {% if id in tipi %}checked{% endif %}>
+          <label for="{{ id }}">{{ name }}</label>
+        {% endfor %}
+        <hr class="separator">
+        {% for id, name in velikosti_ucilnic %}
+          <input type="checkbox" id="{{ id }}" name="{{ id }}" {% if id in velikosti %}checked{% endif %}>
+          <label for="{{ id }}">{{ name }}</label>
+        {% endfor %}
+      </div>
+      <div class="card-action">
+        <button class="btn" type="submit" name="filtriraj-ucilnice" value="True">Filtriraj
+          <i class="material-icons right" style="margin-right: -10px;">filter_list</i>
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="card">
+    <div class="card-content">
+      <span class="card-title">Dodatne možnosti</span>
+    </div>
+    <div class="card-action">
+      <div>Število ur:
+        <ul class="pagination">
+          {% for i in "12345" %}
+            <li{% if i == st_ur %} class="active"{% endif %}
+            ><a href="{% add_get stur=i %}">{{ i }}</a></li>
+          {%  endfor %}
+        </ul>
+      </div>
+      {%  if teden %}
+        <p>Pokaži rezervirane:
+          <span class="switch nobr"><label>Ne<a
+              href="{% if pokazi_rezervirane %}{% add_get pr=False %}{% else %}{% add_get pr=True %}{% endif %}"
+          ><input type="checkbox" {% if pokazi_rezervirane %}checked{% endif %}><span
+              class="lever"></span></a>Da</label></span>
+        </p>
+      {% endif %}
+      <p>*Pokaži zasedene:
+        <span class="switch nobr"><label>Ne<a
+            href="{% if pokazi_zasedene %}{% add_get pz=False %}{% else %}{% add_get pz=True %}{% endif %}"
+        ><input type="checkbox" {% if pokazi_zasedene %}checked{% endif %}><span class="lever"></span></a>Da</label></span>
+      </p>
+      <div class="disclaimer">* zaradi velike količine podatkov se stran lahko nalaga dlje časa</div>
+    </div>
+  </div>
+</div>
+
+{% endblock urnik_content %}
+
+{% block footer %}
+  {% load static %}
+  <script src="{% static 'highlight.js' %}"></script>
+  <script>
+      {% for ucilnica in ustrezne_ucilnice %}
+          hoverByClass("ucilnica-{{ ucilnica.pk }}");
+      {%  endfor %}
+      $(document).ready(function () {
+          $('.teden-dropdown-button').dropdown({
+                  inDuration: 300,
+                  outDuration: 225,
+                  constrainWidth: true, // Does not change width of dropdown to that of the activator
+                  hover: false, // Activate on hover
+                  gutter: 0, // Spacing from edge
+                  belowOrigin: true, // Displays dropdown below the button
+                  alignment: 'left', // Displays dropdown with edge aligned to the left of button
+                  stopPropagation: false // Stops event propagation
+              }
+          );
+      });
+  </script>
+{% endblock footer %}

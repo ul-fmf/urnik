@@ -1,7 +1,11 @@
+from django.http import QueryDict
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.dateparse import parse_date
 from django.utils.http import urlencode
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
+from django.views.decorators.http import require_POST
+
 from .models import *
 
 def zacetna_stran(request):
@@ -110,21 +114,74 @@ def sestavljen_urnik(request):
 
 
 def proste_ucilnice(request):
-    zasedene_ucilnice = {(d, u): set() for d, _ in enumerate(DNEVI, 1) for u in range(MIN_URA, MAX_URA)}
-    for srecanje in Srecanje.objects.all():
-        for i in range(srecanje.trajanje):
-            zasedene_ucilnice[srecanje.dan, srecanje.ura+i].add(srecanje.ucilnica_id)
+    teden = request.GET.get('teden', None)
+    try:
+        teden = parse_date(teden)
+        weekday = teden.weekday()
+        if weekday <= 5:
+            teden -= datetime.timedelta(days=weekday)
+        else:
+            teden += datetime.timedelta(days=7-weekday)
+    except:
+        teden = None
 
-    vse = {ucilnica.pk for ucilnica in Ucilnica.objects.objavljene()}
-    proste_ucilnice = [ProsteUcilnice(d, u, Ucilnica.objects.objavljene().filter(pk__in=vse-zasedene_ucilnice[d, u]))
-                       for d, u in zasedene_ucilnice]
+    pokazi_rezervirane = bool(request.GET.get('pr', False))
+    if not teden: pokazi_rezervirane = False
+    pokazi_zasedene = bool(request.GET.get('pz', False))
+    st_ur = request.GET.get('stur', 1)
+    try:
+        st_ur = max(1, min(MAX_URA-MIN_URA, int(st_ur)))
+    except:
+        st_ur = 1
 
-    return render(request, 'urnik.html', {
-        'nacin': 'proste_ucilnice',
+    ucilnice = request.GET.getlist('ucilnica')
+    if ucilnice:
+        ucilnice = Ucilnica.objects.objavljene().filter(pk__in=ucilnice)
+        if not ucilnice.exists():
+            ucilnice = Ucilnica.objects.objavljene()
+    else:
+        ucilnice = Ucilnica.objects.objavljene()
+
+    tip = set(request.GET.getlist('tip'))
+    tip &= set(Ucilnica.OBJAVLJENI_TIPI)
+    if not tip: tip = set(Ucilnica.OBJAVLJENI_TIPI)
+
+    velikost = set(request.GET.getlist('velikost'))
+    velikost &= {v[0] for v in UcilnicaQuerySet.VELIKOST}
+    if not velikost: velikost = None
+
+    proste = ProsteUcilnice(ucilnice, tip, velikost)
+    if pokazi_rezervirane:
+        proste.upostevaj_rezervacije(teden)
+
+    termini = proste.dobi_termine(st_ur)
+
+    return render(request, 'proste_ucilnice.html', {
         'naslov': 'Proste učilnice',
-        'proste_ucilnice': proste_ucilnice,
-        'vse_ucilnice': Ucilnica.objects.objavljene(),
+        'termini': termini,
+        'velikosti_ucilnic': UcilnicaQuerySet.VELIKOST,
+        'tipi_ucilnic': [u for u in Ucilnica.TIP if u[0] in Ucilnica.OBJAVLJENI_TIPI],
+        'mozni_tedni': sorted(set(r.teden() for r in Rezervacija.objects.prihajajoce())),
+        'ustrezne_ucilnice': list(ucilnice),
+        'teden': teden,
+        'st_ur': str(st_ur),
+        'pokazi_rezervirane': pokazi_rezervirane,
+        'pokazi_zasedene': pokazi_zasedene,
+        'velikosti': velikost,
+        'tipi': [] if tip == set(Ucilnica.OBJAVLJENI_TIPI) else tip,
     })
+
+
+@require_POST
+def proste_ucilnice_filter(request):
+    tipi = [k for k in Ucilnica.OBJAVLJENI_TIPI if request.POST.get(k, '') == 'on']
+    velikosti = [k for k, v in UcilnicaQuerySet.VELIKOST if request.POST.get(k, '') == 'on']
+    q = QueryDict(request.POST.get('qstring', ''), mutable=True)
+    q.setlist('tip', tipi)
+    q.setlist('velikost', velikosti)
+    response = redirect('proste')
+    response['Location'] += "?" + q.urlencode()
+    return response
 
 
 @login_required
