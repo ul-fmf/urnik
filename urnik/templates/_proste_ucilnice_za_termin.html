@@ -1,9 +1,9 @@
 {% load tags %}
 <div class="proste-ucilnice-wrapper" style="{{ termin.style }}">
-  <div class="proste-ucilnice-container">
+  <div class="proste-ucilnice-container" style="background-color: hsl({{ termin.hue }}, 100%, 95%);">
     <span class="proste-ucilnice-list ucilnice-list">
       {# proste učilnice #}
-      {% for ucilnica in termin.proste_ucilnice %}
+      {% for ucilnica in termin.proste %}
         <span class="ucilnica ucilnica-{{ ucilnica.pk }}">
           <span class="ucilnica-ime">
             <a href="{% url 'urnik_ucilnice' ucilnica.pk %}">
@@ -20,11 +20,53 @@
         /
       {% endfor %}
     </span>
+
+    <span class="delno-zasedene-ucilnice-list ucilnice-list">
+      {# delno zasedene učilnice #}
+      {% if pokazi_delno_zasedene %}
+        &nbsp;&bull;&nbsp;
+        {% for ucilnica, razlog, razlog_tip in termin.delno_zasedene %}
+          <span class="ucilnica ucilnica-{{ ucilnica.pk }}">
+            <span class="ucilnica-ime">
+              <a href="{% url 'urnik_ucilnice' ucilnica.pk %}">
+                {{ ucilnica.kratko_ime }}</a></span>{% if not forloop.last %},{% endif %}
+            <span class="hover-area"></span>
+            <span class="ucilnica-tooltip">
+              {% if razlog_tip == 'r' %}
+                <a href="{% url 'urnik_ucilnice' ucilnica.pk %}">Učilnica {{ ucilnica.oznaka }}</a>
+                je od {{ termin.ura }}ih do {{ termin.ura|add:st_ur }}ih delno zasedena, saj jo je od
+                {{ razlog.od }}ih do {{ razlog.do }}ih rezervirala oseba
+                {% if razlog.osebe.all.0 %}
+                  <a href="{% url 'urnik_osebe' razlog.osebe.all.0.pk %}">{{ razlog.osebe.all.0 }}</a>
+                {% else %}
+                  neznan
+                {% endif %}
+                z razlogom: &quot;{{ razlog.opomba|default:"neznan" }}&quot;.
+              {% else %}
+                <a href="{% url 'urnik_ucilnice' ucilnica.pk %}">Učilnica {{ ucilnica.oznaka }}</a>
+                je od {{ termin.ura }}ih do {{ termin.ura|add:st_ur }}ih delno zasedena
+                saj tam od {{ razlog.od }}ih do {{ razlog.do }}ih poteka predmet
+                <a href="{% url 'urnik_predmeta' razlog.predmet.pk %}">&quot;{{ razlog.predmet }}&quot;</a>,
+                ki ga izvaja
+                {% if razlog.ucitelji.all.0 %}
+                  <a href="{% url 'urnik_osebe' razlog.ucitelji.all.0.pk %}">{{ razlog.ucitelji.all.0 }}</a>.
+                {% else %}
+                  neznana oseba.
+                {% endif %}
+              {% endif %}
+            </span>
+          </span>
+        {% empty %}
+          /
+        {% endfor %}
+      {% endif %}
+    </span>
+
     <span class="rezervirane-ucilnice-list ucilnice-list">
       {# rezervirane učilnice #}
       {% if pokazi_rezervirane %}
         &nbsp;&bull;&nbsp;
-        {% for ucilnica, razlog in termin.rezervirane_ucilnice %}
+        {% for ucilnica, razlog in termin.rezervirane %}
           <span class="ucilnica ucilnica-{{ ucilnica.pk }}">
             <span class="ucilnica-ime">
               <a href="{% url 'urnik_ucilnice' ucilnica.pk %}">
@@ -51,15 +93,15 @@
       {# zasedene učilnice #}
       {% if pokazi_zasedene %}
         &nbsp;&bull;&nbsp;
-        {% for ucilnica, razlog in termin.zasedene_ucilnice %}
+        {% for ucilnica, razlog in termin.zasedene %}
           <span class="ucilnica ucilnica-{{ ucilnica.pk }}">
             <span class="ucilnica-ime">
               <a href="{% url 'urnik_ucilnice' ucilnica.pk %}">{{ ucilnica.kratko_ime }}</a></span>{% if not forloop.last %},{% endif %}
             <span class="hover-area"></span>
             <span class="ucilnica-tooltip">
               <a href="{% url 'urnik_ucilnice' ucilnica.pk %}">Učilnica {{ ucilnica.oznaka }}</a>
-              je zasedena v {{ razlog.dan | dan_tozilnik }} ob {{ razlog.ura }}ih
-              saj je tam predmet <a href="{% url 'urnik_predmeta' razlog.predmet.pk %}">
+              je zasedena v {{ razlog.dan | dan_tozilnik }} ob {{ razlog.ura }}ih do {{ razlog.ura|add:st_ur }}ih
+              saj tam poteka predmet <a href="{% url 'urnik_predmeta' razlog.predmet.pk %}">
               &quot;{{ razlog.predmet }}&quot;</a>, ki ga izvaja
               {% if razlog.ucitelji.all.0 %}
                 <a href="{% url 'urnik_osebe' razlog.ucitelji.all.0.pk %}">{{ razlog.ucitelji.all.0 }}</a>.

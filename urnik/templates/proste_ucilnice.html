@@ -81,17 +81,23 @@
           {%  endfor %}
         </ul>
       </div>
-      {%  if teden %}
-        <p>Pokaži rezervirane:
+      {% if st_ur > "1" %}
+        <p>Pokaži delno proste:
           <span class="switch nobr"><label>Ne<a
-              href="{% if pokazi_rezervirane %}{% add_get pr=False %}{% else %}{% add_get pr=True %}{% endif %}"
-          ><input type="checkbox" {% if pokazi_rezervirane %}checked{% endif %}><span
-              class="lever"></span></a>Da</label></span>
+              onclick="window.location ='{% if pokazi_delno_zasedene %}{% add_get pdz=False %}{% else %}{% add_get pdz=True %}{% endif %}';"
+          ><input type="checkbox" {% if pokazi_delno_zasedene %}checked{% endif %}><span class="lever"></span></a>Da</label></span>
+        </p>
+      {% endif %}
+      {% if teden %}
+        <p>Pokaži rezervirane:
+          <span class="switch nobr"><label>Ne<a {# tukaj uporabimo onclick, da propagata JS evente naprej in takoj switche switch #}
+              onclick="window.location ='{% if pokazi_rezervirane %}{% add_get pr=False %}{% else %}{% add_get pr=True %}{% endif %}';"
+          ><input type="checkbox" {% if pokazi_rezervirane %}checked{% endif %}><span class="lever"></span></a>Da</label></span>
         </p>
       {% endif %}
       <p>*Pokaži zasedene:
         <span class="switch nobr"><label>Ne<a
-            href="{% if pokazi_zasedene %}{% add_get pz=False %}{% else %}{% add_get pz=True %}{% endif %}"
+            onclick="window.location ='{% if pokazi_zasedene %}{% add_get pz=False %}{% else %}{% add_get pz=True pdz=True %}{% endif %}';"
         ><input type="checkbox" {% if pokazi_zasedene %}checked{% endif %}><span class="lever"></span></a>Da</label></span>
       </p>
       <div class="disclaimer">* zaradi velike količine podatkov se stran lahko nalaga dlje časa</div>
