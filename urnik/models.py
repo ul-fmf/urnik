@@ -320,42 +320,18 @@ class ProsteUcilniceTermin(Termin):
         # Vse ustrezne proste ucilnice.
         self.proste = [u for u in ustrezne_ucilnice if u.pk not in zasedene_pks and u.pk not in rezervirane_pks]
         # Vse ustrezne ucilnice, ki so pa zasedene, ker je tam stalno srečanje. Vrednosti so razlogi za zasedenost.
-        self.zasedene = list(zasedene_ucilnice.items())
+        self.zasedene = [(u, r) for u, r in zasedene_ucilnice.items() if u.pk not in rezervirane_pks]
         # Vse ustrezne ucilnice, ki so pa zasedene, ker so rezervirane. Vrednosti so razlogi za zasedenost.
         self.rezervirane = list(rezervirane_ucilnice.items())
-        # Ucilnice, ki so kdaj med terminom proste, kdaj pa zasedene
-        self.delno_zasedene = []
 
-    def upostevaj_st_ur(self, st_ur, zasedenost_ucilnic, rezerviranost_ucilnic):
-        proste_vec_ur = []
-        for ucilnica in self.proste:
-            for i in range(1, st_ur):
-                if self.ura + i >= MAX_URA: break
-                if ucilnica in zasedenost_ucilnic[self.dan, self.ura + i]:
-                    self.delno_zasedene.append(
-                        (ucilnica, zasedenost_ucilnic[self.dan, self.ura + i][ucilnica], 'z'))
-                    break
-                elif ucilnica in rezerviranost_ucilnic[self.dan, self.ura + i]:
-                    self.delno_zasedene.append(
-                        (ucilnica, rezerviranost_ucilnic[self.dan, self.ura + i][ucilnica], 'r'))
-                    break
-            else:
-                proste_vec_ur.append(ucilnica)
-        self.proste = proste_vec_ur
-
-    def sort(self):
-        self.proste.sort()
-        self.delno_zasedene.sort()
-        self.zasedene.sort()
-        self.rezervirane.sort()
+    def ucilnice(self):
+        vse = [('prosta', u, None) for u in self.proste] + \
+              [('zasedena', u, r) for u, r in self.zasedene] + \
+              [('rezervirana', u, r) for u, r in self.rezervirane]
+        return sorted(vse, key=lambda x: x[1])
 
     def hue(self):
-        h = self.HUE_POLN
-        if self.delno_zasedene:
-            h = (self.HUE_POLN + self.HUE_PRAZEN) / 2
-        if self.proste:
-            h = self.HUE_PRAZEN
-
+        h = self.HUE_PRAZEN if self.proste else self.HUE_POLN
         return "{:.0f}".format(h)
 
 
@@ -365,8 +341,8 @@ class ProsteUcilnice(object):
         self.zasedenost_ucilnic = defaultdict(dict)
         self.rezerviranost_ucilnic = defaultdict(dict)
 
-        for srecanje in Srecanje.objects.filter(ucilnica__in=self.ustrezne
-                                                ).select_related('ucilnica', 'predmet').prefetch_related('ucitelji'):
+        for srecanje in Srecanje.objects.select_related('ucilnica', 'predmet').prefetch_related('ucitelji'
+                                       ).filter(ucilnica__in=self.ustrezne).exclude(ura__isnull=True):
             for i in range(srecanje.trajanje):
                 self.zasedenost_ucilnic[srecanje.dan, srecanje.ura + i][srecanje.ucilnica] = srecanje
 
@@ -377,16 +353,10 @@ class ProsteUcilnice(object):
                 for i in range(rezervacija.od, rezervacija.do):
                     self.rezerviranost_ucilnic[rezervacija.dan.isoweekday(), i][ucilnica] = rezervacija
 
-    def dobi_termine(self, st_ur):
+    def dobi_termine(self):
         termini = [ProsteUcilniceTermin(d, u, self.ustrezne, self.zasedenost_ucilnic[d, u],
                                         self.rezerviranost_ucilnic[d, u])
                    for d in range(1, len(DNEVI) + 1) for u in range(MIN_URA, MAX_URA)]
-
-        for termin in termini:
-            if st_ur > 1:
-                termin.upostevaj_st_ur(st_ur, self.zasedenost_ucilnic, self.rezerviranost_ucilnic)
-            termin.sort()
-
         return termini
 
 

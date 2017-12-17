@@ -28,8 +28,8 @@ hr.separator {
 }
 
 .disclaimer {
-    color: #aaa;
-    font-size: 0.6em;
+    color: #999;
+    font-size: 0.8em;
     line-height: 1.3em;
     margin-top: -5px;
 }
@@ -397,22 +397,6 @@ a.skrita {
     padding: 2px 4px;
 }
 
-.proste-ucilnice-container .proste-ucilnice-list {
-    color: #222;
-}
-
-.proste-ucilnice-container .delno-zasedene-ucilnice-list {
-    color: #555;
-}
-
-.proste-ucilnice-container .rezervirane-ucilnice-list {
-    color: #777;
-}
-
-.proste-ucilnice-container .zasedene-ucilnice-list {
-    color: #999;
-}
-
 .proste-ucilnice-container .ucilnice-list {
     margin: 0;
 }
@@ -420,6 +404,11 @@ a.skrita {
 .proste-ucilnice-container .ucilnice-list .ucilnica {
     position: relative;
     display: inline-block;
+}
+
+.proste-ucilnice-container .proste-ucilnice-list .ucilnica-stanje-rezervirana,
+.proste-ucilnice-container .proste-ucilnice-list .ucilnica-stanje-zasedena {
+    color: #999;
 }
 
 .proste-ucilnice-container .ucilnice-list .ucilnica a {
@@ -461,8 +450,7 @@ a.skrita {
     border-radius: 2px;
 }
 
-.proste-ucilnice-container .ucilnice-list .ucilnica.highlight .ucilnica-ime,
-.proste-ucilnice-container .ucilnice-list .ucilnica .ucilnica-ime:hover {
+.proste-ucilnice-container .ucilnice-list .ucilnica:hover .ucilnica-ime {
     background-color: #e0e0e0;
 }
 
@@ -571,6 +559,10 @@ a.skrita {
 #proste-ucilnice-panel input[type="range"] {
     margin-bottom: -5px;
     margin-left: 10px;
+}
+
+#proste-ucilnice-panel .switch-option {
+    margin: 10px 0px;
 }
 
 #proste-ucilnice-panel .switch {

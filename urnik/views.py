@@ -127,14 +127,7 @@ def proste_ucilnice(request):
 
     pokazi_rezervirane = bool(request.GET.get('pr', False))
     if not teden: pokazi_rezervirane = False
-    pokazi_delno_zasedene = bool(request.GET.get('pdz', False))
     pokazi_zasedene = bool(request.GET.get('pz', False))
-
-    st_ur = request.GET.get('stur', 1)
-    try:
-        st_ur = max(1, min(MAX_URA-MIN_URA, int(st_ur)))
-    except:
-        st_ur = 1
 
     ucilnice = request.GET.getlist('ucilnica')
     if ucilnice:
@@ -156,22 +149,24 @@ def proste_ucilnice(request):
     if pokazi_rezervirane:
         proste.upostevaj_rezervacije(teden)
 
-    termini = proste.dobi_termine(st_ur)
+    termini = proste.dobi_termine()
 
     return render(request, 'proste_ucilnice.html', {
         'naslov': 'Proste učilnice',
         'termini': termini,
-        'velikosti_ucilnic': UcilnicaQuerySet.VELIKOST,
-        'tipi_ucilnic': [u for u in Ucilnica.TIP if u[0] in Ucilnica.OBJAVLJENI_TIPI],
-        'mozni_tedni': sorted(set(r.teden() for r in Rezervacija.objects.prihajajoce())),
-        'ustrezne_ucilnice': list(ucilnice),
-        'teden': teden,
-        'st_ur': str(st_ur),
+
+        # get parameters
         'pokazi_rezervirane': pokazi_rezervirane,
-        'pokazi_delno_zasedene': pokazi_delno_zasedene,
         'pokazi_zasedene': pokazi_zasedene,
         'velikosti': velikost,
         'tipi': [] if tip == set(Ucilnica.OBJAVLJENI_TIPI) else tip,
+        'teden': teden,
+
+        # possible values
+        'mozne_velikosti_ucilnic': UcilnicaQuerySet.VELIKOST,
+        'mozni_tipi_ucilnic': [u for u in Ucilnica.TIP if u[0] in Ucilnica.OBJAVLJENI_TIPI],
+        'mozni_tedni': sorted(set(r.teden() for r in Rezervacija.objects.prihajajoce())),
+        'ustrezne_ucilnice': list(ucilnice),
     })
 
 

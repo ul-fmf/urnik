@@ -36,7 +36,7 @@
         {% endif %}
         {% for mozen_teden in mozni_tedni %}
           {% if mozen_teden.0|date:"Y-m-d" != teden %}
-            <li><a href="{% add_get teden=mozen_teden.0|date:"Y-m-d" %}">{{ mozen_teden.0 | fmt_teden }}</a></li>
+            <li><a href="{% add_get teden=mozen_teden.0|date:"Y-m-d" pr=True %}">{{ mozen_teden.0 | fmt_teden }}</a></li>
           {% endif %}
         {% endfor %}
       </ul>
@@ -50,12 +50,12 @@
         <span class="card-title">Izberi učilnico</span>
         Če vam ustrezajo le nekatere učilnice, filtrirajte tukaj.
         <hr class="separator">
-        {% for id, name in tipi_ucilnic %}
+        {% for id, name in mozni_tipi_ucilnic %}
           <input type="checkbox" id="{{ id }}" name="{{ id }}" {% if id in tipi %}checked{% endif %}>
           <label for="{{ id }}">{{ name }}</label>
         {% endfor %}
         <hr class="separator">
-        {% for id, name in velikosti_ucilnic %}
+        {% for id, name in mozne_velikosti_ucilnic %}
           <input type="checkbox" id="{{ id }}" name="{{ id }}" {% if id in velikosti %}checked{% endif %}>
           <label for="{{ id }}">{{ name }}</label>
         {% endfor %}
@@ -73,33 +73,18 @@
       <span class="card-title">Dodatne možnosti</span>
     </div>
     <div class="card-action">
-      <div>Število ur:
-        <ul class="pagination">
-          {% for i in "12345" %}
-            <li{% if i == st_ur %} class="active"{% endif %}
-            ><a href="{% add_get stur=i %}">{{ i }}</a></li>
-          {%  endfor %}
-        </ul>
-      </div>
-      {% if st_ur > "1" %}
-        <p>Pokaži delno proste:
-          <span class="switch nobr"><label>Ne<a
-              onclick="window.location ='{% if pokazi_delno_zasedene %}{% add_get pdz=False %}{% else %}{% add_get pdz=True %}{% endif %}';"
-          ><input type="checkbox" {% if pokazi_delno_zasedene %}checked{% endif %}><span class="lever"></span></a>Da</label></span>
-        </p>
-      {% endif %}
       {% if teden %}
-        <p>Pokaži rezervirane:
-          <span class="switch nobr"><label>Ne<a {# tukaj uporabimo onclick, da propagata JS evente naprej in takoj switche switch #}
+        <div class="switch-option">Pokaži rezervirane:
+          <span class="switch nobr"><label>Ne<a {# tukaj uporabimo onclick, da propagata JS evente naprej in takoj switchne switch #}
               onclick="window.location ='{% if pokazi_rezervirane %}{% add_get pr=False %}{% else %}{% add_get pr=True %}{% endif %}';"
           ><input type="checkbox" {% if pokazi_rezervirane %}checked{% endif %}><span class="lever"></span></a>Da</label></span>
-        </p>
+        </div>
       {% endif %}
-      <p>*Pokaži zasedene:
+      <div class="switch-option">*Pokaži zasedene:
         <span class="switch nobr"><label>Ne<a
             onclick="window.location ='{% if pokazi_zasedene %}{% add_get pz=False %}{% else %}{% add_get pz=True pdz=True %}{% endif %}';"
         ><input type="checkbox" {% if pokazi_zasedene %}checked{% endif %}><span class="lever"></span></a>Da</label></span>
-      </p>
+      </div>
       <div class="disclaimer">* zaradi velike količine podatkov se stran lahko nalaga dlje časa</div>
     </div>
   </div>
@@ -108,12 +93,7 @@
 {% endblock urnik_content %}
 
 {% block footer %}
-  {% load static %}
-  <script src="{% static 'highlight.js' %}"></script>
   <script>
-      {% for ucilnica in ustrezne_ucilnice %}
-          hoverByClass("ucilnica-{{ ucilnica.pk }}");
-      {%  endfor %}
       $(document).ready(function () {
           $('.teden-dropdown-button').dropdown({
                   inDuration: 300,
