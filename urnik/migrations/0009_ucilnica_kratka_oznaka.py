@@ -15,6 +15,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='ucilnica',
             name='kratka_oznaka',
-            field=models.CharField(blank=True, max_length=10, unique=True),
+            field=models.CharField(blank=True, max_length=10),
         ),
     ]
