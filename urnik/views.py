@@ -169,3 +169,9 @@ def help(request):
     return render(request, 'help.html', {
         'naslov': 'Prijavi napako',
     })
+
+
+def print_all(request):
+    return render(request, 'print_all.html', {
+        'letniki': Letnik.objects.filter(oddelek__in=[Letnik.MATEMATIKA, Letnik.FIZIKA]),
+    })
