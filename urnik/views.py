@@ -158,3 +158,9 @@ def nastavi_trajanje_srecanja(request, srecanje_id):
 def preklopi_urejanje(request):
     request.session['urejanje'] = not request.session.get('urejanje', False)
     return redirect(request.META.get('HTTP_REFERER', reverse('zacetna_stran')))
+
+
+def print_all(request):
+    return render(request, 'print_all.html', {
+        'letniki': Letnik.objects.filter(oddelek__in=[Letnik.MATEMATIKA, Letnik.FIZIKA]),
+    })

@@ -35,6 +35,7 @@ urlpatterns = [
     url(r'^srecanje/(?P<srecanje_id>\d+)/odlozi/$', urnik.views.odlozi_srecanje, name='odlozi_srecanje'),
     url(r'^srecanje/(?P<srecanje_id>\d+)/trajanje/$', urnik.views.nastavi_trajanje_srecanja, name='nastavi_trajanje_srecanja'),
     url(r'^preklopi_urejanje/$', urnik.views.preklopi_urejanje, name='preklopi_urejanje'),
+    url(r'^printall/$', urnik.views.print_all, name='print_all'),
 ]
 
 if 'silk' in settings.INSTALLED_APPS:
