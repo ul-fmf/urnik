@@ -3,6 +3,7 @@ from collections import defaultdict
 from copy import deepcopy
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.db.models import Prefetch
 from .layout import nastavi_sirine_srecanj, nastavi_barve
 
 MIN_URA, MAX_URA = 7, 20
@@ -347,9 +348,17 @@ class ProsteUcilnice(object):
                 self.zasedenost_ucilnic[srecanje.dan, srecanje.ura + i][srecanje.ucilnica] = srecanje
 
     def upostevaj_rezervacije(self, teden):
-        for rezervacija in Rezervacija.objects.filter(dan__gte=teden, dan__lte=teden+datetime.timedelta(days=6)
-                                                      ).prefetch_related('ucilnice', 'osebe'):
-            for ucilnica in rezervacija.ucilnice.filter(pk__in=self.ustrezne):
+        for rezervacija in Rezervacija.objects.filter(
+            dan__gte=teden,
+            dan__lte=teden+datetime.timedelta(days=6)
+        ).prefetch_related(
+            Prefetch(
+                'ucilnice',
+                queryset=Ucilnica.objects.filter(pk__in=self.ustrezne)
+            ),
+            'osebe'
+        ):
+            for ucilnica in rezervacija.ucilnice.all():
                 for i in range(rezervacija.od, rezervacija.do):
                     self.rezerviranost_ucilnic[rezervacija.dan.isoweekday(), i][ucilnica] = rezervacija
 
