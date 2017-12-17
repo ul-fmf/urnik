@@ -53,6 +53,7 @@ def pobarvajvec(barve):
             ('{0} {1:.2%}, {0} {2:.2%}'.format(BARVE[barva % len(BARVE)], i / len(barve), (i + 1) / len(barve))
                 for i, barva in enumerate(barve)))
         return "background: repeating-linear-gradient(135deg, {});".format(barve)
+    return ''
 
 
 @register.simple_tag(takes_context=True)

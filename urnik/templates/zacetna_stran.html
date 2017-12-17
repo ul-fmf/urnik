@@ -14,9 +14,9 @@
   </div>  <!-- oznaci vec -->
   {% for letniki in stolpci_smeri %}
     <div class="col s6 m3">
-      <table class="highlight">
-        {% regroup letniki by smer as smeri_list %}
-        {% for smer_l in smeri_list %}
+      {% regroup letniki by smer as smeri_list %}
+      {% for smer_l in smeri_list %}
+        <table class="highlight">
           <thead>
           <tr>
             <th>{{ smer_l.grouper }}</th>
@@ -36,8 +36,8 @@
             </tr>
           {% endfor %}
           </tbody>
-        {% endfor %}
-      </table>
+        </table>
+      {% endfor %}
     </div>  <!-- smeri -->
   {% endfor %}
   <div class="col s6 m2">

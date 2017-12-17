@@ -465,7 +465,7 @@ class Srecanje(models.Model):
         return self.dan and self.ura
 
     def po_potrebi_okrajsano_ime_predmeta(self):
-        if 'sirina' in vars(self) and ((self.sirina >= 0.5 and len(self.predmet.ime) < 45 and self.trajanje > 1) or self.sirina == 1):
+        if hasattr(self, 'sirina') and ((self.sirina >= 0.5 and len(self.predmet.ime) < 45 and self.trajanje > 1) or self.sirina == 1):
             return self.predmet.ime
         else:
             return self.predmet.kratica
@@ -479,7 +479,7 @@ class Srecanje(models.Model):
         ).distinct()
 
     def style(self):
-        if self.dan and self.ura and 'sirina' in vars(self):
+        if self.dan and self.ura and hasattr(self, 'sirina'):
             left = (self.dan - 1 + self.zamik) * ENOTA_SIRINE
             top = (self.ura - MIN_URA) * ENOTA_VISINE
             height = self.trajanje * ENOTA_VISINE
@@ -491,8 +491,8 @@ class Srecanje(models.Model):
 
     def css_classes(self):
         classes = []
-        if self.leftmost: classes.append('leftmost')
-        if self.rightmost: classes.append('rightmost')
+        if hasattr(self, 'leftmost') and self.leftmost: classes.append('leftmost')
+        if hasattr(self, 'rightmost') and self.rightmost: classes.append('rightmost')
         return ' '.join(classes)
 
     def prosti_termini(self, tip, oddelek):

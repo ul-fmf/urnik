@@ -183,9 +183,9 @@ nav {
     color: #039be5;
 }
 
-#informacije .srecanje {
+#informacije .srecanje-absolute-box {
     position: relative;
-    height: 4em;
+    height: 70px;
 }
 
 a.skrita {
@@ -204,7 +204,7 @@ a.skrita {
 .srecanje .ucitelj, .srecanje .ucilnica {
     font-size: 0.8em;
     position: absolute;
-    bottom: 4pt;
+    bottom: 2pt;
     z-index: 10;
 }
 
