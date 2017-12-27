@@ -77,8 +77,9 @@
 </div> <!-- navbar fixed -->
 <ul class="side-nav" id="mobile-sidebar"> <!-- side navigation for mobile -->
   <li><a href="{% url 'zacetna_stran' %}"><i class="material-icons left">home</i>Domov</a></li>
+  <li><a href="{% url 'zacetna_stran' %}?izbira"><i class="material-icons left">schedule</i>Sestavljen urnik</a></li>
   <li><a href="{% url 'rezervacije' %}"><i class="material-icons left">border_color</i>Rezervacije učilnic</a></li>
-  <li><a href="{% url 'proste' %}"><i class="material-icons left">event_available</i>Proste učilnice</a></li>
+{#  <li><a href="{% url 'proste' %}"><i class="material-icons left">event_available</i>Proste učilnice</a></li>#}
   <li><a href="javascript:window.print();"><i class="material-icons left">print</i>Natisni stran</a></li>
   <li><a href="{% url 'bugreport' %}"><i class="material-icons left">bug_report</i>Prijavi napako</a></li>
   <li><a href="{% url 'help' %}"><i class="material-icons left">help</i>Navodila in pomoč</a></li>

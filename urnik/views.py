@@ -166,8 +166,6 @@ def bugreport(request):
 
 
 def help(request):
-    pass
-
-
-def proste(request):
-    pass
+    return render(request, 'help.html', {
+        'naslov': 'Prijavi napako',
+    })

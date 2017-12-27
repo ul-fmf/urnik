@@ -90,37 +90,33 @@
       </tbody>
     </table>
   </div> <!-- ucilnice -->
-{#  <div class="col s6 m4">#}
-{#    <table class="highlight">#}
-{#      <thead>#}
-{#      <tr>#}
-{#        <th>Oseba#}
-{#          {% if not izbira %}#}
-{#            <div id="search-osebe-wrapper">#}
-{#              <input type="text" id="search-osebe" class="autocomplete" title="search"><i class="material-icons">search</i>#}
-{#            </div>#}
-{#          {% endif %}#}
-{#        </th>#}
-{#      </tr>#}
-{#      </thead>#}
-{#      <tbody>#}
-{#      {% for oseba in osebe %}#}
-{#        <tr>#}
-{#          <td class="padded">#}
-{#            {% if izbira %}#}
-{#              <input type="checkbox" name="oseba" autocomplete="off" value="{{ oseba.id }}" id="oseba-{{ oseba.id }}"/>#}
-{#              <label for="oseba-{{ oseba.id }}">{{ oseba.ime }} <strong>{{ oseba.priimek }}</strong></label>#}
-{#            {% else %}#}
-{#              <a href="{% url 'urnik_osebe' oseba.id %}">#}
-{#                {{ oseba.ime }} <strong>{{ oseba.priimek }}</strong>#}
-{#              </a>#}
-{#            {% endif %}#}
-{#          </td>#}
-{#        </tr>#}
-{#      {% endfor %}#}
-{#      </tbody>#}
-{#    </table>#}
-{#  </div>  <!-- osebe -->#}
+  {% if izbira %}
+    <div class="col s6 m3 offset-m3">
+      <table class="highlight">
+        <thead>
+        <tr>
+          <th>Oseba
+            {% if not izbira %}
+              <div id="search-osebe-wrapper">
+                <input type="text" id="search-osebe" class="autocomplete" title="search"><i class="material-icons">search</i>
+              </div>
+            {% endif %}
+          </th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for oseba in osebe %}
+          <tr>
+            <td class="padded">
+              <input type="checkbox" name="oseba" autocomplete="off" value="{{ oseba.id }}" id="oseba-{{ oseba.id }}"/>
+              <label for="oseba-{{ oseba.id }}">{{ oseba.ime }} <strong>{{ oseba.priimek }}</strong></label>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>  <!-- osebe -->
+  {% endif %}
 </div> <!-- row -->
 </div> <!-- container -->
 </form>

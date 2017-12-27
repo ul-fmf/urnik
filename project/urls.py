@@ -37,7 +37,6 @@ urlpatterns = [
     url(r'^preklopi_urejanje/$', urnik.views.preklopi_urejanje, name='preklopi_urejanje'),
     url(r'^bugreport/$', urnik.views.bugreport, name='bugreport'),
     url(r'^help/$', urnik.views.help, name='help'),
-    url(r'^proste/$', urnik.views.proste, name='proste'),
 ]
 
 if 'silk' in settings.INSTALLED_APPS:

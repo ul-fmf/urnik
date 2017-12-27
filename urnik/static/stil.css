@@ -5,6 +5,12 @@
 .vertical-space {
     height: 2000px;  /* allows zoom out on mobile */
 }
+code {
+    background: #e0e0e0;
+    display: inline-block;
+    padding: 2px;
+    border-radius: 2px;
+}
 /* navigation and such */
 nav {
     background-color: #555;
