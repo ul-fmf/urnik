@@ -17,7 +17,31 @@ nav {
 }
 #urnik-logo {
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transform: none;
+    left: 250px;
+    right: 150px;
 }
+@media only screen and (max-width: 992px) {
+    #urnik-logo {
+        left: 150px;
+        right: 150px;
+    }
+}
+@media only screen and (max-width: 600px) {
+    #urnik-logo {
+        left: 108px;
+        right: 75px;
+        text-align: left;
+    }
+}
+#urnik-logo i {
+    display: inline;
+    float: none;
+    margin-right: 5px;
+}
+
 #menu-button {
     display: block;
 }

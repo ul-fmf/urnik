@@ -25,13 +25,13 @@
   <nav>
     <div class="nav-wrapper">
       <a href="#!" class="brand-logo center" id="urnik-logo"> <!-- top centred logo: absolute -->
-        <i class="large material-icons">schedule</i>
+        <i class="large material-icons hide-on-med-and-down">schedule</i>
         {{ naslov|default:'Urnik' }}
       </a>
 
       <!-- left menu -->
       <a href="#" id="menu-button" data-activates="mobile-sidebar" class="button-collapse">
-        <i class="material-icons">menu</i><span class="hide-on-small-and-down">Meni</span>
+        <i class="material-icons">menu</i><span class="hide-on-med-and-down">Meni</span>
       </a>
 
       {% if user.is_authenticated %}
