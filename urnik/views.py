@@ -6,7 +6,6 @@ from .models import *
 
 
 def zacetna_stran(request):
-    smeri = {}
     osebe = Oseba.objects.aktivni()
     ucilnice = Ucilnica.objects.objavljene()
     return render(request, 'zacetna_stran.html', {
@@ -158,3 +157,17 @@ def nastavi_trajanje_srecanja(request, srecanje_id):
 def preklopi_urejanje(request):
     request.session['urejanje'] = not request.session.get('urejanje', False)
     return redirect(request.META.get('HTTP_REFERER', reverse('zacetna_stran')))
+
+
+def bugreport(request):
+    return render(request, 'bugreport.html', {
+        'naslov': 'Prijavi napako',
+    })
+
+
+def help(request):
+    pass
+
+
+def proste(request):
+    pass

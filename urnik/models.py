@@ -76,7 +76,6 @@ class UcilnicaQuerySet(models.QuerySet):
             obicajna = Ucilnica.MATEMATICNA
         else:
             obicajna = Ucilnica.FIZIKALNA
-        print(tip)
         if tip == 'velika':
             ustrezne = self.filter(tip=obicajna, velikost__gte=60)
             alternative = self.filter(velikost__gte=45)
