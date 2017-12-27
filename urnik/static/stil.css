@@ -380,3 +380,38 @@ a.skrita {
 #search-osebe-wrapper ul.autocomplete-content li > span > span.highlight {
     color: #039be5;
 }
+
+#bug-report {
+    bottom: 15px;
+    right: 15px;
+}
+
+#bug-report ul {
+    bottom: 54px;
+    left: -160px;
+    text-align: right;
+    background-color: #fff;
+}
+
+#bug-report > a > i {
+    font-size: 2rem;
+}
+
+#bug-report #cancel-bug-report {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    display: none;
+    background-color: white;
+    color: #26a69a;
+    border-radius: 12px;
+    z-index: 998;
+    height: 24px;
+    width: 24px;
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14),0 1px 5px 0 rgba(0,0,0,0.12),0 3px 1px -2px rgba(0,0,0,0.2);
+    cursor: pointer;
+}
+
+#bug-report:hover #cancel-bug-report {
+    display: block;
+}
