@@ -171,7 +171,5 @@ def help(request):
     })
 
 
-def print_all(request):
-    return render(request, 'print_all.html', {
-        'letniki': Letnik.objects.filter(oddelek__in=[Letnik.MATEMATIKA, Letnik.FIZIKA]),
-    })
+def print_all(request, oddelek):
+    return render(request, 'print_all.html', {'letniki': Letnik.objects.filter(oddelek=oddelek)})

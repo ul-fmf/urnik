@@ -20,5 +20,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': '/srv/urnik/var/db.sqlite3',
-    }
+        'OPTIONS': {
+            'timeout': 30,  # seconds
+        }
+    },
 }
