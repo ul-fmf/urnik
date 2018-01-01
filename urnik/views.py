@@ -160,7 +160,5 @@ def preklopi_urejanje(request):
     return redirect(request.META.get('HTTP_REFERER', reverse('zacetna_stran')))
 
 
-def print_all(request):
-    return render(request, 'print_all.html', {
-        'letniki': Letnik.objects.filter(oddelek__in=[Letnik.MATEMATIKA, Letnik.FIZIKA]),
-    })
+def print_all(request, oddelek):
+    return render(request, 'print_all.html', {'letniki': Letnik.objects.filter(oddelek=oddelek)})
