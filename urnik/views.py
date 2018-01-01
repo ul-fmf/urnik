@@ -171,5 +171,21 @@ def help(request):
     })
 
 
-def print_all(request, oddelek):
-    return render(request, 'print_all.html', {'letniki': Letnik.objects.filter(oddelek=oddelek)})
+def print_all(request):
+    return render(request, 'print_all.html', {
+        'naslov': 'Množično tiskanje',
+        'oddelki': Letnik.ODDELEK,
+        'moznosti': [('printall_ucilnice', 'učilnice'), ('printall_smeri', 'smeri')],
+    })
+
+
+def print_all_ucilnice(request, oddelek):
+    return render(request, 'print_all_list.html', {
+        'links': [reverse('urnik_ucilnice', args=[u.id]) for u in Ucilnica.objects.filter(tip=oddelek)]
+    })
+
+
+def print_all_smeri(request, oddelek):
+    return render(request, 'print_all_list.html', {
+        'links': [reverse('urnik_letnika', args=[l.id]) for l in Letnik.objects.filter(oddelek=oddelek)]
+    })

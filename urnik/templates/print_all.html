@@ -1,45 +1,37 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Natisni vse</title>
-  <style>
-    * { margin: 0; padding: 0; }
-    #navodila {
-      margin: 10px;
-      width: 500px;
-    }
-    iframe { border: 0; }
-    @media print {
-      @page {
-        size: A4 landscape;
-        margin: 0mm;
-      }
-      #navodila { display: none; }
-      iframe { page-break-after: always; }
-    }
-  </style>
-</head>
-<body>
-<p id="navodila">
-  <b>Počakajte, da se stran naloži do konca! Preverite vse urnike, če so se naložili brez napak.</b><br>
-  <b>Stran se bo natisnila drugače, kot zgleda sedaj.</b><br>
-  Izgled preverite na predogledu tiskanja (print preview) v vašem brskalniku.
-  Po potrebi lahko vključite tudi iskanje ozadij, sicer so bela.
-</p>
+{% extends 'osnova.html' %}
+{% block content %}
+  <div class="container">
+    <p class="flow-text">
+      Tukaj imate možnost tiskanja več urnikov naenkrat po smereh in učilnicah. Izberite pravo povezavo v tabeli in
+      sledite navodilom v dokumentu, ki se pojavi.
+    </p>
 
-{% for letnik in letniki %}
-  <iframe src="{% url 'urnik_letnika' letnik.id %}" width="1200" height="843" onload="set_print(this)"></iframe>
-{% endfor %}
-
-</body>
-<script>
-  function set_print(iframe) {
-      var links = (iframe.contentDocument || iframe.contentWindow.document).getElementsByTagName("link");
-      for (var j = 0; j < links.length; j++) {
-          if (links[j].media === "print") {
-              links[j].media = "all";
-          }
-      }
-  }
-</script>
-</html>
+    <table class="printall-table">
+      <thead>
+      <tr>
+        <th></th>
+        {% for oddelek in oddelki %}
+          <th>{{ oddelek.1 }}</th>
+        {% endfor %}
+      </tr>
+      </thead>
+      <tbody>
+      {% for moznost in moznosti %}
+        <tr>
+          <td>{{ moznost.1 }}</td>
+          {% for oddelek in oddelki %}
+            <td><a href="{% url moznost.0 oddelek.0 %}" target="_blank">
+              <span class="tripple-icon left">
+                <i class="material-icons">print</i>
+                <i class="material-icons">print</i>
+                <i class="material-icons">print</i>
+              </span>
+              Natisni vse
+            </a></td>
+          {% endfor %}
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock content %}

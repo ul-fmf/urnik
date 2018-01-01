@@ -3,6 +3,10 @@
     margin: 0mm;
 }
 
+body {
+    font-size: 12px;
+}
+
 a {
     color: black;
 }
@@ -20,23 +24,27 @@ a {
     overflow: hidden;
 }
 
-#urnik-logo {
-    color: #333;
-    font-size: 24px;
-}
-
-.brand-logo i {
-    display: none;
-}
-
+/* zgornja vrstica */
 nav {
     background: white;
 }
 
-nav div.nav-wrapper ul.left, nav div.nav-wrapper ul.right, #mobile-sidebar, a.button-collapse, div.vertical-space {
+nav div.nav-wrapper *, #mobile-sidebar {
+    display: none !important;
+}
+
+nav div.nav-wrapper #urnik-logo {
+    display: block !important;
+    color: #333;
+    font-size: 24px;
+    left: 0px;
+    right: 0px;
+}
+
+nav div.nav-wrapper #urnik-logo i {
     display: none;
 }
 
-body {
-    font-size: 12px;
+nav div.nav-wrapper ul.left, nav div.nav-wrapper ul.right, #mobile-sidebar, a.button-collapse, div.vertical-space {
+    display: none;
 }
