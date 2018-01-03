@@ -5,24 +5,159 @@
 .vertical-space {
     height: 2000px;  /* allows zoom out on mobile */
 }
+code {
+    background: #e0e0e0;
+    display: inline-block;
+    padding: 2px;
+    border-radius: 2px;
+}
+span.tripple-icon {
+    position: relative;
+    height: 48px;
+    line-height: 48px;
+    width: 24px;
+}
+span.tripple-icon i {
+    position: absolute;
+    background: white;
+    border-radius: 3px;
+    border: 1px solid;
+}
+span.tripple-icon i:nth-child(1) {
+    left: 3px;
+    bottom: calc(50% + 6px - 16px);
+    /*color: rgba(0,255,0,0.5);*/
+}
+span.tripple-icon i:nth-child(2) {
+    left: 0px;
+    bottom: calc(50% + 3px - 16px);
+    /*color: rgba(255,0,0,0.5);*/
+}
+span.tripple-icon i:nth-child(3) {
+    left: -3px;
+    bottom: calc(50% - 16px);
+    /*color: rgba(0,0,255,0.5);*/
+}
 /* navigation and such */
 nav {
     background-color: #555;
 }
 #urnik-logo {
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transform: none;
+    left: 250px;
+    right: 150px;
 }
-@media only screen and (min-width: 600px) {
-    nav a.button-collapse {
-        display:none;
+@media only screen and (max-width: 992px) {
+    #urnik-logo {
+        left: 150px;
+        right: 150px;
     }
 }
+@media only screen and (max-width: 600px) {
+    #urnik-logo {
+        left: 108px;
+        right: 75px;
+        text-align: left;
+    }
+}
+#urnik-logo i {
+    display: inline;
+    float: none;
+    margin-right: 5px;
+}
+
+#menu-button {
+    display: block;
+}
+#menu-button span {
+    vertical-align: middle;
+    font-size: 20pt;
+    height: 64px;
+    line-height: 64px;
+    display: block;
+    float: right;
+    margin-left: 16px;
+    margin-right: 16px;
+}
+#menu-button i {
+    display: inline-block;
+}
+.side-icon {
+    margin: 0 32px 0 0;
+    color: rgba(0,0,0,0.54);
+    float: left;
+}
+.side-nav, #sidenav-overlay {
+    top: 64px;
+}
+/*#mobile-sidebar {*/
+    /*transform: translateX(0px) !important;*/
+/*}*/
 .dropdown-content li > a {
     color: #039be5;
 }
 .dropdown-content li.disabled, .dropdown-content li.disabled > a {
     color: #5e5e5e;
     cursor: default;
+}
+#search-wrapper {
+    padding: 0px 0px 5px 5px;
+    overflow: hidden;
+}
+#search-wrapper input[type="search"] {
+    padding-left: 2.5rem;
+    width: calc(100% - 2.5rem);
+    height: 64px;
+}
+#search-wrapper input[type="search"]:focus {
+    border-bottom: 1px solid #039be5;
+    box-shadow: 0 1px 0 0 #039be5;
+}
+@media only screen and (max-width: 600px) {
+    #search-wrapper input[type="search"]::placeholder {
+        color: transparent;
+    }
+}
+#search-wrapper form label {
+    margin-top: -12px;
+    margin-left: -16px;
+}
+#search-wrapper form label i {
+    font-size: 28px;
+    color: #fff;
+}
+#search-wrapper ul.autocomplete-content {
+    margin-bottom: 0px;
+}
+
+#search-wrapper ul.autocomplete-content li {
+    min-height: 0px;
+    padding: 5px;
+}
+#search-wrapper ul.autocomplete-content li > span {
+    font-weight: normal;
+    padding: 3px 5px;
+    font-size: 14px;
+    color: rgba(0,0,0,0.87);
+}
+#search-wrapper ul.autocomplete-content li > span > span.highlight {
+    color: #039be5;
+}
+#admin-dropdown .dropdown-button {
+    display: inline-block;
+    padding: 0 10px;
+}
+#admin-dropdown .dropdown-button #user-name {
+    margin-right: 15px;
+}
+#admin-dropdown .dropdown-button #dropdown-arrow {
+    margin-left: 5px;
+}
+#admin-dropdown .dropdown-button #mode-indicator {
+    margin-left: 0px;
 }
 /* urnik */
 .urnik-wrapper {
@@ -320,63 +455,50 @@ a.skrita {
 .alternativa.prosta button, .alternativa.prosta {
     background: orange;
 }
+
 /* front page */
-.oznaci-vec {
-    position: relative;
-    float: right;
-    font-weight: normal;
+#prikazi-sestavljen-urnik {
+     background: none;
+     color: #039be5;
+     border: none;
+     padding: 0;
+     font: inherit;
+     cursor: pointer;
 }
-.oznaci-vec > a, .oznaci-vec > button {
-    position: absolute;
-    right: 0px;
-    top: 6px;
-    white-space: nowrap;
+#firstpage-menu tbody tr td ul {
+    list-style-type: none;
+    margin: 0px;
 }
-.oznaci-vec > a > i.material-icons, .oznaci-vec > button > i.material-icons {
-    margin-right: 5px;
+#firstpage-menu tbody tr td ul li {
+    display: block;
+    height: 55px;
 }
-#search-osebe-wrapper {
-    position: relative;
-    margin-top: 5px;
-}
-
-#search-osebe-wrapper i.material-icons {
-    position: absolute;
-    top: 0px;
-    right: 0px;
-    font-size: 1.5em;
-    color: #aaa;
+#firstpage-menu tbody tr td ul li a i {
+    color: inherit;
 }
 
-#search-osebe-wrapper input {
-    margin: 10px 0px 0px 0px;
-    height: 20px;
-    width: 100%;
-    float: right;
-    font-weight: normal;
-    border-bottom-color: #ccc;
+/* printall */
+.printall-table {
+    width: auto;
+}
+.printall-table th, .printall-table td {
+    padding: 20px 30px;
+}
+.printall-table th, .printall-table td:first-child {
+    text-transform: capitalize;
+    font-weight: bold;
+    font-size: 1.2em;
 }
 
-#search-osebe-wrapper input:focus, #search-osebe-wrapper input:active {
-    border-bottom: 1px solid #039be5;
-    -webkit-box-shadow: 0 1px 0 0 #039be5;
-    box-shadow: 0 1px 0 0 #039be5;
+.printall-table td:first-child, .printall-table th:first-child {
+    border-right: 1px solid #d0d0d0;
 }
 
-#search-osebe-wrapper ul.autocomplete-content {
-    margin-bottom: 0px;
+.printall-table a {
+    display: block;
+    line-height: 44px;
 }
+.printall-table a span.tripple-icon {
+    margin-right: 15px;
 
-#search-osebe-wrapper ul.autocomplete-content li {
-    min-height: 0px;
-    padding: 5px;
-}
-#search-osebe-wrapper ul.autocomplete-content li > span {
-    font-weight: normal;
-    padding: 3px 5px;
-    font-size: 14px;
-    color: rgba(0,0,0,0.87);
-}
-#search-osebe-wrapper ul.autocomplete-content li > span > span.highlight {
-    color: #039be5;
 }

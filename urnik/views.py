@@ -6,7 +6,6 @@ from .models import *
 
 
 def zacetna_stran(request):
-    smeri = {}
     osebe = Oseba.objects.aktivni()
     ucilnice = Ucilnica.objects.objavljene()
     return render(request, 'zacetna_stran.html', {
@@ -158,3 +157,35 @@ def nastavi_trajanje_srecanja(request, srecanje_id):
 def preklopi_urejanje(request):
     request.session['urejanje'] = not request.session.get('urejanje', False)
     return redirect(request.META.get('HTTP_REFERER', reverse('zacetna_stran')))
+
+
+def bugreport(request):
+    return render(request, 'bugreport.html', {
+        'naslov': 'Prijavi napako',
+    })
+
+
+def help(request):
+    return render(request, 'help.html', {
+        'naslov': 'Prijavi napako',
+    })
+
+
+def print_all(request):
+    return render(request, 'print_all.html', {
+        'naslov': 'Množično tiskanje',
+        'oddelki': Letnik.ODDELEK,
+        'moznosti': [('printall_ucilnice', 'učilnice'), ('printall_smeri', 'smeri')],
+    })
+
+
+def print_all_ucilnice(request, oddelek):
+    return render(request, 'print_all_list.html', {
+        'links': [reverse('urnik_ucilnice', args=[u.id]) for u in Ucilnica.objects.filter(tip=oddelek)]
+    })
+
+
+def print_all_smeri(request, oddelek):
+    return render(request, 'print_all_list.html', {
+        'links': [reverse('urnik_letnika', args=[l.id]) for l in Letnik.objects.filter(oddelek=oddelek)]
+    })

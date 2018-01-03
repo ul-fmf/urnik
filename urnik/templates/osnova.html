@@ -24,25 +24,39 @@
 <div class="navbar-fixed">
   <nav>
     <div class="nav-wrapper">
-      <a href="#!" class="brand-logo center" id="urnik-logo"> <!-- top centred logo -->
-        <i class="large material-icons">schedule</i>
+      <a href="#!" class="brand-logo center" id="urnik-logo"> <!-- top centred logo: absolute -->
+        <i class="large material-icons hide-on-med-and-down">schedule</i>
         {{ naslov|default:'Urnik' }}
       </a>
-      <a href="#" data-activates="mobile-sidebar" class="button-collapse"><i class="material-icons">menu</i></a>
-      <ul class="left hide-on-small-and-down"> <!-- top menu -->
-        {% include "navigation.html" %}
-      </ul> <!-- top menu -->
+
+      <!-- left menu -->
+      <a href="#" id="menu-button" data-activates="mobile-sidebar" class="button-collapse">
+        <i class="material-icons">menu</i><span class="hide-on-med-and-down">Meni</span>
+      </a>
+
       {% if user.is_authenticated %}
-        <ul class="right">
+        <!-- right control panel  -->
+        <ul class="right" id="admin-dropdown">
           <li>
-            <a class="dropdown-button" href="#!" data-activates="user-dropdown" style="display: inline-block">
-              <i class="material-icons right" style="margin-left: 5px;">arrow_drop_down</i>
-              <span class="hide-on-small-and-down">{{ user.get_full_name|default:user.get_username }}</span>
-              <i class="material-icons right">{% if request.session.urejanje %}edit{% else %}visibility{% endif %}</i>
+            <a class="dropdown-button" href="#!" data-activates="user-dropdown">
+              <i class="material-icons right" id="dropdown-arrow">arrow_drop_down</i>
+              <span class="hide-on-small-and-down" id="user-name">{{ user.get_full_name|default:user.get_username }}</span>
+              <i class="material-icons right" id="mode-indicator">{% if request.session.urejanje %}edit{% else %}visibility{% endif %}</i>
             </a>
           </li>
         </ul>
       {% endif %}
+
+      <!-- middle search: Preserve the order: left, right first, then middle -->
+      <div id="search-wrapper">
+        <form>
+          <div class="input-field">
+            <input id="search" type="search" required placeholder="Išči..." class="autocomplete" title="search">
+            <label class="label-icon" for="search"><i class="material-icons">search</i></label>
+            <i class="material-icons">close</i>
+          </div>
+        </form>
+      </div>
     </div> <!-- nav wrapper -->
     <ul id="user-dropdown" class="dropdown-content">
       <li class="disabled hide-on-med-and-up">
@@ -62,7 +76,20 @@
   </nav>
 </div> <!-- navbar fixed -->
 <ul class="side-nav" id="mobile-sidebar"> <!-- side navigation for mobile -->
-  {% include "navigation.html" %}
+  <li><a href="{% url 'zacetna_stran' %}"><i class="material-icons left">home</i>Domov</a></li>
+  <li><a href="{% url 'zacetna_stran' %}?izbira"><i class="material-icons left">schedule</i>Sestavljen urnik</a></li>
+  <li><a href="{% url 'rezervacije' %}"><i class="material-icons left">border_color</i>Rezervacije učilnic</a></li>
+{#  <li><a href="{% url 'proste' %}"><i class="material-icons left">event_available</i>Proste učilnice</a></li>#}
+  <li><a href="javascript:window.print();"><i class="material-icons left">print</i>Natisni stran</a></li>
+  {% if user.is_authenticated %}
+  <li><a href="{% url 'printall' %}"><span class="tripple-icon side-icon">
+      <i class="material-icons">print</i>
+      <i class="material-icons">print</i>
+      <i class="material-icons">print</i>
+    </span>Natisni več hkrati</a></li>
+  {% endif %}
+  <li><a href="{% url 'bugreport' %}"><i class="material-icons left">bug_report</i>Prijavi napako</a></li>
+  <li><a href="{% url 'help' %}"><i class="material-icons left">help</i>Navodila in pomoč</a></li>
 </ul> <!-- side nav -->
 
 {% block content %}{% endblock content %}
@@ -70,6 +97,15 @@
 <script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
 <script>
+    var search_urls = {
+        {% for letnik in letniki_search %}
+            "{{ letnik }} ({{letnik.kratica}})": "{% url 'urnik_letnika' letnik.id %}",{% endfor %}
+        {% for oseba in osebe_search %}
+            "{{ oseba.ime }} {{ oseba.priimek }}": "{% url 'urnik_osebe' oseba.id %}",{%  endfor %}
+        {% for ucilnica in ucilnice_search %}
+            "Učilnica {{ ucilnica.oznaka }}": "{% url 'urnik_ucilnice' ucilnica.id %}",{% endfor %}
+    };
+
     $(document).ready(function () {
         $(".dropdown-button").dropdown({
             constrainWidth: false,
@@ -79,6 +115,22 @@
             alignment: "right"
         });
         $(".button-collapse").sideNav();
+
+        var search_data = {};
+        for (var term in search_urls) {
+            search_data[term] = null;
+        }
+        var $search = $('#search');
+        $search.autocomplete({
+            data: search_data,
+            limit: 10, // The max amount of results that can be shown at once. Default: Infinity.
+            onAutocomplete: function (val) {
+                window.location = search_urls[val];
+            }
+        });
+        $search.focus(function () {
+            this.value = "";
+        });
     });
 </script>
 

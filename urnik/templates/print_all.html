@@ -1,0 +1,37 @@
+{% extends 'osnova.html' %}
+{% block content %}
+  <div class="container">
+    <p class="flow-text">
+      Tukaj imate možnost tiskanja več urnikov naenkrat po smereh in učilnicah. Izberite pravo povezavo v tabeli in
+      sledite navodilom v dokumentu, ki se pojavi.
+    </p>
+
+    <table class="printall-table">
+      <thead>
+      <tr>
+        <th></th>
+        {% for oddelek in oddelki %}
+          <th>{{ oddelek.1 }}</th>
+        {% endfor %}
+      </tr>
+      </thead>
+      <tbody>
+      {% for moznost in moznosti %}
+        <tr>
+          <td>{{ moznost.1 }}</td>
+          {% for oddelek in oddelki %}
+            <td><a href="{% url moznost.0 oddelek.0 %}" target="_blank">
+              <span class="tripple-icon left">
+                <i class="material-icons">print</i>
+                <i class="material-icons">print</i>
+                <i class="material-icons">print</i>
+              </span>
+              Natisni vse
+            </a></td>
+          {% endfor %}
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock content %}
