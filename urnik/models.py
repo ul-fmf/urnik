@@ -3,6 +3,7 @@ from collections import defaultdict
 from copy import deepcopy
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.db.models import Prefetch
 from .layout import nastavi_sirine_srecanj, nastavi_barve
 
 MIN_URA, MAX_URA = 7, 20
@@ -70,7 +71,13 @@ class Letnik(models.Model):
 
 
 class UcilnicaQuerySet(models.QuerySet):
+    VELIKOST = [
+        ('majhna', 'majhna'),
+        ('obicajna', 'običajna'),
+        ('velika', 'velika'),
+    ]
 
+    # TODO: fix this mess
     def ustrezne(self, tip, oddelek):
         if oddelek == 'MAT':
             obicajna = Ucilnica.MATEMATICNA
@@ -97,13 +104,20 @@ class UcilnicaQuerySet(models.QuerySet):
 
         return list(ustrezne), list(alternative.exclude(pk__in=ustrezne))
 
+    def ustrezne_velikosti(self, velikosti):
+        if not velikosti:
+            return self.all()
+        ustrezne = self.none()
+        if 'majhna' in velikosti:
+            ustrezne |= self.filter(velikost__lt=30)
+        if 'obicajna' in velikosti:
+            ustrezne |= self.filter(velikost__gte=30, velikost__lt=60)
+        if 'velika' in velikosti:
+            ustrezne |= self.filter(velikost__gte=60)
+        return ustrezne
+
     def objavljene(self):
-        return self.filter(tip__in=(
-            Ucilnica.MATEMATICNA,
-            Ucilnica.FIZIKALNA,
-            Ucilnica.RACUNALNISKA,
-            Ucilnica.PRAKTIKUM
-        ))
+        return self.filter(tip__in=Ucilnica.OBJAVLJENI_TIPI)
 
 
 class Ucilnica(models.Model):
@@ -114,8 +128,16 @@ class Ucilnica(models.Model):
         (RACUNALNISKA, 'računalniška'), (PRAKTIKUM, 'praktikum'),
         (PISARNA, 'pisarna'), (ZUNANJA, 'zunanja'),
     )
+    OBJAVLJENI_TIPI = (
+        MATEMATICNA,
+        FIZIKALNA,
+        RACUNALNISKA,
+        PRAKTIKUM,
+    )
+
     tip = models.CharField(max_length=1, choices=TIP, default=ZUNANJA, blank=True)
     oznaka = models.CharField(max_length=192, unique=True)
+    kratka_oznaka = models.CharField(max_length=10, unique=True, blank=True)
     velikost = models.PositiveSmallIntegerField(blank=True, null=True)
     objects = UcilnicaQuerySet.as_manager()
 
@@ -125,6 +147,14 @@ class Ucilnica(models.Model):
         ordering = ('oznaka',)
 
     def __str__(self):
+        return self.oznaka
+
+    def __lt__(self, other):
+        return self.oznaka < other.oznaka
+
+    def kratko_ime(self):
+        if self.kratka_oznaka:
+            return self.kratka_oznaka
         return self.oznaka
 
 
@@ -213,12 +243,24 @@ class SrecanjeQuerySet(models.QuerySet):
         return (fizikalne_ucilnice | fizikalni_letniki).distinct()
 
 
-class Termin:
+class Termin(object):
+    def __init__(self, dan, ura):
+        self.dan = dan
+        self.ura = ura
+
+    def style(self):
+        left = (self.dan - 1) * ENOTA_SIRINE
+        top = (self.ura - MIN_URA) * ENOTA_VISINE
+        height = ENOTA_VISINE
+        width = ENOTA_SIRINE
+        return 'position: absolute; left: {:.2%}; width: {:.2%}; top: {:.2%}; height: {:.2%};'.format(left, width, top, height)
+
+
+class TerminUrejanje(Termin):
     ZASEDEN = 'zaseden'
 
     def __init__(self, dan, ura, ustrezne, alternative, zasedenost_ucilnic, srecanje):
-        self.dan = dan
-        self.ura = ura
+        super().__init__(dan, ura)
         self.ucilnice = []
         self.zasedenost = self.ZASEDEN
         ure = range(self.ura, self.ura + srecanje.trajanje)
@@ -267,12 +309,68 @@ class Termin:
         elif deloma_alternative:
             self.zasedenost = 'deloma_proste_alternative'
 
-    def style(self):
-        left = (self.dan - 1) * ENOTA_SIRINE
-        top = (self.ura - MIN_URA) * ENOTA_VISINE
-        height = ENOTA_VISINE
-        width = ENOTA_SIRINE
-        return 'position: absolute; left: {:.2%}; width: {:.2%}; top: {:.2%}; height: {:.2%}'.format(left, width, top, height)
+
+class ProsteUcilniceTermin(Termin):
+    HUE_PRAZEN = 120  # zelena
+    HUE_POLN = 0  # rdeca
+
+    def __init__(self, dan, ura, ustrezne_ucilnice, zasedene_ucilnice, rezervirane_ucilnice):
+        super().__init__(dan, ura)
+        zasedene_pks = {u.pk for u in zasedene_ucilnice}
+        rezervirane_pks = {u.pk for u in rezervirane_ucilnice}
+        # Vse ustrezne proste ucilnice.
+        self.proste = [u for u in ustrezne_ucilnice if u.pk not in zasedene_pks and u.pk not in rezervirane_pks]
+        # Vse ustrezne ucilnice, ki so pa zasedene, ker je tam stalno srečanje. Vrednosti so razlogi za zasedenost.
+        self.zasedene = [(u, r) for u, r in zasedene_ucilnice.items() if u.pk not in rezervirane_pks]
+        # Vse ustrezne ucilnice, ki so pa zasedene, ker so rezervirane. Vrednosti so razlogi za zasedenost.
+        self.rezervirane = list(rezervirane_ucilnice.items())
+        # ucilnice, ki bodo prikazane, skupaj s stanjem in razlogom
+        self.prikazane_ucilnice = []
+
+    def filtriraj_ucilnice(self, pokazi_zasedene, pokazi_rezervirane):
+        vse = [('prosta', u, None) for u in self.proste]
+        if pokazi_rezervirane:
+            vse.extend([('rezervirana', u, r) for u, r in self.rezervirane])
+        if pokazi_zasedene:
+            vse.extend([('zasedena', u, r) for u, r in self.zasedene])
+        self.prikazane_ucilnice = sorted(vse, key=lambda x: x[1])
+
+    def hue(self):
+        h = self.HUE_PRAZEN if self.proste else self.HUE_POLN
+        return "{:.0f}".format(h)
+
+
+class ProsteUcilnice(object):
+    def __init__(self, ustrezne_ucilnice, tip, velikost):
+        self.ustrezne = ustrezne_ucilnice.filter(tip__in=tip).ustrezne_velikosti(velikost)
+        self.zasedenost_ucilnic = defaultdict(dict)
+        self.rezerviranost_ucilnic = defaultdict(dict)
+
+        for srecanje in Srecanje.objects.select_related('ucilnica', 'predmet').prefetch_related('ucitelji'
+                                       ).filter(ucilnica__in=self.ustrezne).exclude(ura__isnull=True):
+            for i in range(srecanje.trajanje):
+                self.zasedenost_ucilnic[srecanje.dan, srecanje.ura + i][srecanje.ucilnica] = srecanje
+
+    def upostevaj_rezervacije(self, teden):
+        for rezervacija in Rezervacija.objects.filter(
+            dan__gte=teden,
+            dan__lte=teden+datetime.timedelta(days=6)
+        ).prefetch_related(
+            Prefetch(
+                'ucilnice',
+                queryset=Ucilnica.objects.filter(pk__in=self.ustrezne)
+            ),
+            'osebe'
+        ):
+            for ucilnica in rezervacija.ucilnice.all():
+                for i in range(rezervacija.od, rezervacija.do):
+                    self.rezerviranost_ucilnic[rezervacija.dan.isoweekday(), i][ucilnica] = rezervacija
+
+    def dobi_termine(self):
+        termini = [ProsteUcilniceTermin(d, u, self.ustrezne, self.zasedenost_ucilnic[d, u],
+                                        self.rezerviranost_ucilnic[d, u])
+                   for d in range(1, len(DNEVI) + 1) for u in range(MIN_URA, MAX_URA)]
+        return termini
 
 
 class Srecanje(models.Model):
@@ -380,7 +478,6 @@ class Srecanje(models.Model):
         if hasattr(self, 'rightmost') and self.rightmost: classes.append('rightmost')
         return ' '.join(classes)
 
-
     def prosti_termini(self, tip, oddelek):
         ustrezne, alternative = Ucilnica.objects.ustrezne(tip=tip, oddelek=oddelek)
         if self.ucilnica not in ustrezne and self.ucilnica not in alternative:
@@ -394,7 +491,7 @@ class Srecanje(models.Model):
         termini = {}
         for dan in range(1, 6):
             for ura in range(MIN_URA, MAX_URA - self.trajanje + 1):
-                termini[(dan, ura)] = Termin(
+                termini[(dan, ura)] = TerminUrejanje(
                     dan=dan,
                     ura=ura,
                     ustrezne=ustrezne,

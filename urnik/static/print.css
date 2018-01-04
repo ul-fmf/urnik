@@ -29,7 +29,7 @@ nav {
     background: white;
 }
 
-nav div.nav-wrapper *, #mobile-sidebar {
+nav div.nav-wrapper *, #side-menu {
     display: none !important;
 }
 
@@ -45,6 +45,11 @@ nav div.nav-wrapper #urnik-logo i {
     display: none;
 }
 
-nav div.nav-wrapper ul.left, nav div.nav-wrapper ul.right, #mobile-sidebar, a.button-collapse, div.vertical-space {
+nav div.nav-wrapper ul.left, nav div.nav-wrapper ul.right, #side-menu, a.button-collapse, div.vertical-space {
+    display: none;
+}
+
+/* ce je stranski meni odprt */
+#side-menu, #sidenav-overlay, div.drag-target {
     display: none;
 }

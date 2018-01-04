@@ -1,4 +1,8 @@
+from datetime import timedelta
+
 from django import template
+from django.template import defaultfilters
+from django.utils.dateparse import parse_date
 from django.utils.safestring import mark_safe
 from urnik import models
 
@@ -13,6 +17,7 @@ def dnevi():
         </div>
         '''.format(indeks_dneva / len(models.DNEVI), ime_dneva)
         for indeks_dneva, ime_dneva in enumerate(models.DNEVI)) + '</div>')
+
 
 @register.simple_tag()
 def ure():
@@ -35,9 +40,11 @@ BARVE = [
     'rgba(177,89,40, 0.5)',
 ]
 
+
 @register.simple_tag()
 def pobarvaj(barva):
     return "background: {}".format(BARVE[barva % len(BARVE)])
+
 
 @register.simple_tag()
 def pobarvajvec(barve):
@@ -47,3 +54,36 @@ def pobarvajvec(barve):
                 for i, barva in enumerate(barve)))
         return "background: repeating-linear-gradient(135deg, {});".format(barve)
     return ''
+
+
+@register.simple_tag(takes_context=True)
+def add_get(context, **kwargs):
+    request = context['request']
+    if request is None:
+        return ''
+    params = request.GET.copy()
+    for k, v in kwargs.items():
+        if not v:
+            params.pop(k, None)
+        elif isinstance(v, list):
+            params.setlist(k, v)
+        else:
+            params[k] = v
+    get_part = params.urlencode()
+    if get_part:
+        return request.path + '?' + get_part
+    return request.path
+
+
+@register.filter(is_safe=True)
+def fmt_teden(start_date):
+    if isinstance(start_date, str):
+        start_date = parse_date(start_date)
+    end_date = start_date + timedelta(days=6)
+    return mark_safe(defaultfilters.date(start_date, "j. b") + " &ndash; " + defaultfilters.date(end_date, "j. b Y"))
+
+
+DNEVI_TOZILNIK = ["ponedeljek", "torek", "sredo", "četrtek", "petek", "soboto", "nedeljo"]
+@register.filter()
+def dan_tozilnik(day):
+    return DNEVI_TOZILNIK[int(day)-1]

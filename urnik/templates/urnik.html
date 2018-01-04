@@ -1,21 +1,19 @@
-{% extends 'osnova.html' %}
+{% extends 'urnik_osnova.html' %}
 {% load tags %}
-{% block content %}
-
-<div class="urnik-wrapper">
+{% block urnik_content %}
 
 {% if nacin == 'ogled' %}
   <div id="urnik" class="{% if not barve %}cel{% endif %}">
     {% dnevi %}
     {% ure %}
-    <div id="srecanja">
+    <div id="srecanja" class="poravnaj-na-termine">
       {% for srecanje in srecanja %}
         {% include '_srecanje.html' with nacin='ogled' %}
       {% endfor %}
     </div>
   </div>
   {% if barve %}
-    <div id='informacije'>
+    <div class='right-panel' id='informacije'>
       <ul class="collapsible" data-collapsible="expandable">
         <li>
           <div class="collapsible-header active">
@@ -35,7 +33,7 @@
   <div id="urnik">
     {% dnevi %}
     {% ure %}
-    <div id="srecanja">
+    <div id="srecanja" class="poravnaj-na-termine">
       {% for srecanje in srecanja %}
         {% include '_srecanje.html' with nacin='urejanje' %}
       {% endfor %}
@@ -44,7 +42,7 @@
       {% endfor %}
     </div>
   </div>
-  <div id='informacije'>
+  <div class='right-panel' id='informacije'>
     <ul class="collapsible" data-collapsible="expandable">
       {% if nacin == 'urejanje' %}
         <li>
@@ -114,7 +112,4 @@
   </div>
 {% endif %}
 
-</div>
-<div class="vertical-space hide-on-med-and-up"></div>
-
-{% endblock content %}
+{% endblock urnik_content %}

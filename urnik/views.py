@@ -1,9 +1,12 @@
+from django.http import QueryDict
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.dateparse import parse_date
 from django.utils.http import urlencode
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
-from .models import *
+from django.views.decorators.http import require_POST
 
+from .models import *
 
 def zacetna_stran(request):
     osebe = Oseba.objects.aktivni()
@@ -38,7 +41,7 @@ def rezervacije(request):
                 'dan': rezervacija.dan,
                 'teden': rezervacija.teden(),
             })
-    rezervacije.sort(key=lambda r:(r['dan'], r['ucilnica'].oznaka, r['od']))
+    rezervacije.sort(key=lambda r: (r['dan'], r['ucilnica'].oznaka, r['od']))
     return render(request, 'rezervacije.html', {
         'naslov': 'Rezervacije učilnic',
         'rezervacije': rezervacije,
@@ -109,6 +112,77 @@ def sestavljen_urnik(request):
     return urnik(request, srecanja, 'Sestavljen urnik', barve=list(letniki) + list(osebe) + list(ucilnice))
 
 
+def proste_ucilnice(request):
+    teden = request.GET.get('teden', None)
+    try:
+        teden = parse_date(teden)
+        weekday = teden.weekday()
+        if weekday <= 5:
+            teden -= datetime.timedelta(days=weekday)
+        else:
+            teden += datetime.timedelta(days=7-weekday)
+    except:
+        teden = None
+
+    pokazi_rezervirane = bool(request.GET.get('pr', False))
+    if not teden: pokazi_rezervirane = False
+    pokazi_zasedene = bool(request.GET.get('pz', False))
+
+    ucilnice = request.GET.getlist('ucilnica')
+    if ucilnice:
+        ucilnice = Ucilnica.objects.objavljene().filter(pk__in=ucilnice)
+        if not ucilnice.exists():
+            ucilnice = Ucilnica.objects.objavljene()
+    else:
+        ucilnice = Ucilnica.objects.objavljene()
+
+    tip = set(request.GET.getlist('tip'))
+    tip &= set(Ucilnica.OBJAVLJENI_TIPI)
+    if not tip: tip = set(Ucilnica.OBJAVLJENI_TIPI)
+
+    velikost = set(request.GET.getlist('velikost'))
+    velikost &= {v[0] for v in UcilnicaQuerySet.VELIKOST}
+    if not velikost: velikost = None
+
+    proste = ProsteUcilnice(ucilnice, tip, velikost)
+    if pokazi_rezervirane:
+        proste.upostevaj_rezervacije(teden)
+
+    termini = proste.dobi_termine()
+    for t in termini:
+        t.filtriraj_ucilnice(pokazi_rezervirane=pokazi_rezervirane, pokazi_zasedene=pokazi_zasedene)
+
+    return render(request, 'proste_ucilnice.html', {
+        'naslov': 'Proste učilnice',
+        'termini': termini,
+
+        # get parameters
+        'pokazi_rezervirane': pokazi_rezervirane,
+        'pokazi_zasedene': pokazi_zasedene,
+        'velikosti': velikost,
+        'tipi': [] if tip == set(Ucilnica.OBJAVLJENI_TIPI) else tip,
+        'teden': teden,
+
+        # possible values
+        'mozne_velikosti_ucilnic': UcilnicaQuerySet.VELIKOST,
+        'mozni_tipi_ucilnic': [u for u in Ucilnica.TIP if u[0] in Ucilnica.OBJAVLJENI_TIPI],
+        'mozni_tedni': sorted(set(r.teden() for r in Rezervacija.objects.prihajajoce())),
+        'ustrezne_ucilnice': list(ucilnice),
+    })
+
+
+@require_POST
+def proste_ucilnice_filter(request):
+    tipi = [k for k in Ucilnica.OBJAVLJENI_TIPI if request.POST.get(k, '') == 'on']
+    velikosti = [k for k, v in UcilnicaQuerySet.VELIKOST if request.POST.get(k, '') == 'on']
+    q = QueryDict(request.POST.get('qstring', ''), mutable=True)
+    q.setlist('tip', tipi)
+    q.setlist('velikost', velikosti)
+    response = redirect('proste')
+    response['Location'] += "?" + q.urlencode()
+    return response
+
+
 @login_required
 def premakni_srecanje(request, srecanje_id):
     srecanje = get_object_or_404(Srecanje, id=srecanje_id)
@@ -125,7 +199,8 @@ def premakni_srecanje(request, srecanje_id):
             'srecanja': srecanje.povezana_srecanja().urnik(),
             'odlozena_srecanja': Srecanje.objects.odlozena(),
             'prekrivanja_po_tipih': {},
-            'prosti_termini': srecanje.prosti_termini(request.GET['tip'], 'MAT' if 'matematika' in ','.join(group.name for group in request.user.groups.all()) else 'FIZ'),
+            'prosti_termini': srecanje.prosti_termini(request.GET['tip'], 'MAT' if 'matematika' in ','.join(
+                group.name for group in request.user.groups.all()) else 'FIZ'),
             'premaknjeno_srecanje': srecanje,
             'next': request.META.get('HTTP_REFERER', reverse('zacetna_stran')),
         })
@@ -159,15 +234,15 @@ def preklopi_urejanje(request):
     return redirect(request.META.get('HTTP_REFERER', reverse('zacetna_stran')))
 
 
-def bugreport(request):
+def bug_report(request):
     return render(request, 'bugreport.html', {
         'naslov': 'Prijavi napako',
     })
 
 
-def help(request):
+def help_page(request):
     return render(request, 'help.html', {
-        'naslov': 'Prijavi napako',
+        'naslov': 'Navodila in pomoč',
     })
 
 
