@@ -4,14 +4,33 @@
 <form action="{% url 'sestavljen_urnik' %}">
 <div class="container">
 <div class="row">
-  <div class="oznaci-vec">
-    {% if izbira %}
-      <button class="btn-flat" href="#!"><i class="material-icons left">playlist_play</i>prikaži</button>
-    {% else %}
-      <a class="btn-flat" href="{% url 'zacetna_stran' %}?izbira"><i class="material-icons left">playlist_add_check</i>označi
-        več</a>
-    {% endif %}
-  </div>  <!-- oznaci vec -->
+  <div class="col m3 hide-on-small-and-down">
+    <table id="firstpage-menu">
+      <thead>
+      <tr>
+        <th>Hitre povezave</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td>
+          <ul>
+            {% if izbira %}
+              <li><button id="prikazi-sestavljen-urnik"><i class="material-icons left">done_all</i>Prikaži sestavljen urnik</button></li>
+            {% else %}
+              <li><a href="{% url 'zacetna_stran' %}?izbira"><i class="material-icons left">schedule</i>Sestavljen urnik</a></li>
+            {% endif %}
+            <li><a href="{% url 'rezervacije' %}"><i class="material-icons left">border_color</i>Rezervacije učilnic</a>
+            </li>
+{#            <li><a href="#"><i class="material-icons left">event_available</i>Proste učilnice</a></li>#}
+            <li><a href="#"><i class="material-icons left">bug_report</i>Prijavi napako</a></li>
+            <li><a href="#"><i class="material-icons left">help</i>Navodila in pomoč</a></li>
+          </ul>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
   {% for letniki in stolpci_smeri %}
     <div class="col s6 m3">
       {% regroup letniki by smer as smeri_list %}
@@ -40,7 +59,7 @@
       {% endfor %}
     </div>  <!-- smeri -->
   {% endfor %}
-  <div class="col s6 m2">
+  <div class="col s6 m3">
     <table class="highlight">
       <thead>
       <tr>
@@ -71,64 +90,28 @@
       </tbody>
     </table>
   </div> <!-- ucilnice -->
-  <div class="col s6 m4">
-    <table class="highlight">
-      <thead>
-      <tr>
-        <th>Oseba
-          {% if not izbira %}
-            <div id="search-osebe-wrapper">
-              <input type="text" id="search-osebe" class="autocomplete" title="search"><i class="material-icons">search</i>
-            </div>
-          {% endif %}
-        </th>
-      </tr>
-      </thead>
-      <tbody>
-      {% for oseba in osebe %}
+  {% if izbira %}
+    <div class="col s6 m3 offset-m3">
+      <table class="highlight">
+        <thead>
         <tr>
-          <td class="padded">
-            {% if izbira %}
+          <th>Oseba</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for oseba in osebe %}
+          <tr>
+            <td class="padded">
               <input type="checkbox" name="oseba" autocomplete="off" value="{{ oseba.id }}" id="oseba-{{ oseba.id }}"/>
               <label for="oseba-{{ oseba.id }}">{{ oseba.ime }} <strong>{{ oseba.priimek }}</strong></label>
-            {% else %}
-              <a href="{% url 'urnik_osebe' oseba.id %}">
-                {{ oseba.ime }} <strong>{{ oseba.priimek }}</strong>
-              </a>
-            {% endif %}
-          </td>
-        </tr>
-      {% endfor %}
-      </tbody>
-    </table>
-  </div>  <!-- osebe -->
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>  <!-- osebe -->
+  {% endif %}
 </div> <!-- row -->
 </div> <!-- container -->
 </form>
 {% endblock content %}
-
-{% block footer %}
-  {% if not izbira %}
-    <script>
-        var osebe_urls = {
-            {% for oseba in osebe %}"{{ oseba.ime }} {{ oseba.priimek }}":
-                "{% url 'urnik_osebe' oseba.id %}",{%  endfor %}
-        };
-
-        $(document).ready(function () {
-            $('#search-osebe').autocomplete({
-                data: {
-                    {% for oseba in osebe %}"{{ oseba.ime }} {{ oseba.priimek }}": null,{% endfor %}
-                },
-                limit: 10, // The max amount of results that can be shown at once. Default: Infinity.
-                onAutocomplete: function (val) {
-                    window.location = osebe_urls[val];
-                }
-            });
-            $('#search-osebe').focus(function() {
-               this.value = "";
-            });
-        });
-    </script>
-  {% endif %}
-{% endblock footer %}
