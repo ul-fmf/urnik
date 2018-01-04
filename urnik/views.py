@@ -149,6 +149,8 @@ def proste_ucilnice(request):
         proste.upostevaj_rezervacije(teden)
 
     termini = proste.dobi_termine()
+    for t in termini:
+        t.filtriraj_ucilnice(pokazi_rezervirane=pokazi_rezervirane, pokazi_zasedene=pokazi_zasedene)
 
     return render(request, 'proste_ucilnice.html', {
         'naslov': 'Proste učilnice',
@@ -232,15 +234,15 @@ def preklopi_urejanje(request):
     return redirect(request.META.get('HTTP_REFERER', reverse('zacetna_stran')))
 
 
-def bugreport(request):
+def bug_report(request):
     return render(request, 'bugreport.html', {
         'naslov': 'Prijavi napako',
     })
 
 
-def help(request):
+def help_page(request):
     return render(request, 'help.html', {
-        'naslov': 'Prijavi napako',
+        'naslov': 'Navodila in pomoč',
     })
 
 

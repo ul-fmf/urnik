@@ -22,9 +22,9 @@
             {% endif %}
             <li><a href="{% url 'rezervacije' %}"><i class="material-icons left">border_color</i>Rezervacije učilnic</a>
             </li>
-{#            <li><a href="#"><i class="material-icons left">event_available</i>Proste učilnice</a></li>#}
-            <li><a href="#"><i class="material-icons left">bug_report</i>Prijavi napako</a></li>
-            <li><a href="#"><i class="material-icons left">help</i>Navodila in pomoč</a></li>
+            <li><a href="{% url 'proste' %}"><i class="material-icons left">event_available</i>Najdi proste učilnice</a></li>
+            <li><a href="{% url 'bugreport' %}"><i class="material-icons left">bug_report</i>Prijavi napako</a></li>
+            <li><a href="{% url 'help' %}"><i class="material-icons left">help</i>Navodila in pomoč</a></li>
           </ul>
         </td>
       </tr>

@@ -324,12 +324,16 @@ class ProsteUcilniceTermin(Termin):
         self.zasedene = [(u, r) for u, r in zasedene_ucilnice.items() if u.pk not in rezervirane_pks]
         # Vse ustrezne ucilnice, ki so pa zasedene, ker so rezervirane. Vrednosti so razlogi za zasedenost.
         self.rezervirane = list(rezervirane_ucilnice.items())
+        # ucilnice, ki bodo prikazane, skupaj s stanjem in razlogom
+        self.prikazane_ucilnice = []
 
-    def ucilnice(self):
-        vse = [('prosta', u, None) for u in self.proste] + \
-              [('zasedena', u, r) for u, r in self.zasedene] + \
-              [('rezervirana', u, r) for u, r in self.rezervirane]
-        return sorted(vse, key=lambda x: x[1])
+    def filtriraj_ucilnice(self, pokazi_zasedene, pokazi_rezervirane):
+        vse = [('prosta', u, None) for u in self.proste]
+        if pokazi_rezervirane:
+            vse.extend([('rezervirana', u, r) for u, r in self.rezervirane])
+        if pokazi_zasedene:
+            vse.extend([('zasedena', u, r) for u, r in self.zasedene])
+        self.prikazane_ucilnice = sorted(vse, key=lambda x: x[1])
 
     def hue(self):
         h = self.HUE_PRAZEN if self.proste else self.HUE_POLN

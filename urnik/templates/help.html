@@ -10,10 +10,15 @@
     med zaznamke.
 
     <h5>Uporaba iskalnika</h5>
-    Kliknite v naslovno vrstico desno od ikone za iskanje <code><i class="material-icons left">search</i> Išči...</code>
-    in vpišite začetek imena ali priimka osebe, oznake učilnice ali smeri. Prikazal se bo seznam rezultatov
-    (max. 10 vnosov), po katerem se lahko premikate s puščicama gor in dol in izbiro potrdite s tipko Enter.
-    Uporabljate lahko tudi miško. Če iskanega rezulata ni med naštetimi, napišite manj široko poizvedbo.
+    Da bi začeli iskati, kliknite v naslovno vrstico desno od ikone za iskanje
+    <code><i class="material-icons left">search</i> Išči...</code> ali pa pritisnite
+    tipko <code>/</code> ali <code>f</code> na tipkovnici.
+
+    Vpišite začetek imena ali priimka osebe, oznake učilnice ali smeri. Prikazal se bo seznam rezultatov
+    (max. 10 vnosov), po katerem se lahko premikate s puščicama gor in dol in izbiro potrdite s tipko
+    <code>Enter</code>. S tipko <code>Esc</code> ali klikom na križec
+    prekličete trenutno iskanje. Če iskanega rezulata ni med naštetimi, napišite manj specifično poizvedbo, ali
+    pa sporočite <a href="{% url 'bugreport' %}">tehnično napako</a>.
 
     <h5>Izdelava sestavljenih urnikov</h5>
     Bolj komplicirane urnike, ki niso direktno dostopni prek iskalnika, si lahko ogledate tako, da v meniju ali na prvi
@@ -29,6 +34,15 @@
       Če želite lahko v nastavitvah brskalnika vključite tudi tiskanje ozadij. Če se urnik morda ne natisne eno
       stran, prosimo sporočite <a href="{% url 'bugreport' %}">tehnično napako</a>.
     </p>
+
+    <h5>Iskanje prostih učilnic</h5>
+    Pojdite na <a href="{% url 'proste' %}">stran za iskanje prostih učilnic</a>. Ta prikaže proste učilnice
+    za vsak termin v splošnem tednu znotraj trenutnega semestra. Zeleni termini imajo vsaj eno prosto učilnico,
+    rdeči pa nimajo nobene. Če na desni izberete konkreten teden, se pri izračunu prostih
+    učilnic upoštevajo tudi rezervacije. Če je prikazanih učilnic zelo veliko, lahko učilnice
+    filtrirate po tipu in po velikosti. Kot dodatne možnosti lahko vklopite tudi prikaz zasedenih
+    (tj. notri poteka nek predmet) ali rezerviranih predavalnic. V tem primeru ob prehodu miške čez posamezno
+    učilnico vidite tudi razlog za zasedenost.
 
     <h5>Razno</h5>
     Če imate težavo z uporabo kakšnega dela urnika, jo poskusite najprej rešiti sami ali vprašajte kolega,
