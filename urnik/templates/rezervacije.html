@@ -16,7 +16,7 @@
 
 {% regroup rezervacije by teden as rezervacije_po_tednih %}
 {% for teden in rezervacije_po_tednih %}
-  <ul class="collapsible" data-collapsible="expandable">
+  <ul class="collapsible" data-collapsible="expandable" id="rezervacije-list">
     <li>
       <div class="collapsible-header {% if forloop.counter <= 2 %}active{% endif %}">
         <h5>

@@ -773,5 +773,9 @@ a.skrita {
 }
 .printall-table a span.tripple-icon {
     margin-right: 15px;
+}
 
+/* rezervacije */
+#rezervacije-list .collapsible-body {
+    padding-top: 0;
 }
