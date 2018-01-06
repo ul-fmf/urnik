@@ -14,7 +14,7 @@
               <a href="{% url 'urnik_ucilnice' ucilnica.pk %}">Učilnica {{ ucilnica.oznaka }}</a>
               je prosta v {{ termin.dan|dan_tozilnik }} ob {{ termin.ura }}ih.
               {#  TODO: odkomentiraj ko bo narejen obrazec za rezervacije  #}
-              {#          <a href="#" class="nobr">Rezerviraj <i class="material-icons">open_in_new</i></a>#}
+              {#  <a href="#" class="nobr">Rezerviraj <i class="material-icons">open_in_new</i></a>#}
             {% elif stanje == 'rezervirana' %}
               <a href="{% url 'urnik_ucilnice' ucilnica.pk %}">Učilnico {{ ucilnica.oznaka }}</a>
               je od {{ razlog.od }}ih do {{ razlog.do }}ih rezervirala oseba

@@ -1,24 +1,38 @@
 from django.http import QueryDict
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.dateparse import parse_date
-from django.utils.http import urlencode
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.views.decorators.http import require_POST
 
 from .models import *
 
+
 def zacetna_stran(request):
-    osebe = Oseba.objects.aktivni()
     ucilnice = Ucilnica.objects.objavljene()
     return render(request, 'zacetna_stran.html', {
         'stolpci_smeri': [
             Letnik.objects.filter(oddelek=Letnik.MATEMATIKA),
             Letnik.objects.filter(oddelek=Letnik.FIZIKA),
         ],
-        'osebe': sorted(osebe, key=lambda oseba: oseba.vrstni_red()),
         'ucilnice': ucilnice,
-        'izbira': 'izbira' in request.GET,
+    })
+
+
+def sestavljen_urnik_form(request):
+    osebe = sorted(Oseba.objects.aktivni(), key=lambda oseba: oseba.vrstni_red())
+    columns = 3
+    length = len(osebe)
+    per_column = length // columns
+    ucilnice = Ucilnica.objects.objavljene()
+    return render(request, 'sestavljen_urnik.html', {
+        'stolpci_smeri': [
+            Letnik.objects.filter(oddelek=Letnik.MATEMATIKA),
+            Letnik.objects.filter(oddelek=Letnik.FIZIKA),
+        ],
+        'osebe': [osebe[i*per_column:(i+1)*per_column] for i in range(columns)],
+        'ucilnice': ucilnice,
+        'naslov': 'Sestavljen urnik',
     })
 
 
