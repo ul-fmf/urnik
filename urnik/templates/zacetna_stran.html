@@ -1,7 +1,5 @@
 {% extends 'osnova.html' %}
 {% block content %}
-
-<form action="{% url 'sestavljen_urnik' %}">
 <div class="container">
 <div class="row">
   <div class="col m3 hide-on-small-and-down">
@@ -15,13 +13,8 @@
       <tr>
         <td>
           <ul>
-            {% if izbira %}
-              <li><button id="prikazi-sestavljen-urnik"><i class="material-icons left">done_all</i>Prikaži sestavljen urnik</button></li>
-            {% else %}
-              <li><a href="{% url 'zacetna_stran' %}?izbira"><i class="material-icons left">schedule</i>Sestavljen urnik</a></li>
-            {% endif %}
-            <li><a href="{% url 'rezervacije' %}"><i class="material-icons left">border_color</i>Rezervacije učilnic</a>
-            </li>
+            <li><a href="{% url 'sestavljen_urnik_form' %}"><i class="material-icons left">schedule</i>Sestavljen urnik</a></li>
+            <li><a href="{% url 'rezervacije' %}"><i class="material-icons left">border_color</i>Rezervacije učilnic</a></li>
             <li><a href="{% url 'proste' %}"><i class="material-icons left">event_available</i>Najdi proste učilnice</a></li>
             <li><a href="{% url 'bugreport' %}"><i class="material-icons left">bug_report</i>Prijavi napako</a></li>
             <li><a href="{% url 'help' %}"><i class="material-icons left">help</i>Navodila in pomoč</a></li>
@@ -31,6 +24,7 @@
       </tbody>
     </table>
   </div>
+
   {% for letniki in stolpci_smeri %}
     <div class="col s6 m3">
       {% regroup letniki by smer as smeri_list %}
@@ -45,12 +39,7 @@
           {% for letnik in smer_l.list %}
             <tr>
               <td class="padded">
-                {% if izbira %}
-                  <input type="checkbox" name="letnik" value="{{ letnik.id }}" id="letnik-{{ letnik.id }}"/>
-                  <label for="letnik-{{ letnik.id }}">{{ letnik.leto }}</label>
-                {% else %}
                   <a href="{% url 'urnik_letnika' letnik.id %}">{{ letnik.leto }}</a>
-                {% endif %}
               </td>
             </tr>
           {% endfor %}
@@ -70,12 +59,7 @@
       {% for ucilnica in ucilnice %}
         <tr>
           <td class="padded">
-            {% if izbira %}
-              <input type="checkbox" name="ucilnica" value="{{ ucilnica.id }}" id="ucilnica-{{ ucilnica.id }}"/>
-              <label for="ucilnica-{{ ucilnica.id }}">{{ ucilnica.oznaka }}</label>
-            {% else %}
-              <a href="{% url 'urnik_ucilnice' ucilnica.id %}">{{ ucilnica.oznaka }}</a>
-            {% endif %}
+            <a href="{% url 'urnik_ucilnice' ucilnica.id %}">{{ ucilnica.oznaka }}</a>
             <small>
               {% if ucilnica.tip == ucilnica.RACUNALNISKA %}
                 <i class="tiny material-icons">computer</i>
@@ -90,28 +74,7 @@
       </tbody>
     </table>
   </div> <!-- ucilnice -->
-  {% if izbira %}
-    <div class="col s6 m3 offset-m3">
-      <table class="highlight">
-        <thead>
-        <tr>
-          <th>Oseba</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for oseba in osebe %}
-          <tr>
-            <td class="padded">
-              <input type="checkbox" name="oseba" autocomplete="off" value="{{ oseba.id }}" id="oseba-{{ oseba.id }}"/>
-              <label for="oseba-{{ oseba.id }}">{{ oseba.ime }} <strong>{{ oseba.priimek }}</strong></label>
-            </td>
-          </tr>
-        {% endfor %}
-        </tbody>
-      </table>
-    </div>  <!-- osebe -->
-  {% endif %}
 </div> <!-- row -->
 </div> <!-- container -->
-</form>
+
 {% endblock content %}
