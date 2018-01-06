@@ -3,8 +3,15 @@
 <div class="container">
 
 <p class="flow-text">
-  Stran z rezervacijami je še v delu. V kratkem bo omogočen tudi obrazec za rezervacijo,
-  zaenkrat pa rezervacije še vedno javljajte v študentski referat.
+  Stran z rezervacijami je še v delu. V kratkem bo omogočen tudi obrazec za
+  rezervacijo, zaenkrat pa rezervacije še vedno javljajte v študentski referat.
+  <b>Pred tem prosimo preverite, da je učilnica, ki jo želite rezervirati,
+  prosta.</b> Spodaj lahko preverite, katere učilnice so že rezervirane, če pa
+  želite rezervacijo med semestrom, preverite tudi
+  <a href="{% url 'zacetna_stran' %}">urnik</a>.
+  Za lažje iskanje prostih učilnic lahko uporabite tudi
+  <a href="{% url 'proste' %}">iskalnik prostih učilnic</a>.
+  Pri sporočanju rezervacije prosim napišite katero predavalnico, kdaj in zakaj jo želite.
 </p>
 
 {% regroup rezervacije by teden as rezervacije_po_tednih %}
