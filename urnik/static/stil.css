@@ -151,6 +151,9 @@ nav {
     #search-wrapper input[type="search"]::placeholder {
         color: transparent;
     }
+    #search-wrapper input[type="search"] {
+        height: 56px;
+    }
 }
 #search-wrapper form label {
     margin-top: -12px;
@@ -714,14 +717,6 @@ a.skrita {
 }
 
 /* front page */
-#prikazi-sestavljen-urnik {
-     background: none;
-     color: #039be5;
-     border: none;
-     padding: 0;
-     font: inherit;
-     cursor: pointer;
-}
 #firstpage-menu tbody tr td ul {
     list-style-type: none;
     margin: 0px;
@@ -732,6 +727,27 @@ a.skrita {
 }
 #firstpage-menu tbody tr td ul li a i {
     color: inherit;
+}
+
+/* sestavljen urnik */
+#sestavljen-urnik-text input {
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+#sestavljen-urnik-form div.container {
+    width: 95%;
+}
+#sestavljen-urnik-form div.row {
+    margin-bottom: 0px;
+}
+#sestavljen-urnik-form table td {
+    padding: 0px 2px;
+}
+#sestavljen-urnik-form table th {
+    padding: 4px 2px 0px;
+}
+#sestavljen-urnik-form table tbody tr:first-child td {
+    padding-top: 4px;
 }
 
 /* printall */
@@ -757,5 +773,9 @@ a.skrita {
 }
 .printall-table a span.tripple-icon {
     margin-right: 15px;
+}
 
+/* rezervacije */
+#rezervacije-list .collapsible-body {
+    padding-top: 0;
 }

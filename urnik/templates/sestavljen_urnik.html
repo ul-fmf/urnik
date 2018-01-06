@@ -1,0 +1,94 @@
+{% extends 'osnova.html' %}
+{% block content %}
+
+<form action="{% url 'sestavljen_urnik' %}" id="sestavljen-urnik-form">
+<div class="container">
+<div class="row">
+  <div class="col m12">
+    <p id="sestavljen-urnik-text">
+      <input type="submit" value="Prikaži sestavljen urnik" class="btn">
+      <span class="flow-text">Tukaj lahko pogledate urnike za več letnikov, oseb ali učilnic hkrati.</span>
+    </p>
+  </div>
+</div>
+<div class="row">
+  {% for letniki in stolpci_smeri %}
+    <div class="col s6 m2">
+      {% regroup letniki by smer as smeri_list %}
+      {% for smer_l in smeri_list %}
+        <table class="highlight">
+          <thead>
+          <tr>
+            <th>{{ smer_l.grouper }}</th>
+          </tr>
+          </thead>
+          <tbody>
+          {% for letnik in smer_l.list %}
+            <tr>
+              <td>
+                <input type="checkbox" name="letnik" value="{{ letnik.id }}" id="letnik-{{ letnik.id }}"/>
+                <label for="letnik-{{ letnik.id }}">{{ letnik.leto }}</label>
+              </td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      {% endfor %}
+    </div>  <!-- smeri -->
+  {% endfor %}
+  <div class="col s6 m2">
+    <table class="highlight">
+      <thead>
+      <tr>
+        <th>Učilnica</th>
+      </tr>
+      </thead>
+      <tbody>
+      {% for ucilnica in ucilnice %}
+        <tr>
+          <td>
+            <input type="checkbox" name="ucilnica" value="{{ ucilnica.id }}" id="ucilnica-{{ ucilnica.id }}"/>
+            <label for="ucilnica-{{ ucilnica.id }}">{{ ucilnica.oznaka }}</label>
+            <small>
+              {% if ucilnica.tip == ucilnica.RACUNALNISKA %}
+                <i class="tiny material-icons">computer</i>
+              {% elif ucilnica.tip == ucilnica.PRAKTIKUM %}
+                <i class="tiny material-icons">build</i>
+              {% endif %}
+              ({{ ucilnica.velikost|default:'?' }} mest)
+            </small>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div> <!-- ucilnice -->
+  {%  for column in osebe %}
+  <div class="col s6 m2">
+    <table class="highlight">
+      <thead>
+      <tr>
+        <th>Oseba
+          {% if forloop.counter0 > 0 %}
+          (nadalj.)
+          {% endif %}
+        </th>
+      </tr>
+      </thead>
+      <tbody>
+      {% for oseba in column %}
+        <tr>
+          <td>
+            <input type="checkbox" name="oseba" autocomplete="off" value="{{ oseba.id }}" id="oseba-{{ oseba.id }}"/>
+            <label for="oseba-{{ oseba.id }}">{{ oseba.ime }} <strong>{{ oseba.priimek }}</strong></label>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>  <!-- osebe -->
+  {% endfor %}
+</div> <!-- row -->
+</div> <!-- container -->
+</form>
+{% endblock content %}
