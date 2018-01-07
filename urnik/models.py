@@ -346,6 +346,7 @@ class ProsteUcilnice(object):
         self.zasedenost_ucilnic = defaultdict(dict)
         self.rezerviranost_ucilnic = defaultdict(dict)
 
+    def upostevaj_urnik(self):
         for srecanje in Srecanje.objects.select_related('ucilnica', 'predmet').prefetch_related('ucitelji'
                                        ).filter(ucilnica__in=self.ustrezne).exclude(ura__isnull=True):
             for i in range(srecanje.trajanje):

@@ -75,6 +75,11 @@
       Obarvane so sivo.
     </div>
     <div class="card-action">
+      <div class="switch-option">Ignoriraj urnik:
+        <span class="switch nobr"><label>Ne<a
+            onclick="window.location ='{% if ignoriraj_urnik %}{% add_get iu=False %}{% else %}{% add_get iu=True %}{% endif %}';"
+        ><input type="checkbox" {% if ignoriraj_urnik %}checked{% endif %}><span class="lever"></span></a>Da</label></span>
+      </div>
       {% if teden %}
         <div class="switch-option">Pokaži rezervirane:
           <span class="switch nobr"><label>Ne<a {# tukaj uporabimo onclick, da propagata JS evente naprej in takoj switchne switch #}

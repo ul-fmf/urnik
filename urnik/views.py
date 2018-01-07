@@ -141,6 +141,7 @@ def proste_ucilnice(request):
     pokazi_rezervirane = bool(request.GET.get('pr', False))
     if not teden: pokazi_rezervirane = False
     pokazi_zasedene = bool(request.GET.get('pz', False))
+    ignoriraj_urnik = bool(request.GET.get('iu', False))
 
     ucilnice = request.GET.getlist('ucilnica')
     if ucilnice:
@@ -159,6 +160,8 @@ def proste_ucilnice(request):
     if not velikost: velikost = None
 
     proste = ProsteUcilnice(ucilnice, tip, velikost)
+    if not ignoriraj_urnik:
+        proste.upostevaj_urnik()
     if pokazi_rezervirane:
         proste.upostevaj_rezervacije(teden)
 
@@ -176,6 +179,7 @@ def proste_ucilnice(request):
         'velikosti': velikost,
         'tipi': [] if tip == set(Ucilnica.OBJAVLJENI_TIPI) else tip,
         'teden': teden,
+        'ignoriraj_urnik': ignoriraj_urnik,
 
         # possible values
         'mozne_velikosti_ucilnic': UcilnicaQuerySet.VELIKOST,
