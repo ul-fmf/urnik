@@ -69,6 +69,11 @@ span.tripple-icon i:nth-child(3) {
     /*color: rgba(0,0,255,0.5);*/
 }
 
+dt {
+    font-weight: bold;
+    margin-top: 10px;
+}
+
 /* navigation and such */
 nav {
     background-color: #555;

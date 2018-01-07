@@ -1,4 +1,5 @@
 {% extends 'osnova.html' %}
+{% load static %}
 {% block content %}
   <div class="container">
     <p class="flow-text">
@@ -36,13 +37,54 @@
     </p>
 
     <h5>Iskanje prostih učilnic</h5>
-    Pojdite na <a href="{% url 'proste' %}">stran za iskanje prostih učilnic</a>. Ta prikaže proste učilnice
-    za vsak termin v splošnem tednu znotraj trenutnega semestra. Zeleni termini imajo vsaj eno prosto učilnico,
-    rdeči pa nimajo nobene. Če na desni izberete konkreten teden, se pri izračunu prostih
-    učilnic upoštevajo tudi rezervacije. Če je prikazanih učilnic zelo veliko, lahko učilnice
-    filtrirate po tipu in po velikosti. Kot dodatne možnosti lahko vklopite tudi prikaz zasedenih
-    (tj. notri poteka nek predmet) ali rezerviranih predavalnic. V tem primeru ob prehodu miške čez posamezno
-    učilnico vidite tudi razlog za zasedenost.
+    Za iskanje prostih učilnic je namenjen <a href="{% url 'proste' %}">iskalnik prostih učilnic</a>.
+    Ko pridete na stran, prikaže proste učilnice za vsak termin v splošnem tednu znotraj trenutnega semestra.
+    Zeleni termini imajo vsaj eno prosto učilnico, rdeči pa nimajo nobene.
+
+    <dl>
+      <dt>Filtriranje učilnic:</dt>
+      <dd>
+        Prikazanih učilnic je zelo veliko, pogosto pa vas zanima le nekaj učilnic.
+        Učilnice filtrirate po tipu in po velikosti. Odkljukajte kvadratek pred želenimi učilnicami in
+        kliknite gumb <code><i class="material-icons left">filter_list</i> Filtriraj</code>.
+        Za rezervacije kolokvijev so najbolj uporabne velike matematične ali fizikalne učilnice.
+      </dd>
+      <dt>Upoštevanje rezervacij:</dt>
+      <dd>
+        Če na desni izberete konkreten teden, se pri izračunu prostih učilnic upoštevajo tudi rezervacije.
+        Učilnice, ki so rezervirane, se prikažejo sivo, če pa grete čez z miško, se pokažejo tudi dodatni
+        podatki o rezervaciji. Med dodatnimi možnostmi lahko tudi skrijete rezervirane učilnice, da ne motijo pogleda.
+      </dd>
+      <dt>Prikaz zasedenih učilnic:</dt>
+      <dd>
+        Kot dodatne možnosti lahko vklopite tudi prikaz zasedenih predavalnic.
+        V tem primeru ob prehodu miške čez posamezno učilnico vidite tudi razlog za zasedenost.
+      </dd>
+      <dt id="primer-uporabe">Iskanje prostih učilnic v času izpitnega obdobja:</dt>
+      <dd>
+        Za ta namen je pod dodatnimi možnostmi možnost <code>Ignoriraj urnik</code>. To pomeni, da izračun
+        prostih učilnic ne bo upošteval predavalnik, kjer poteka pouk po urniku kot zasedenih, ampak bo
+        upošteval samo že narejene rezervacije.
+      </dd>
+      <dt>Primer uporabe: </dt>
+      <dd>
+        Denimo, da želimo rezervirati učilnico za izpit iz predmeta X. Rezervirati jo želimo v tednu
+        od 22. do 28. januarja in potrebujemo vsaj 50 mest. Na stranskem meniju izberemo teden 22. &ndash; 28. januar.
+        Odkljukamo, da želimo veliko matematično učilnico in pritisnemo
+        <code><i class="material-icons left">filter_list</i> Filtriraj</code>. Ker je ta teden med izpitnim obdobjem,
+        lahko med dodatnimi možnostmi ignoriramo urnik.
+
+        Za rezultat dobimo nekaj podobnega temu na sliki spodaj:
+        <img src="https://user-images.githubusercontent.com/1394590/34654878-f37b1858-f401-11e7-8c95-86ffe9d4e6f5.png"
+             alt="primer uporabe" style="width: 100%;">
+
+        Vidimo, da so nekateri termini že popolnoma zasedeni in so obarvani rdeče.
+        V vseh ostalih terminih je prosta vsaj ena učilnica. Z miško lahko preverimo, zakaj je npr. zasedena 2.01
+        v ponedeljek ob 12ih, tako da se zapeljemo čeznjo. V petek je dopoldne je prosta samo še učilnica 2.02.
+        Ko si izberemo termin, ga sporočimo v referat in prosimo za rezervacijo.
+      </dd>
+    </dl>
+
 
     <h5>Razno</h5>
     Če imate težavo z uporabo kakšnega dela urnika, jo poskusite najprej rešiti sami ali vprašajte kolega,
