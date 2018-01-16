@@ -177,6 +177,19 @@ class Predmet(models.Model):
         return ', '.join(letnik.kratica for letnik in self.letniki.all())
 
 
+class Semester(models.Model):
+    ime = models.CharField(max_length=192)
+    od = models.DateField()
+    do = models.DateField()
+
+    class Meta:
+        verbose_name_plural = 'semestri'
+        ordering = ('od',)
+
+    def __str__(self):
+        return self.ime
+
+
 class SrecanjeQuerySet(models.QuerySet):
 
     def odlozena(self):
@@ -379,6 +392,7 @@ class Srecanje(models.Model):
         (PREDAVANJA, 'predavanja'), (SEMINAR, 'seminar'),
         (VAJE, 'vaje'), (LABORATORIJSKE_VAJE, 'laboratorijske vaje'),
     )
+    semester = models.ForeignKey('urnik.Semester')
     predmet = models.ForeignKey('urnik.Predmet', null=True, blank=True, on_delete=models.CASCADE)
     tip = models.CharField(max_length=1, choices=TIP, blank=True)
     oznaka = models.CharField(max_length=64, blank=True)

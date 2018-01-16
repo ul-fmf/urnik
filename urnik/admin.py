@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.shortcuts import redirect
-from .models import Oseba, Letnik, Ucilnica, Predmet, Srecanje, Rezervacija
+from .models import Oseba, Letnik, Ucilnica, Predmet, Srecanje, Semester, Rezervacija
 
 
 @admin.register(Oseba)
@@ -8,6 +8,18 @@ class OsebaAdmin(admin.ModelAdmin):
     search_fields = (
         'ime',
         'priimek',
+    )
+
+
+@admin.register(Semester)
+class SemesterAdmin(admin.ModelAdmin):
+    list_display = (
+        'ime',
+        'od',
+        'do',
+    )
+    list_display_links = (
+        'ime',
     )
 
 
@@ -135,7 +147,9 @@ class RezervacijaAdmin(admin.ModelAdmin):
 
 @admin.register(Srecanje)
 class SrecanjeAdmin(admin.ModelAdmin):
-
+    list_filter = (
+        'semester',
+    )
     filter_horizontal = (
         'ucitelji',
     )
