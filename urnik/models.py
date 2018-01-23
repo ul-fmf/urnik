@@ -41,8 +41,8 @@ class Oseba(models.Model):
     def vrstni_red(self):
         return self.priimek.replace('Č', 'Cz').replace('Š', 'Sz').replace('Ž', 'Zz')
 
-    def vsa_srecanja(self):
-        return (self.srecanja.all() | Srecanje.objects.filter(predmet__slusatelji=self)).distinct()
+    def vsa_srecanja(self, semester):
+        return (self.srecanja.filter(semester=semester) | semester.srecanja.filter(predmet__slusatelji=self)).distinct()
 
 
 class Letnik(models.Model):
@@ -66,8 +66,8 @@ class Letnik(models.Model):
         else:
             return self.smer
 
-    def srecanja(self):
-        return Srecanje.objects.filter(predmet__letniki=self).distinct()
+    def srecanja(self, semester):
+        return semester.srecanja.filter(predmet__letniki=self).distinct()
 
 
 class UcilnicaQuerySet(models.QuerySet):
@@ -354,12 +354,13 @@ class ProsteUcilniceTermin(Termin):
 
 
 class ProsteUcilnice(object):
-    def __init__(self, ustrezne_ucilnice, tip, velikost):
+    def __init__(self, semester, ustrezne_ucilnice, tip, velikost):
+        self.semester = semester
         self.ustrezne = ustrezne_ucilnice.filter(tip__in=tip).ustrezne_velikosti(velikost)
         self.zasedenost_ucilnic = defaultdict(dict)
         self.rezerviranost_ucilnic = defaultdict(dict)
 
-        for srecanje in Srecanje.objects.select_related('ucilnica', 'predmet').prefetch_related('ucitelji'
+        for srecanje in self.semester.srecanja.select_related('ucilnica', 'predmet').prefetch_related('ucitelji'
                                        ).filter(ucilnica__in=self.ustrezne).exclude(ura__isnull=True):
             for i in range(srecanje.trajanje):
                 self.zasedenost_ucilnic[srecanje.dan, srecanje.ura + i][srecanje.ucilnica] = srecanje
@@ -468,9 +469,10 @@ class Srecanje(models.Model):
             return self.predmet.kratica
 
     def povezana_srecanja(self):
-        letniki_poslusajo = Srecanje.objects.filter(predmet__letniki__in=self.predmet.letniki.all())
-        ucitelj_uci = Srecanje.objects.filter(ucitelji__in=self.ucitelji.all())
-        ucitelj_poslusa = Srecanje.objects.filter(predmet__slusatelji__in=self.ucitelji.all())
+        srecanja = self.semester.srecanja
+        letniki_poslusajo = srecanja.filter(predmet__letniki__in=self.predmet.letniki.all())
+        ucitelj_uci = srecanja.filter(ucitelji__in=self.ucitelji.all())
+        ucitelj_poslusa = srecanja.filter(predmet__slusatelji__in=self.ucitelji.all())
         return (letniki_poslusajo | ucitelj_uci | ucitelj_poslusa).exclude(
             pk=self.pk
         ).distinct()
@@ -498,7 +500,7 @@ class Srecanje(models.Model):
             ustrezne.insert(0, self.ucilnica)
 
         zasedenost_ucilnic = defaultdict(set)
-        for srecanje in Srecanje.objects.neodlozena().filter(ucilnica__in=ustrezne + alternative).exclude(pk=self.pk).select_related('ucilnica'):
+        for srecanje in self.semester.srecanja.neodlozena().filter(ucilnica__in=ustrezne + alternative).exclude(pk=self.pk).select_related('ucilnica'):
             for ura in range(srecanje.ura, srecanje.ura + srecanje.trajanje):
                 zasedenost_ucilnic[(srecanje.dan, ura)].add(srecanje.ucilnica)
 
