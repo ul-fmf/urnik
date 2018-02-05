@@ -7,8 +7,7 @@ from django.views.decorators.http import require_POST
 
 from .models import *
 
-STARI = Semester.objects.get(pk=1)
-NOVI = Semester.objects.get(pk=2)
+STARI = NOVI = Semester.objects.get(pk=2)
 
 def izbrani_semester(request):
     return NOVI if request.session.get('urejanje', False) else STARI
