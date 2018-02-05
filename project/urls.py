@@ -24,8 +24,8 @@ urlpatterns = [
     url(r'^accounts/logout/$', auth_views.logout, name='logout'),
     url(r'^accounts/login/$', auth_views.login,  {'template_name': 'admin/login.html'}, name='login'),
     url(r'^$', urnik.views.zacetna_stran, name='zacetna_stran'),
-    url(r'^urnik/$', urnik.views.sestavljen_urnik, name='sestavljen_urnik'),
-    url(r'^sestavljen/$', urnik.views.sestavljen_urnik_form, name='sestavljen_urnik_form'),
+    url(r'^urnik/$', urnik.views.kombiniran_pogled, name='kombiniran_pogled'),
+    url(r'^sestavljen/$', urnik.views.kombiniran_pogled_form, name='kombiniran_pogled_form'),
     url(r'^rezervacije/$', urnik.views.rezervacije, name='rezervacije'),
     url(r'^proste/$', urnik.views.proste_ucilnice, name='proste'),
     url(r'^proste_filter/$', urnik.views.proste_ucilnice_filter, name='proste_filter'),
@@ -49,4 +49,3 @@ if 'silk' in settings.INSTALLED_APPS:
     urlpatterns += [
         url(r'^silk/', include('silk.urls', namespace='silk')),
     ]
-

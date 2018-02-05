@@ -23,13 +23,13 @@ def zacetna_stran(request):
     })
 
 
-def sestavljen_urnik_form(request):
+def kombiniran_pogled_form(request):
     osebe = sorted(Oseba.objects.aktivni(), key=lambda oseba: oseba.vrstni_red())
     columns = 3
     length = len(osebe)
     per_column = length // columns
     ucilnice = Ucilnica.objects.objavljene()
-    return render(request, 'sestavljen_urnik.html', {
+    return render(request, 'kombiniran_pogled.html', {
         'stolpci_smeri': [
             Letnik.objects.filter(oddelek=Letnik.MATEMATIKA),
             Letnik.objects.filter(oddelek=Letnik.FIZIKA),
@@ -117,7 +117,7 @@ def urnik_predmeta(request, predmet_id):
     return urnik(request, predmet.srecanja.filter(semester=izbrani_semester(request)), naslov)
 
 
-def sestavljen_urnik(request):
+def kombiniran_pogled(request):
     letniki = Letnik.objects.filter(id__in=request.GET.getlist('letnik'))
     osebe = Oseba.objects.filter(id__in=request.GET.getlist('oseba'))
     ucilnice = Ucilnica.objects.filter(id__in=request.GET.getlist('ucilnica'))
