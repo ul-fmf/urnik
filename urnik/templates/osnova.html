@@ -88,7 +88,7 @@
       <i class="material-icons">print</i>
     </span>Natisni več hkrati</a></li>
   {% endif %}
-  <li><a href="{% url 'bugreport' %}"><i class="material-icons left">bug_report</i>Prijavi napako</a></li>
+  <li><a href="{% url 'bugreport' %}"><i class="material-icons left">bug_report</i>Prijava napake</a></li>
   <li><a href="{% url 'help' %}"><i class="material-icons left">help</i>Navodila in pomoč</a></li>
 </ul> <!-- side nav -->
 
@@ -103,7 +103,7 @@
         "Meni: Rezervacije učilnic" : "{% url 'rezervacije' %}",
         "Meni: Proste učilnice" : "{% url 'proste' %}",
         "Meni: Natisni stran" : "javascript:window.print();",
-        "Meni: Prijavi napako" : "{% url 'bugreport' %}",
+        "Meni: Prijava napake" : "{% url 'bugreport' %}",
         "Meni: Navodila in pomoč" : "{% url 'help' %}",
 
         {% for letnik in letniki_search %}
