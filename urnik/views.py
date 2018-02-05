@@ -7,6 +7,11 @@ from django.views.decorators.http import require_POST
 
 from .models import *
 
+STARI = Semester.objects.get(pk=1)
+NOVI = Semester.objects.get(pk=2)
+
+def izbrani_semester(request):
+    return NOVI if request.session.get('urejanje', False) else STARI
 
 def zacetna_stran(request):
     ucilnice = Ucilnica.objects.objavljene()
@@ -75,8 +80,8 @@ def urnik(request, srecanja, naslov, barve=None):
             'nacin': 'urejanje',
             'naslov': naslov,
             'srecanja': srecanja.urnik(barve=barve),
-            'odlozena_srecanja': Srecanje.objects.odlozena(),
-            'prekrivanja_po_tipih': Srecanje.objects.prekrivanja(),
+            'odlozena_srecanja': izbrani_semester(request).srecanja.odlozena(),
+            'prekrivanja_po_tipih': izbrani_semester(request).srecanja.prekrivanja(),
             'next': next_url,
             'barve': barve,
         })
@@ -92,35 +97,35 @@ def urnik(request, srecanja, naslov, barve=None):
 def urnik_osebe(request, oseba_id):
     oseba = get_object_or_404(Oseba, id=oseba_id)
     naslov = str(oseba)
-    return urnik(request, oseba.vsa_srecanja(), naslov)
+    return urnik(request, oseba.vsa_srecanja(izbrani_semester(request)), naslov)
 
 
 def urnik_letnika(request, letnik_id):
     letnik = get_object_or_404(Letnik, id=letnik_id)
     naslov = str(letnik)
-    return urnik(request, letnik.srecanja().all(), naslov)
+    return urnik(request, letnik.srecanja(izbrani_semester(request)).all(), naslov)
 
 
 def urnik_ucilnice(request, ucilnica_id):
     ucilnica = get_object_or_404(Ucilnica, id=ucilnica_id)
     naslov = 'Učilnica {}'.format(ucilnica.oznaka)
-    return urnik(request, ucilnica.srecanja.all(), naslov, barve=[])
+    return urnik(request, ucilnica.srecanja.filter(semester=izbrani_semester(request)), naslov, barve=[])
 
 
 def urnik_predmeta(request, predmet_id):
     predmet = get_object_or_404(Predmet, id=predmet_id)
     naslov = str(predmet)
-    return urnik(request, predmet.srecanja.all(), naslov)
+    return urnik(request, predmet.srecanja.filter(semester=izbrani_semester(request)), naslov)
 
 
 def sestavljen_urnik(request):
     letniki = Letnik.objects.filter(id__in=request.GET.getlist('letnik'))
     osebe = Oseba.objects.filter(id__in=request.GET.getlist('oseba'))
     ucilnice = Ucilnica.objects.filter(id__in=request.GET.getlist('ucilnica'))
-    srecanja_letnikov = Srecanje.objects.filter(predmet__letniki__in=letniki)
-    srecanja_uciteljev = Srecanje.objects.filter(ucitelji__in=osebe)
-    srecanja_slusateljev = Srecanje.objects.filter(predmet__slusatelji__in=osebe)
-    srecanja_ucilnic = Srecanje.objects.filter(ucilnica__in=ucilnice)
+    srecanja_letnikov = izbrani_semester(request).srecanja.filter(predmet__letniki__in=letniki)
+    srecanja_uciteljev = izbrani_semester(request).srecanja.filter(ucitelji__in=osebe)
+    srecanja_slusateljev = izbrani_semester(request).srecanja.filter(predmet__slusatelji__in=osebe)
+    srecanja_ucilnic = izbrani_semester(request).srecanja.filter(ucilnica__in=ucilnice)
     srecanja = (srecanja_letnikov | srecanja_uciteljev |
                 srecanja_slusateljev | srecanja_ucilnic).distinct()
     return urnik(request, srecanja, 'Sestavljen urnik', barve=list(letniki) + list(osebe) + list(ucilnice))
@@ -159,7 +164,7 @@ def proste_ucilnice(request):
     velikost &= {v[0] for v in UcilnicaQuerySet.VELIKOST}
     if not velikost: velikost = None
 
-    proste = ProsteUcilnice(ucilnice, tip, velikost)
+    proste = ProsteUcilnice(izbrani_semester(request), ucilnice, tip, velikost)
     if not ignoriraj_urnik:
         proste.upostevaj_urnik()
     if pokazi_rezervirane:
@@ -215,7 +220,7 @@ def premakni_srecanje(request, srecanje_id):
             'nacin': 'premikanje',
             'naslov': 'Premikanje srečanja',
             'srecanja': srecanje.povezana_srecanja().urnik(),
-            'odlozena_srecanja': Srecanje.objects.odlozena(),
+            'odlozena_srecanja': izbrani_semester(request).srecanja.odlozena(),
             'prekrivanja_po_tipih': {},
             'prosti_termini': srecanje.prosti_termini(request.GET['tip'], 'MAT' if 'matematika' in ','.join(
                 group.name for group in request.user.groups.all()) else 'FIZ'),
