@@ -76,8 +76,8 @@
   </nav>
 </div> <!-- navbar fixed -->
 <ul class="side-nav" id="side-menu"> <!-- side navigation -->
-  <li><a href="{% url 'zacetna_stran' %}"><i class="material-icons left">home</i>Domov</a></li>
-  <li><a href="{% url 'sestavljen_urnik_form' %}"><i class="material-icons left">schedule</i>Sestavljen urnik</a></li>
+  <li><a href="{% url 'zacetna_stran' %}"><i class="material-icons left">home</i>Urnik</a></li>
+  <li><a href="{% url 'sestavljen_urnik_form' %}"><i class="material-icons left">schedule</i>Kombiniran pogled</a></li>
   <li><a href="{% url 'rezervacije' %}"><i class="material-icons left">border_color</i>Rezervacije učilnic</a></li>
   <li><a href="{% url 'proste' %}"><i class="material-icons left">event_available</i>Proste učilnice</a></li>
   <li><a href="javascript:window.print();"><i class="material-icons left">print</i>Natisni stran</a></li>
@@ -98,8 +98,8 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
 <script>
     var search_urls = {
-        "Meni: Domov" : "{% url 'zacetna_stran' %}",
-        "Meni: Sestavljen urnik" : "{% url 'sestavljen_urnik_form' %}",
+        "Meni: Urnik" : "{% url 'zacetna_stran' %}",
+        "Meni: Kombiniran pogled" : "{% url 'sestavljen_urnik_form' %}",
         "Meni: Rezervacije učilnic" : "{% url 'rezervacije' %}",
         "Meni: Proste učilnice" : "{% url 'proste' %}",
         "Meni: Natisni stran" : "javascript:window.print();",

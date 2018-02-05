@@ -36,7 +36,7 @@ def sestavljen_urnik_form(request):
         ],
         'osebe': [osebe[i*per_column:(i+1)*per_column] for i in range(columns)],
         'ucilnice': ucilnice,
-        'naslov': 'Sestavljen urnik',
+        'naslov': 'Kombiniran pogled',
     })
 
 
@@ -127,7 +127,7 @@ def sestavljen_urnik(request):
     srecanja_ucilnic = izbrani_semester(request).srecanja.filter(ucilnica__in=ucilnice)
     srecanja = (srecanja_letnikov | srecanja_uciteljev |
                 srecanja_slusateljev | srecanja_ucilnic).distinct()
-    return urnik(request, srecanja, 'Sestavljen urnik', barve=list(letniki) + list(osebe) + list(ucilnice))
+    return urnik(request, srecanja, 'Kombiniran pogled', barve=list(letniki) + list(osebe) + list(ucilnice))
 
 
 def proste_ucilnice(request):
