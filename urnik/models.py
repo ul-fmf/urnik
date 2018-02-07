@@ -181,6 +181,7 @@ class Semester(models.Model):
     ime = models.CharField(max_length=192)
     od = models.DateField()
     do = models.DateField()
+    objavljen = models.BooleanField(default=False)
 
     class Meta:
         verbose_name_plural = 'semestri'

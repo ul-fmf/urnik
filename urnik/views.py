@@ -7,15 +7,18 @@ from django.urls import reverse
 from django.views.decorators.http import require_POST
 from .models import *
 
-def poisci_semester(kljuc, pk):
-    semester = cache.get(kljuc)
-    if not semester:
-        semester = Semester.objects.get(pk=pk)
-        cache.set(kljuc, semester, None)
-    return semester
 
 def izbrani_semester(request):
-    return poisci_semester('semester_za_urejanje', 2) if request.session.get('urejanje', False) else poisci_semester('objavljeni_semester', 1)
+    urejanje = request.session.get('urejanje', False)
+    kljuc_semestra = 'semester_za_urejanje' if urejanje else 'semester_za_ogled'
+    semester = cache.get(kljuc_semestra)
+    if not semester:
+        if urejanje:
+            semester = Semester.objects.latest('od')
+        else:
+            semester = Semester.objects.filter(objavljen=True).latest('od')
+        cache.set(kljuc_semestra, semester, None)
+    return semester
 
 def zacetna_stran(request):
     ucilnice = Ucilnica.objects.objavljene()
