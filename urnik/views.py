@@ -1,12 +1,24 @@
+from django.core.cache import cache
 from django.http import QueryDict
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.dateparse import parse_date
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.views.decorators.http import require_POST
-
 from .models import *
 
+
+def izbrani_semester(request):
+    urejanje = request.session.get('urejanje', False)
+    kljuc_semestra = 'semester_za_urejanje' if urejanje else 'semester_za_ogled'
+    semester = cache.get(kljuc_semestra)
+    if not semester:
+        if urejanje:
+            semester = Semester.objects.latest('od')
+        else:
+            semester = Semester.objects.filter(objavljen=True).latest('od')
+        cache.set(kljuc_semestra, semester, None)
+    return semester
 
 def zacetna_stran(request):
     ucilnice = Ucilnica.objects.objavljene()
@@ -19,20 +31,20 @@ def zacetna_stran(request):
     })
 
 
-def sestavljen_urnik_form(request):
+def kombiniran_pogled_form(request):
     osebe = sorted(Oseba.objects.aktivni(), key=lambda oseba: oseba.vrstni_red())
     columns = 3
     length = len(osebe)
     per_column = length // columns
     ucilnice = Ucilnica.objects.objavljene()
-    return render(request, 'sestavljen_urnik.html', {
+    return render(request, 'kombiniran_pogled.html', {
         'stolpci_smeri': [
             Letnik.objects.filter(oddelek=Letnik.MATEMATIKA),
             Letnik.objects.filter(oddelek=Letnik.FIZIKA),
         ],
         'osebe': [osebe[i*per_column:(i+1)*per_column] for i in range(columns)],
         'ucilnice': ucilnice,
-        'naslov': 'Sestavljen urnik',
+        'naslov': 'Kombiniran pogled',
     })
 
 
@@ -75,8 +87,8 @@ def urnik(request, srecanja, naslov, barve=None):
             'nacin': 'urejanje',
             'naslov': naslov,
             'srecanja': srecanja.urnik(barve=barve),
-            'odlozena_srecanja': Srecanje.objects.odlozena(),
-            'prekrivanja_po_tipih': Srecanje.objects.prekrivanja(),
+            'odlozena_srecanja': izbrani_semester(request).srecanja.odlozena(),
+            'prekrivanja_po_tipih': izbrani_semester(request).srecanja.prekrivanja(),
             'next': next_url,
             'barve': barve,
         })
@@ -92,38 +104,38 @@ def urnik(request, srecanja, naslov, barve=None):
 def urnik_osebe(request, oseba_id):
     oseba = get_object_or_404(Oseba, id=oseba_id)
     naslov = str(oseba)
-    return urnik(request, oseba.vsa_srecanja(), naslov)
+    return urnik(request, oseba.vsa_srecanja(izbrani_semester(request)), naslov)
 
 
 def urnik_letnika(request, letnik_id):
     letnik = get_object_or_404(Letnik, id=letnik_id)
     naslov = str(letnik)
-    return urnik(request, letnik.srecanja().all(), naslov)
+    return urnik(request, letnik.srecanja(izbrani_semester(request)).all(), naslov)
 
 
 def urnik_ucilnice(request, ucilnica_id):
     ucilnica = get_object_or_404(Ucilnica, id=ucilnica_id)
     naslov = 'Učilnica {}'.format(ucilnica.oznaka)
-    return urnik(request, ucilnica.srecanja.all(), naslov, barve=[])
+    return urnik(request, ucilnica.srecanja.filter(semester=izbrani_semester(request)), naslov, barve=[])
 
 
 def urnik_predmeta(request, predmet_id):
     predmet = get_object_or_404(Predmet, id=predmet_id)
     naslov = str(predmet)
-    return urnik(request, predmet.srecanja.all(), naslov)
+    return urnik(request, predmet.srecanja.filter(semester=izbrani_semester(request)), naslov)
 
 
-def sestavljen_urnik(request):
+def kombiniran_pogled(request):
     letniki = Letnik.objects.filter(id__in=request.GET.getlist('letnik'))
     osebe = Oseba.objects.filter(id__in=request.GET.getlist('oseba'))
     ucilnice = Ucilnica.objects.filter(id__in=request.GET.getlist('ucilnica'))
-    srecanja_letnikov = Srecanje.objects.filter(predmet__letniki__in=letniki)
-    srecanja_uciteljev = Srecanje.objects.filter(ucitelji__in=osebe)
-    srecanja_slusateljev = Srecanje.objects.filter(predmet__slusatelji__in=osebe)
-    srecanja_ucilnic = Srecanje.objects.filter(ucilnica__in=ucilnice)
+    srecanja_letnikov = izbrani_semester(request).srecanja.filter(predmet__letniki__in=letniki)
+    srecanja_uciteljev = izbrani_semester(request).srecanja.filter(ucitelji__in=osebe)
+    srecanja_slusateljev = izbrani_semester(request).srecanja.filter(predmet__slusatelji__in=osebe)
+    srecanja_ucilnic = izbrani_semester(request).srecanja.filter(ucilnica__in=ucilnice)
     srecanja = (srecanja_letnikov | srecanja_uciteljev |
                 srecanja_slusateljev | srecanja_ucilnic).distinct()
-    return urnik(request, srecanja, 'Sestavljen urnik', barve=list(letniki) + list(osebe) + list(ucilnice))
+    return urnik(request, srecanja, 'Kombiniran pogled', barve=list(letniki) + list(osebe) + list(ucilnice))
 
 
 def proste_ucilnice(request):
@@ -141,7 +153,6 @@ def proste_ucilnice(request):
     pokazi_rezervirane = bool(request.GET.get('pr', False))
     if not teden: pokazi_rezervirane = False
     pokazi_zasedene = bool(request.GET.get('pz', False))
-    ignoriraj_urnik = bool(request.GET.get('iu', False))
 
     ucilnice = request.GET.getlist('ucilnica')
     if ucilnice:
@@ -160,10 +171,14 @@ def proste_ucilnice(request):
     if not velikost: velikost = None
 
     proste = ProsteUcilnice(ucilnice, tip, velikost)
-    if not ignoriraj_urnik:
-        proste.upostevaj_urnik()
     if pokazi_rezervirane:
         proste.upostevaj_rezervacije(teden)
+        # teh semestrov bi moralo biti 0 ali 1
+        prekrivajoci_semestri = Semester.objects.filter(od__lte=teden,do__gte=teden)
+        for semester in prekrivajoci_semestri:
+            proste.dodaj_srecanja_semestra(semester)
+    else:
+        proste.dodaj_srecanja_semestra(izbrani_semester(request))
 
     termini = proste.dobi_termine()
     for t in termini:
@@ -179,7 +194,6 @@ def proste_ucilnice(request):
         'velikosti': velikost,
         'tipi': [] if tip == set(Ucilnica.OBJAVLJENI_TIPI) else tip,
         'teden': teden,
-        'ignoriraj_urnik': ignoriraj_urnik,
 
         # possible values
         'mozne_velikosti_ucilnic': UcilnicaQuerySet.VELIKOST,
@@ -215,7 +229,7 @@ def premakni_srecanje(request, srecanje_id):
             'nacin': 'premikanje',
             'naslov': 'Premikanje srečanja',
             'srecanja': srecanje.povezana_srecanja().urnik(),
-            'odlozena_srecanja': Srecanje.objects.odlozena(),
+            'odlozena_srecanja': izbrani_semester(request).srecanja.odlozena(),
             'prekrivanja_po_tipih': {},
             'prosti_termini': srecanje.prosti_termini(request.GET['tip'], 'MAT' if 'matematika' in ','.join(
                 group.name for group in request.user.groups.all()) else 'FIZ'),

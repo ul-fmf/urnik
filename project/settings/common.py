@@ -62,6 +62,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'urnik.context_preprocessors.search_data',
+                'urnik.context_preprocessors.izbrani_semester',
             ],
         },
     },

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.shortcuts import redirect
-from .models import Oseba, Letnik, Ucilnica, Predmet, Srecanje, Rezervacija
+from .models import Oseba, Letnik, Ucilnica, Predmet, Srecanje, Semester, Rezervacija
 
 
 @admin.register(Oseba)
@@ -8,6 +8,19 @@ class OsebaAdmin(admin.ModelAdmin):
     search_fields = (
         'ime',
         'priimek',
+    )
+
+
+@admin.register(Semester)
+class SemesterAdmin(admin.ModelAdmin):
+    list_display = (
+        'ime',
+        'od',
+        'do',
+        'objavljen',
+    )
+    list_display_links = (
+        'ime',
     )
 
 
@@ -64,9 +77,40 @@ class PredmetAdmin(admin.ModelAdmin):
             'letniki',
         )
 
+class CasRezervacijeListFilter(admin.SimpleListFilter):
+    title = 'čas rezervacije'
+    parameter_name = 'cas'
+
+    def lookups(self, request, model_admin):
+        return (
+            (None, 'Prihajajoče'),
+            ('vse', 'Vse'),
+        )
+
+    def choices(self, cl):
+        for lookup, title in self.lookup_choices:
+            yield {
+                'selected': self.value() == lookup,
+                'query_string': cl.get_query_string({
+                    self.parameter_name: lookup,
+                }, []),
+                'display': title,
+            }
+
+    def queryset(self, request, queryset):
+        if self.value() == 'vse':
+            return queryset
+        else:
+            return queryset.prihajajoce()
 
 @admin.register(Rezervacija)
 class RezervacijaAdmin(admin.ModelAdmin):
+    search_fields = (
+        'osebe__ime',
+        'osebe__priimek',
+        'ucilnice__oznaka',
+        'opomba',
+    )
     list_display = (
         'seznam_ucilnic',
         'seznam_oseb',
@@ -75,8 +119,10 @@ class RezervacijaAdmin(admin.ModelAdmin):
         'do',
         'opomba',
     )
+    date_hierarchy = 'dan'
     list_filter = (
-        ('osebe', admin.RelatedOnlyFieldListFilter),
+        CasRezervacijeListFilter,
+        'ucilnice__tip',
         ('ucilnice', admin.RelatedOnlyFieldListFilter),
     )
     filter_horizontal = (
@@ -102,7 +148,9 @@ class RezervacijaAdmin(admin.ModelAdmin):
 
 @admin.register(Srecanje)
 class SrecanjeAdmin(admin.ModelAdmin):
-
+    list_filter = (
+        'semester',
+    )
     filter_horizontal = (
         'ucitelji',
     )

@@ -41,8 +41,8 @@ class Oseba(models.Model):
     def vrstni_red(self):
         return self.priimek.replace('Č', 'Cz').replace('Š', 'Sz').replace('Ž', 'Zz')
 
-    def vsa_srecanja(self):
-        return (self.srecanja.all() | Srecanje.objects.filter(predmet__slusatelji=self)).distinct()
+    def vsa_srecanja(self, semester):
+        return (self.srecanja.filter(semester=semester) | semester.srecanja.filter(predmet__slusatelji=self)).distinct()
 
 
 class Letnik(models.Model):
@@ -66,8 +66,8 @@ class Letnik(models.Model):
         else:
             return self.smer
 
-    def srecanja(self):
-        return Srecanje.objects.filter(predmet__letniki=self).distinct()
+    def srecanja(self, semester):
+        return semester.srecanja.filter(predmet__letniki=self).distinct()
 
 
 class UcilnicaQuerySet(models.QuerySet):
@@ -137,7 +137,7 @@ class Ucilnica(models.Model):
 
     tip = models.CharField(max_length=1, choices=TIP, default=ZUNANJA, blank=True)
     oznaka = models.CharField(max_length=192, unique=True)
-    kratka_oznaka = models.CharField(max_length=10, unique=True, blank=True)
+    kratka_oznaka = models.CharField(max_length=10, blank=True)
     velikost = models.PositiveSmallIntegerField(blank=True, null=True)
     objects = UcilnicaQuerySet.as_manager()
 
@@ -175,6 +175,20 @@ class Predmet(models.Model):
 
     def kratice_letnikov(self):
         return ', '.join(letnik.kratica for letnik in self.letniki.all())
+
+
+class Semester(models.Model):
+    ime = models.CharField(max_length=192)
+    od = models.DateField()
+    do = models.DateField()
+    objavljen = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name_plural = 'semestri'
+        ordering = ('od',)
+
+    def __str__(self):
+        return self.ime
 
 
 class SrecanjeQuerySet(models.QuerySet):
@@ -346,8 +360,8 @@ class ProsteUcilnice(object):
         self.zasedenost_ucilnic = defaultdict(dict)
         self.rezerviranost_ucilnic = defaultdict(dict)
 
-    def upostevaj_urnik(self):
-        for srecanje in Srecanje.objects.select_related('ucilnica', 'predmet').prefetch_related('ucitelji'
+    def dodaj_srecanja_semestra(self, semester):
+        for srecanje in semester.srecanja.select_related('ucilnica', 'predmet').prefetch_related('ucitelji'
                                        ).filter(ucilnica__in=self.ustrezne).exclude(ura__isnull=True):
             for i in range(srecanje.trajanje):
                 self.zasedenost_ucilnic[srecanje.dan, srecanje.ura + i][srecanje.ucilnica] = srecanje
@@ -380,6 +394,7 @@ class Srecanje(models.Model):
         (PREDAVANJA, 'predavanja'), (SEMINAR, 'seminar'),
         (VAJE, 'vaje'), (LABORATORIJSKE_VAJE, 'laboratorijske vaje'),
     )
+    semester = models.ForeignKey('urnik.Semester')
     predmet = models.ForeignKey('urnik.Predmet', null=True, blank=True, on_delete=models.CASCADE)
     tip = models.CharField(max_length=1, choices=TIP, blank=True)
     oznaka = models.CharField(max_length=64, blank=True)
@@ -455,9 +470,10 @@ class Srecanje(models.Model):
             return self.predmet.kratica
 
     def povezana_srecanja(self):
-        letniki_poslusajo = Srecanje.objects.filter(predmet__letniki__in=self.predmet.letniki.all())
-        ucitelj_uci = Srecanje.objects.filter(ucitelji__in=self.ucitelji.all())
-        ucitelj_poslusa = Srecanje.objects.filter(predmet__slusatelji__in=self.ucitelji.all())
+        srecanja = self.semester.srecanja
+        letniki_poslusajo = srecanja.filter(predmet__letniki__in=self.predmet.letniki.all())
+        ucitelj_uci = srecanja.filter(ucitelji__in=self.ucitelji.all())
+        ucitelj_poslusa = srecanja.filter(predmet__slusatelji__in=self.ucitelji.all())
         return (letniki_poslusajo | ucitelj_uci | ucitelj_poslusa).exclude(
             pk=self.pk
         ).distinct()
@@ -485,7 +501,7 @@ class Srecanje(models.Model):
             ustrezne.insert(0, self.ucilnica)
 
         zasedenost_ucilnic = defaultdict(set)
-        for srecanje in Srecanje.objects.neodlozena().filter(ucilnica__in=ustrezne + alternative).exclude(pk=self.pk).select_related('ucilnica'):
+        for srecanje in self.semester.srecanja.neodlozena().filter(ucilnica__in=ustrezne + alternative).exclude(pk=self.pk).select_related('ucilnica'):
             for ura in range(srecanje.ura, srecanje.ura + srecanje.trajanje):
                 zasedenost_ucilnic[(srecanje.dan, ura)].add(srecanje.ucilnica)
 
