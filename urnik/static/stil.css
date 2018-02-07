@@ -729,24 +729,24 @@ a.skrita {
     color: inherit;
 }
 
-/* sestavljen urnik */
-#sestavljen-urnik-text input {
+/* kombiniran pogled */
+#kombiniran-pogled-text input {
     margin-right: 10px;
     margin-bottom: 10px;
 }
-#sestavljen-urnik-form div.container {
+#kombiniran-pogled-form div.container {
     width: 95%;
 }
-#sestavljen-urnik-form div.row {
+#kombiniran-pogled-form div.row {
     margin-bottom: 0px;
 }
-#sestavljen-urnik-form table td {
+#kombiniran-pogled-form table td {
     padding: 0px 2px;
 }
-#sestavljen-urnik-form table th {
+#kombiniran-pogled-form table th {
     padding: 4px 2px 0px;
 }
-#sestavljen-urnik-form table tbody tr:first-child td {
+#kombiniran-pogled-form table tbody tr:first-child td {
     padding-top: 4px;
 }
 
