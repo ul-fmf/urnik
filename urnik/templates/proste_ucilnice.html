@@ -88,12 +88,11 @@
           ><input type="checkbox" {% if pokazi_rezervirane %}checked{% endif %}><span class="lever"></span></a>Da</label></span>
         </div>
       {% endif %}
-      <div class="switch-option">*Pokaži zasedene:
+      <div class="switch-option">Pokaži zasedene:
         <span class="switch nobr"><label>Ne<a
             onclick="window.location ='{% if pokazi_zasedene %}{% add_get pz=False %}{% else %}{% add_get pz=True %}{% endif %}';"
         ><input type="checkbox" {% if pokazi_zasedene %}checked{% endif %}><span class="lever"></span></a>Da</label></span>
       </div>
-      <div class="disclaimer">* zaradi velike količine podatkov se stran lahko nalaga dlje časa</div>
     </div>
   </div>
 </div>
