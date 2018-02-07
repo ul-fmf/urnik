@@ -1,16 +1,21 @@
+from django.core.cache import cache
 from django.http import QueryDict
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.dateparse import parse_date
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.views.decorators.http import require_POST
-
 from .models import *
 
-STARI = NOVI = Semester.objects.get(pk=2)
+def poisci_semester(kljuc, pk):
+    semester = cache.get(kljuc)
+    if not semester:
+        semester = Semester.objects.get(pk=pk)
+        cache.set(kljuc, semester, None)
+    return semester
 
 def izbrani_semester(request):
-    return NOVI if request.session.get('urejanje', False) else STARI
+    return poisci_semester('semester_za_urejanje', 2) if request.session.get('urejanje', False) else poisci_semester('objavljeni_semester', 1)
 
 def zacetna_stran(request):
     ucilnice = Ucilnica.objects.objavljene()

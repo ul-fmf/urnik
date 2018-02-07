@@ -137,7 +137,7 @@ class Ucilnica(models.Model):
 
     tip = models.CharField(max_length=1, choices=TIP, default=ZUNANJA, blank=True)
     oznaka = models.CharField(max_length=192, unique=True)
-    kratka_oznaka = models.CharField(max_length=10, unique=True, blank=True)
+    kratka_oznaka = models.CharField(max_length=10, blank=True)
     velikost = models.PositiveSmallIntegerField(blank=True, null=True)
     objects = UcilnicaQuerySet.as_manager()
 
