@@ -81,15 +81,8 @@
       Obarvane so sivo.
     </div>
     <div class="card-action">
-      {% if teden %}
-        <div class="switch-option">Pokaži rezervirane:
-          <span class="switch nobr"><label>Ne<a {# tukaj uporabimo onclick, da propagata JS evente naprej in takoj switchne switch #}
-              onclick="window.location ='{% if pokazi_rezervirane %}{% add_get pr=False %}{% else %}{% add_get pr=True %}{% endif %}';"
-          ><input type="checkbox" {% if pokazi_rezervirane %}checked{% endif %}><span class="lever"></span></a>Da</label></span>
-        </div>
-      {% endif %}
       <div class="switch-option">Pokaži zasedene:
-        <span class="switch nobr"><label>Ne<a
+        <span class="switch nobr"><label>Ne<a {# tukaj uporabimo onclick, da propagata JS evente naprej in takoj switchne switch #}
             onclick="window.location ='{% if pokazi_zasedene %}{% add_get pz=False %}{% else %}{% add_get pz=True %}{% endif %}';"
         ><input type="checkbox" {% if pokazi_zasedene %}checked{% endif %}><span class="lever"></span></a>Da</label></span>
       </div>

@@ -150,8 +150,6 @@ def proste_ucilnice(request):
     except:
         teden = None
 
-    pokazi_rezervirane = bool(request.GET.get('pr', False))
-    if not teden: pokazi_rezervirane = False
     pokazi_zasedene = bool(request.GET.get('pz', False))
 
     ucilnice = request.GET.getlist('ucilnica')
@@ -171,7 +169,7 @@ def proste_ucilnice(request):
     if not velikost: velikost = None
 
     proste = ProsteUcilnice(ucilnice, tip, velikost)
-    if pokazi_rezervirane:
+    if teden:
         proste.upostevaj_rezervacije(teden)
         # teh semestrov bi moralo biti 0 ali 1
         prekrivajoci_semestri = Semester.objects.filter(od__lte=teden,do__gte=teden)
@@ -182,14 +180,13 @@ def proste_ucilnice(request):
 
     termini = proste.dobi_termine()
     for t in termini:
-        t.filtriraj_ucilnice(pokazi_rezervirane=pokazi_rezervirane, pokazi_zasedene=pokazi_zasedene)
+        t.filtriraj_ucilnice(pokazi_zasedene=pokazi_zasedene)
 
     return render(request, 'proste_ucilnice.html', {
         'naslov': 'Proste učilnice',
         'termini': termini,
 
         # get parameters
-        'pokazi_rezervirane': pokazi_rezervirane,
         'pokazi_zasedene': pokazi_zasedene,
         'velikosti': velikost,
         'tipi': [] if tip == set(Ucilnica.OBJAVLJENI_TIPI) else tip,

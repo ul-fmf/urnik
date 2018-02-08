@@ -341,11 +341,10 @@ class ProsteUcilniceTermin(Termin):
         # ucilnice, ki bodo prikazane, skupaj s stanjem in razlogom
         self.prikazane_ucilnice = []
 
-    def filtriraj_ucilnice(self, pokazi_zasedene, pokazi_rezervirane):
+    def filtriraj_ucilnice(self, pokazi_zasedene):
         vse = [('prosta', u, None) for u in self.proste]
-        if pokazi_rezervirane:
-            vse.extend([('rezervirana', u, r) for u, r in self.rezervirane])
         if pokazi_zasedene:
+            vse.extend([('rezervirana', u, r) for u, r in self.rezervirane])
             vse.extend([('zasedena', u, r) for u, r in self.zasedene])
         self.prikazane_ucilnice = sorted(vse, key=lambda x: x[1])
 
