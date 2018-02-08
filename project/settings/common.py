@@ -100,7 +100,10 @@ TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
-USE_L10N = True
+# USE_L10N = True
+DATE_FORMAT = 'd. F Y'
+SHORT_DATE_FORMAT = 'j. M. Y'
+FIRST_DAY_OF_WEEK = 1
 
 USE_TZ = True
 
