@@ -527,11 +527,11 @@ class RezervacijaQuerySet(models.QuerySet):
 
 class Rezervacija(models.Model):
     ucilnice = models.ManyToManyField('urnik.Ucilnica')
-    osebe = models.ManyToManyField('urnik.Oseba', blank=True)
+    osebe = models.ManyToManyField('urnik.Oseba')
     dan = models.DateField()
     od = models.PositiveSmallIntegerField()
     do = models.PositiveSmallIntegerField()
-    opomba = models.CharField(max_length=192, blank=True)
+    opomba = models.CharField(max_length=192)
     objects = RezervacijaQuerySet.as_manager()
 
     class Meta:
