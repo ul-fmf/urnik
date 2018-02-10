@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.shortcuts import redirect
 from .models import Oseba, Letnik, Ucilnica, Predmet, Srecanje, Semester, Rezervacija
-
+from .admin_rezervacije import RezervacijaAdmin
 
 @admin.register(Oseba)
 class OsebaAdmin(admin.ModelAdmin):
@@ -77,74 +77,6 @@ class PredmetAdmin(admin.ModelAdmin):
             'letniki',
         )
 
-class CasRezervacijeListFilter(admin.SimpleListFilter):
-    title = 'čas rezervacije'
-    parameter_name = 'cas'
-
-    def lookups(self, request, model_admin):
-        return (
-            (None, 'Prihajajoče'),
-            ('vse', 'Vse'),
-        )
-
-    def choices(self, cl):
-        for lookup, title in self.lookup_choices:
-            yield {
-                'selected': self.value() == lookup,
-                'query_string': cl.get_query_string({
-                    self.parameter_name: lookup,
-                }, []),
-                'display': title,
-            }
-
-    def queryset(self, request, queryset):
-        if self.value() == 'vse':
-            return queryset
-        else:
-            return queryset.prihajajoce()
-
-@admin.register(Rezervacija)
-class RezervacijaAdmin(admin.ModelAdmin):
-    search_fields = (
-        'osebe__ime',
-        'osebe__priimek',
-        'ucilnice__oznaka',
-        'opomba',
-    )
-    list_display = (
-        'seznam_ucilnic',
-        'seznam_oseb',
-        'dan',
-        'od',
-        'do',
-        'opomba',
-    )
-    date_hierarchy = 'dan'
-    list_filter = (
-        CasRezervacijeListFilter,
-        'ucilnice__tip',
-        ('ucilnice', admin.RelatedOnlyFieldListFilter),
-    )
-    filter_horizontal = (
-        'ucilnice',
-        'osebe',
-    )
-
-    def seznam_oseb(self, obj):
-        return ', '.join(str(oseba) for oseba in obj.osebe.all())
-    seznam_oseb.short_description = 'Osebe'
-    seznam_oseb.admin_order_field = 'osebe'
-
-    def seznam_ucilnic(self, obj):
-        return ', '.join(str(ucilnica) for ucilnica in obj.ucilnice.all())
-    seznam_ucilnic.short_description = 'Učilnice'
-    seznam_ucilnic.admin_order_field = 'ucilnice'
-
-    def get_queryset(self, request):
-        return super().get_queryset(request).prefetch_related(
-            'ucilnice',
-            'osebe',
-        )
 
 @admin.register(Srecanje)
 class SrecanjeAdmin(admin.ModelAdmin):
@@ -168,3 +100,5 @@ class SrecanjeAdmin(admin.ModelAdmin):
         ).prefetch_related(
             'ucitelji'
         )
+
+admin.site.register(Rezervacija, RezervacijaAdmin)

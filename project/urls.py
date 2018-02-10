@@ -17,16 +17,18 @@ from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
+from urnik.admin_rezervacije import rezervacije_admin_site
 import urnik.views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'^rezervacije/urejevalnik/', rezervacije_admin_site.urls),
+    url(r'^rezervacije/$', urnik.views.rezervacije, name='rezervacije'),
     url(r'^accounts/logout/$', auth_views.logout, name='logout'),
     url(r'^accounts/login/$', auth_views.login,  {'template_name': 'admin/login.html'}, name='login'),
     url(r'^$', urnik.views.zacetna_stran, name='zacetna_stran'),
     url(r'^urnik/$', urnik.views.kombiniran_pogled, name='kombiniran_pogled'),
     url(r'^kombiniran/$', urnik.views.kombiniran_pogled_form, name='kombiniran_pogled_form'),
-    url(r'^rezervacije/$', urnik.views.rezervacije, name='rezervacije'),
     url(r'^proste/$', urnik.views.proste_ucilnice, name='proste'),
     url(r'^proste_filter/$', urnik.views.proste_ucilnice_filter, name='proste_filter'),
     url(r'^oseba/(?P<oseba_id>\d+)/$', urnik.views.urnik_osebe, name='urnik_osebe'),

@@ -4,6 +4,7 @@ from copy import deepcopy
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.db.models import Prefetch
+from django.conf import settings
 from .layout import nastavi_sirine_srecanj, nastavi_barve
 
 MIN_URA, MAX_URA = 7, 20
@@ -525,6 +526,7 @@ class RezervacijaQuerySet(models.QuerySet):
 
 
 class Rezervacija(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
     ucilnice = models.ManyToManyField('urnik.Ucilnica')
     osebe = models.ManyToManyField('urnik.Oseba')
     dan = models.DateField()
@@ -549,6 +551,10 @@ class Rezervacija(models.Model):
         return (start, end)
 
     def konflikti(self):
+        """
+        To v prihodnje ne bo potrebno, saj je preverba konfliktov nareta ze pri
+        validaciji rezervacije. Glej forms.RezervacijaForm, metoda clean
+        """
         for ucilnica in self.ucilnice.all():
             for srecanje in ucilnica.srecanja.all():
                 if self.dan.weekday() + 1 != srecanje.dan or not srecanje.od:
