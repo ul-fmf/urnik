@@ -229,9 +229,7 @@ class SrecanjeQuerySet(models.QuerySet):
             for opis_tipa, prekrivanja_tipa in prekrivanja_po_tipih.items()
         }
 
-    def urnik(self, skrij_rezervacije=False, barve=[]):
-        if skrij_rezervacije:
-            self = self.exclude(predmet__kratica='REZ')
+    def urnik(self, barve=[]):
         self = self.neodlozena(
         ).order_by(
             'dan', 'ura', 'trajanje'
@@ -244,17 +242,6 @@ class SrecanjeQuerySet(models.QuerySet):
         nastavi_sirine_srecanj(self)
         nastavi_barve(self, barve)
         return self
-
-    def fiziki(self):
-        FIZIKALNE_UCILNICE = (
-            'F1', 'F2', 'F3', 'F4', 'F5', 'F7',
-            'P.01', 'P.03', 'P.04',
-            'MFP', 'VFP'
-        )
-        FIZIKALNE_SMERI = ('Fiz',)
-        fizikalne_ucilnice = self.filter(ucilnica__oznaka__in=FIZIKALNE_UCILNICE)
-        fizikalni_letniki = self.filter(predmet__letniki__smer__in=FIZIKALNE_SMERI)
-        return (fizikalne_ucilnice | fizikalni_letniki).distinct()
 
 
 class Termin(object):
@@ -537,11 +524,6 @@ class Rezervacija(models.Model):
         verbose_name_plural = 'rezervacije'
         default_related_name = 'rezervacije'
         ordering = ('dan', 'od', 'do')
-
-    # def clean(self):
-    #     if not self.osebe.exists() and not self.opomba:
-    #         raise ValidationError('Rezervaciji dodajte vsaj eno osebo ali vpišite opombo.')
-    #     return self
 
     def teden(self):
         start = self.dan - datetime.timedelta(days=self.dan.weekday())
