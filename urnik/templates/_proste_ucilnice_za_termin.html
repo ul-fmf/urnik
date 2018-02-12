@@ -11,10 +11,19 @@
           <span class="hover-area"></span>
           <span class="ucilnica-tooltip">
             {% if stanje == 'prosta' %}
-              <a href="{% url 'urnik_ucilnice' ucilnica.pk %}">Učilnica {{ ucilnica.oznaka }}</a>
-              je prosta v {{ termin.dan|dan_tozilnik }} ob {{ termin.ura }}ih.
-              {#  TODO: odkomentiraj ko bo narejen obrazec za rezervacije  #}
-              {#  <a href="#" class="nobr">Rezerviraj <i class="material-icons">open_in_new</i></a>#}
+              {% if teden %}
+                {% with teden|dan_v_tednu:termin.dan as dan %}
+                  <a href="{% url 'urnik_ucilnice' ucilnica.pk %}">Učilnica {{ ucilnica.oznaka }}</a>
+                  je {{ dan|date:"j. n Y" }} ob {{ termin.ura }}ih prosta.
+                  {# Če želimo, lahko naslednji link prikažemo samo, če je user logged in; če ni, ga klik na link avtomatično vrže na log in page. #}
+                  {# if user.is_authenticated #}
+                  <a href="{% url 'rezervacije_admin_site:urnik_rezervacija_add' %}?ucilnice={{ ucilnica.id }}&amp;od={{ termin.ura }}&amp;do={{ termin.ura|add:1 }}{% if teden %}&amp;dan={{ dan|date:"Y-m-d" }}{% endif %}" class="nobr">Rezerviraj <i class="material-icons">open_in_new</i></a>
+                  {# endif #}
+                {% endwith %}
+              {% else %}
+                V <a href="{% url 'urnik_ucilnice' ucilnica.pk %}">učilnici {{ ucilnica.oznaka }}</a> ob {{ termin.dan|dan_tozilnik_mnozina }} ob {{ termin.ura }}ih ni predavanj.
+                <a href="{% url 'rezervacije_admin_site:urnik_rezervacija_add' %}?ucilnice={{ ucilnica.id }}&amp;od={{ termin.ura }}&amp;do={{ termin.ura|add:1 }}" class="nobr">Rezerviraj <i class="material-icons">open_in_new</i></a>
+              {% endif %}
             {% elif stanje == 'rezervirana' %}
               <a href="{% url 'urnik_ucilnice' ucilnica.pk %}">Učilnico {{ ucilnica.oznaka }}</a>
               je od {{ razlog.od }}ih do {{ razlog.do }}ih rezervirala oseba
@@ -26,7 +35,7 @@
               z razlogom: &quot;{{ razlog.opomba|default:"neznan" }}&quot;.
             {% elif stanje == 'zasedena' %}
               <a href="{% url 'urnik_ucilnice' ucilnica.pk %}">Učilnica {{ ucilnica.oznaka }}</a>
-              je zasedena v {{ razlog.dan | dan_tozilnik }} ob {{ razlog.ura }}ih
+              je zasedena ob {{ razlog.dan | dan_tozilnik_mnozina }} ob {{ razlog.ura }}ih,
               saj tam poteka predmet <a href="{% url 'urnik_predmeta' razlog.predmet.pk %}">
               &quot;{{ razlog.predmet }}&quot;</a>, ki ga izvaja
               {% if razlog.ucitelji.all.0 %}

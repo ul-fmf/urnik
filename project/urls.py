@@ -22,7 +22,7 @@ import urnik.views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^rezervacije/urejevalnik/', rezervacije_admin_site.urls),
+    url(r'^rezervacije/urejevalnik/', rezervacije_admin_site.urls, name="rezervacije_admin_site"),
     url(r'^rezervacije/$', urnik.views.rezervacije, name='rezervacije'),
     url(r'^accounts/logout/$', auth_views.logout, name='logout'),
     url(r'^accounts/login/$', auth_views.login,  {'template_name': 'admin/login.html'}, name='login'),
