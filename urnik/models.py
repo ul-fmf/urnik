@@ -137,7 +137,7 @@ class Ucilnica(models.Model):
 
     tip = models.CharField(max_length=1, choices=TIP, default=ZUNANJA, blank=True)
     oznaka = models.CharField(max_length=192, unique=True)
-    kratka_oznaka = models.CharField(max_length=10, unique=True, blank=True)
+    kratka_oznaka = models.CharField(max_length=10, blank=True)
     velikost = models.PositiveSmallIntegerField(blank=True, null=True)
     objects = UcilnicaQuerySet.as_manager()
 
@@ -181,6 +181,7 @@ class Semester(models.Model):
     ime = models.CharField(max_length=192)
     od = models.DateField()
     do = models.DateField()
+    objavljen = models.BooleanField(default=False)
 
     class Meta:
         verbose_name_plural = 'semestri'
@@ -340,11 +341,10 @@ class ProsteUcilniceTermin(Termin):
         # ucilnice, ki bodo prikazane, skupaj s stanjem in razlogom
         self.prikazane_ucilnice = []
 
-    def filtriraj_ucilnice(self, pokazi_zasedene, pokazi_rezervirane):
+    def filtriraj_ucilnice(self, pokazi_zasedene):
         vse = [('prosta', u, None) for u in self.proste]
-        if pokazi_rezervirane:
-            vse.extend([('rezervirana', u, r) for u, r in self.rezervirane])
         if pokazi_zasedene:
+            vse.extend([('rezervirana', u, r) for u, r in self.rezervirane])
             vse.extend([('zasedena', u, r) for u, r in self.zasedene])
         self.prikazane_ucilnice = sorted(vse, key=lambda x: x[1])
 
@@ -354,15 +354,14 @@ class ProsteUcilniceTermin(Termin):
 
 
 class ProsteUcilnice(object):
-    def __init__(self, semester, ustrezne_ucilnice, tip, velikost):
-        self.semester = semester
+    def __init__(self, ustrezne_ucilnice, tip, velikost):
         self.ustrezne = ustrezne_ucilnice.filter(tip__in=tip).ustrezne_velikosti(velikost)
         self.zasedenost_ucilnic = defaultdict(dict)
         self.rezerviranost_ucilnic = defaultdict(dict)
 
-    def upostevaj_urnik(self):
-        for srecanje in self.semester.srecanja.select_related('ucilnica', 'predmet').prefetch_related('ucitelji'
-                                    ).filter(ucilnica__in=self.ustrezne).exclude(ura__isnull=True):
+    def dodaj_srecanja_semestra(self, semester):
+        for srecanje in semester.srecanja.select_related('ucilnica', 'predmet').prefetch_related('ucitelji'
+                                       ).filter(ucilnica__in=self.ustrezne).exclude(ura__isnull=True):
             for i in range(srecanje.trajanje):
                 self.zasedenost_ucilnic[srecanje.dan, srecanje.ura + i][srecanje.ucilnica] = srecanje
 
@@ -527,11 +526,11 @@ class RezervacijaQuerySet(models.QuerySet):
 
 class Rezervacija(models.Model):
     ucilnice = models.ManyToManyField('urnik.Ucilnica')
-    osebe = models.ManyToManyField('urnik.Oseba', blank=True)
+    osebe = models.ManyToManyField('urnik.Oseba')
     dan = models.DateField()
     od = models.PositiveSmallIntegerField()
     do = models.PositiveSmallIntegerField()
-    opomba = models.CharField(max_length=192, blank=True)
+    opomba = models.CharField(max_length=192)
     objects = RezervacijaQuerySet.as_manager()
 
     class Meta:

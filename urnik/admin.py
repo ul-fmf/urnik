@@ -17,6 +17,7 @@ class SemesterAdmin(admin.ModelAdmin):
         'ime',
         'od',
         'do',
+        'objavljen',
     )
     list_display_links = (
         'ime',
