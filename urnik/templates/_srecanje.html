@@ -15,11 +15,13 @@
       </span>
     </span>
     <br>
+    {% if srecanje.trajanje > 1 %}
     <span class="letniki">
       {% for letnik in srecanje.predmet.letniki.all %}
         <a href="{% url 'urnik_letnika' letnik.id %}">{{ letnik.kratica }}</a>{% if not forloop.last %}, {% endif %}
       {% endfor %}
     </span>
+    {% endif %}
   </div>
 
   <div class="ucitelj">
