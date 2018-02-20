@@ -1,32 +1,32 @@
 {% load tags %}
 <div class="srecanje-absolute-box {{ srecanje.css_classes }}" style="{{ srecanje.style }}">
 <div class="srecanje" style="{% pobarvajvec srecanje.barve %}">
-  <div class="predmet">
-    {% if srecanje.predmet %}
-      <a href="{% url 'urnik_predmeta' srecanje.predmet.id %}">
-        {% if nacin == 'ogled' %}{{ srecanje.po_potrebi_okrajsano_ime_predmeta }}{% else %}{{ srecanje.predmet.kratica }}{% endif %}
-      </a>
-    {% endif %}
-    <span class="tip">
-     {{ srecanje.tip }}{{ srecanje.oznaka }}{{ srecanje.barva }}
+  <div class="main-box">
+{# TODO: info box, ko bo potreben #}
+{#    <div class="info-box"><i class="material-icons">info_outline</i></div> #}
+    <span class="predmet">
+      {% if srecanje.predmet %}
+        <a href="{% url 'urnik_predmeta' srecanje.predmet.id %}">
+          {% if nacin == 'ogled' %}{{ srecanje.po_potrebi_okrajsano_ime_predmeta }}{% else %}{{ srecanje.predmet.kratica }}{% endif %}
+        </a>
+      {% endif %}
+      <span class="tip">
+       {{ srecanje.tip }}{{ srecanje.oznaka }}{{ srecanje.barva }}
+      </span>
     </span>
-  </div>
-
-  {% if srecanje.trajanje > 1 %}
-    <div class="letniki">
+    <br>
+    <span class="letniki">
       {% for letnik in srecanje.predmet.letniki.all %}
         <a href="{% url 'urnik_letnika' letnik.id %}">{{ letnik.kratica }}</a>{% if not forloop.last %}, {% endif %}
       {% endfor %}
-    </div>
-  {% endif %}
+    </span>
+  </div>
 
-  {% if srecanje.sirina >= 0.5 or nacin == 'urejanje' or nacin == 'odlozisce' %}
-    <div class="ucitelj">
-      {% for ucitelj in srecanje.ucitelji.all %}
-        <a href="{% url 'urnik_osebe' ucitelj.id %}">{{ ucitelj.priimek }}</a>{% if not forloop.last %}, {% endif %}
-      {% endfor %}
-    </div>
-  {% endif %}
+  <div class="ucitelj">
+    {% for ucitelj in srecanje.ucitelji.all %}
+      <a href="{% url 'urnik_osebe' ucitelj.id %}">{{ ucitelj.priimek }}</a>{% if not forloop.last %}, {% endif %}
+    {% endfor %}
+  </div>
 
   {% if srecanje.ucilnica %}
     <div class="ucilnica">

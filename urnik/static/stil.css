@@ -298,12 +298,18 @@ nav {
     width: 20%;
 }
 
+/* pozicioniranje srečanj */
 .srecanje-absolute-box {
     position: absolute;   /* spodaj je pixel perfect pozicioniranje boxov */
     padding-top: 3px;     /* izberi si koliko želiš margin od roba "dneva" */
     padding-bottom: 4px;  /* = top + 1, ker imamo spodaj 1px borderr */
     padding-left: 3px;    /* izberi si spacing med srecanji */
     padding-right: 0px;   /* vazna je samo vsota left + right, zato right = 0  */
+}
+
+#informacije .srecanje-absolute-box {
+    position: relative;
+    height: 70px;
 }
 
 .srecanje-absolute-box.leftmost {
@@ -314,58 +320,93 @@ nav {
     padding-right: 3px;  /* postavi desni rob od dneva na top */
 }
 
-.srecanje {
+.srecanje-absolute-box .srecanje {  /* absolutno, da mamo proste roke pri ostalem */
     background: #eee;
     position: relative;
     width: 100%;
     height: 100%;
-    padding: 2pt;
+    padding: 2px;
 }
 
-.srecanje a {
-    color: #333;
+.srecanje-absolute-box .srecanje .ucitelj,
+.srecanje-absolute-box .srecanje .ucilnica {  /* ucilnica in ucitelj sta spodaj levo in desno */
+    position: absolute;
+    bottom: 0px;
+    line-height: 17px;
+    height: 17px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
-.srecanje a:hover, .urejanje a {
-    color: #039be5;
+.srecanje-absolute-box .srecanje .ucitelj {
+    left: 3px;
+    width: calc(95% - 30px);
 }
 
-#informacije .srecanje-absolute-box {
-    position: relative;
-    height: 70px;
+.srecanje-absolute-box .srecanje .ucilnica {
+    right: 3px;
+    width: 30px;
+    text-align: right;
 }
 
-a.skrita {
-    color: #555;
+.srecanje-absolute-box .srecanje .main-box {  /* glavni box je vse razen zadnje vrstice */
+    position: absolute;
+    top: 0px;
+    left: 3px;
+    bottom: 17px;
+    right: 3px;
+    line-height: 16px;
+    overflow: hidden;
+    /*word-break: break-all;*/
 }
 
-.srecanje .ucitelj, .srecanje .ucilnica, .srecanje .tip {
+.srecanje-absolute-box .srecanje .main-box .info-box {
+    float: right;
+    /*position: absolute;*/
+    right: 0px;
+    width: 15px;
+    height: 15px;
+    margin-top: 2px;
+    cursor: pointer;
+    /*border: 1px red solid;*/
+}
+
+/* pisave & barve v srecanju */
+.srecanje-absolute-box .srecanje .ucitelj,
+.srecanje-absolute-box .srecanje .ucilnica,
+.srecanje-absolute-box .srecanje .main-box .letniki {
+    font-size: 0.8em;
+}
+
+.srecanje-absolute-box .srecanje .ucitelj,
+.srecanje-absolute-box .srecanje .ucilnica,
+.srecanje-absolute-box .srecanje .main-box .predmet .tip {
     color: #555;
     font-weight: normal;
 }
 
-.srecanje .letniki {
-    font-size: 0.8em;
+.srecanje-absolute-box .srecanje .predmet {
+    font-size: 0.9em;
+    font-weight: bold;
 }
 
-.srecanje .ucitelj, .srecanje .ucilnica {
-    font-size: 0.8em;
-    position: absolute;
-    bottom: 2pt;
-    z-index: 10;
+.srecanje-absolute-box .srecanje a {
+    color: #333;
 }
 
-.srecanje .ucilnica {
-    right: 4pt;
+.srecanje-absolute-box .srecanje a:hover, .urejanje a {
+    color: #039be5;
+}
+
+.srecanje-absolute-box .srecanje .main-box .info-box i {
+    font-size: 12pt;
+    color: #555;
 }
 
 .termin {
     position: absolute;
     /*opacity: 0.6;*/
-}
-
-.termin:hover {
-    /*opacity: 0.8;*/
 }
 
 .legenda {
@@ -378,10 +419,6 @@ a.skrita {
     height: 100%;
 }
 
-.srecanje .predmet {
-    font-size: 0.9em;
-    font-weight: bold;
-}
 
 .zaseden {
     background: rgba(255, 0, 0, 0.5);
