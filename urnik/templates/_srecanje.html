@@ -30,7 +30,7 @@
 
   {% if srecanje.ucilnica %}
     <div class="ucilnica">
-      <a href="{% url 'urnik_ucilnice' srecanje.ucilnica.id %}">{{ srecanje.ucilnica.oznaka }}</a>
+      <a href="{% url 'urnik_ucilnice' srecanje.ucilnica.id %}">{{ srecanje.ucilnica.kratko_ime }}</a>
     </div>
   {% endif %}
 
