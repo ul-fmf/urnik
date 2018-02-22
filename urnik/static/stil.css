@@ -129,6 +129,11 @@ nav {
 .side-nav, #sidenav-overlay {
     top: 64px;
 }
+@media only screen and (max-width: 600px) {
+    .side-nav, #sidenav-overlay {
+        top: 56px;
+    }
+}
 
 .dropdown-content li > a {
     color: #039be5;
