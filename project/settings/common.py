@@ -101,9 +101,14 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 # USE_L10N = True
-DATE_FORMAT = 'd. F Y'
+DATE_FORMAT = 'D, d. F Y'
 SHORT_DATE_FORMAT = 'j. M. Y'
 FIRST_DAY_OF_WEEK = 1
+DATE_INPUT_FORMATS = [
+    '%d.%m.%Y', '%d.%m.%y',         # '25.10.2006', '25.10.06'
+    '%d-%m-%Y',                     # '25-10-2006'
+    '%d. %m. %Y', '%d. %m. %y',     # '25. 10. 2006', '25. 10. 06'
+]
 
 USE_TZ = True
 
