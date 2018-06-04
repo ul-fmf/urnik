@@ -8,6 +8,12 @@ from django.views.decorators.http import require_POST
 from .models import *
 
 
+def teden(dan):
+    ponedeljek = dan - datetime.timedelta(days=dan.weekday())
+    nedelja = ponedeljek + datetime.timedelta(days=6)
+    return (ponedeljek, nedelja)
+
+
 def izbrani_semester(request):
     urejanje = request.session.get('urejanje', False)
     kljuc_semestra = 'semester_za_urejanje' if urejanje else 'semester_za_ogled'
@@ -58,15 +64,16 @@ def rezervacije(request):
     )
     for rezervacija in queryset:
         for ucilnica in rezervacija.ucilnice.all():
-            rezervacije.append({
-                'ucilnica': ucilnica,
-                'osebe': rezervacija.osebe,
-                'od': rezervacija.od,
-                'do': rezervacija.do,
-                'opomba': rezervacija.opomba,
-                'dan': rezervacija.dan,
-                'teden': rezervacija.teden(),
-            })
+            for dan in rezervacija.dnevi():
+                rezervacije.append({
+                    'ucilnica': ucilnica,
+                    'osebe': rezervacija.osebe,
+                    'od': rezervacija.od,
+                    'do': rezervacija.do,
+                    'opomba': rezervacija.opomba,
+                    'dan': dan,
+                    'teden': teden(dan),
+                })
     rezervacije.sort(key=lambda r: (r['dan'], r['ucilnica'].oznaka, r['od']))
     return render(request, 'rezervacije.html', {
         'naslov': 'Rezervacije učilnic',
@@ -195,7 +202,7 @@ def proste_ucilnice(request):
         # possible values
         'mozne_velikosti_ucilnic': UcilnicaQuerySet.VELIKOST,
         'mozni_tipi_ucilnic': [u for u in Ucilnica.TIP if u[0] in Ucilnica.OBJAVLJENI_TIPI],
-        'mozni_tedni': sorted(set(r.teden() for r in Rezervacija.objects.prihajajoce())),
+        'mozni_tedni': sorted(set(teden(d) for r in Rezervacija.objects.prihajajoce() for d in r.dnevi())),
         'ustrezne_ucilnice': list(ucilnice),
     })
 

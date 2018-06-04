@@ -353,9 +353,8 @@ class ProsteUcilnice(object):
                 self.zasedenost_ucilnic[srecanje.dan, srecanje.ura + i][srecanje.ucilnica] = srecanje
 
     def upostevaj_rezervacije(self, teden):
-        for rezervacija in Rezervacija.objects.filter(
-            dan__gte=teden,
-            dan__lte=teden+datetime.timedelta(days=6)
+        for rezervacija in Rezervacija.objects.v_tednu(
+            teden
         ).prefetch_related(
             Prefetch(
                 'ucilnice',
@@ -364,8 +363,9 @@ class ProsteUcilnice(object):
             'osebe'
         ):
             for ucilnica in rezervacija.ucilnice.all():
-                for i in range(rezervacija.od, rezervacija.do):
-                    self.rezerviranost_ucilnic[rezervacija.dan.isoweekday(), i][ucilnica] = rezervacija
+                for dan in rezervacija.dnevi():
+                    for ura in range(rezervacija.od, rezervacija.do):
+                        self.rezerviranost_ucilnic[dan.isoweekday(), ura][ucilnica] = rezervacija
 
     def dobi_termine(self):
         termini = [ProsteUcilniceTermin(d, u, self.ustrezne, self.zasedenost_ucilnic[d, u],
@@ -444,7 +444,7 @@ class Srecanje(models.Model):
         return self.trajanje > 1
 
     def lahko_podaljsam(self):
-        return not self.ura or self.ura + self.trajanje < MAX_URA
+        return not self.ura or self.do < MAX_URA
 
     def lahko_odlozim(self):
         return self.dan and self.ura
@@ -507,6 +507,19 @@ class Srecanje(models.Model):
 
 class RezervacijaQuerySet(models.QuerySet):
 
+    def v_tednu(self, ponedeljek):
+        nedelja = ponedeljek + datetime.timedelta(days=6)
+        return self.filter(
+            dan_konca__isnull=True,
+            dan__gte=ponedeljek,
+            dan__lte=nedelja,
+        ) | self.filter(
+            dan_konca__isnull=False,
+            dan__lte=nedelja,
+        ).exclude(
+            dan_konca__lt=ponedeljek,
+        )
+
     def prihajajoce(self):
         return self.filter(dan__gte=datetime.date.today())
 
@@ -514,7 +527,8 @@ class RezervacijaQuerySet(models.QuerySet):
 class Rezervacija(models.Model):
     ucilnice = models.ManyToManyField('urnik.Ucilnica')
     osebe = models.ManyToManyField('urnik.Oseba')
-    dan = models.DateField()
+    dan = models.DateField(verbose_name='Dan začetka')
+    dan_konca = models.DateField(blank=True, null=True, verbose_name='Dan konca', help_text='Izpolni le, če je drugačen od začetka')
     od = models.PositiveSmallIntegerField()
     do = models.PositiveSmallIntegerField()
     opomba = models.CharField(max_length=192)
@@ -525,10 +539,13 @@ class Rezervacija(models.Model):
         default_related_name = 'rezervacije'
         ordering = ('dan', 'od', 'do')
 
-    def teden(self):
-        start = self.dan - datetime.timedelta(days=self.dan.weekday())
-        end = start + datetime.timedelta(days=6)
-        return (start, end)
+    def dnevi(self):
+        dan = self.dan
+        dan_konca = self.dan_konca or dan
+        razlika = datetime.timedelta(days=1)
+        while dan <= dan_konca:
+            yield dan
+            dan += razlika
 
     def konflikti(self):
         for ucilnica in self.ucilnice.all():
