@@ -8,7 +8,7 @@ from django.views.decorators.http import require_POST
 from .models import *
 
 
-def teden(dan):
+def teden_dneva(dan):
     ponedeljek = dan - datetime.timedelta(days=dan.weekday())
     nedelja = ponedeljek + datetime.timedelta(days=6)
     return (ponedeljek, nedelja)
@@ -72,7 +72,7 @@ def rezervacije(request):
                     'do': rezervacija.do,
                     'opomba': rezervacija.opomba,
                     'dan': dan,
-                    'teden': teden(dan),
+                    'teden': teden_dneva(dan),
                 })
     rezervacije.sort(key=lambda r: (r['dan'], r['ucilnica'].oznaka, r['od']))
     return render(request, 'rezervacije.html', {
@@ -202,7 +202,7 @@ def proste_ucilnice(request):
         # possible values
         'mozne_velikosti_ucilnic': UcilnicaQuerySet.VELIKOST,
         'mozni_tipi_ucilnic': [u for u in Ucilnica.TIP if u[0] in Ucilnica.OBJAVLJENI_TIPI],
-        'mozni_tedni': sorted(set(teden(d) for r in Rezervacija.objects.prihajajoce() for d in r.dnevi())),
+        'mozni_tedni': sorted(set(teden_dneva(d) for r in Rezervacija.objects.prihajajoce() for d in r.dnevi())),
         'ustrezne_ucilnice': list(ucilnice),
     })
 
