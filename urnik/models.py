@@ -189,6 +189,17 @@ class Semester(models.Model):
 
     def __str__(self):
         return self.ime
+    
+    def pripravi_kopijo(self):
+        novi_semester = Semester.objects.create(
+            ime=self.ime + ' (kopija)',
+            od=self.od + datetime.timedelta(days=365),
+            do=self.do + datetime.timedelta(days=365),
+            objavljen=False
+        )
+        for srecanje in self.srecanja.all():
+            srecanje.podvoji(novi_semester=novi_semester)
+        return novi_semester
 
 
 class SrecanjeQuerySet(models.QuerySet):
@@ -418,9 +429,11 @@ class Srecanje(models.Model):
         if self.ura:
             return self.ura + self.trajanje
 
-    def podvoji(self):
+    def podvoji(self, novi_semester=None):
         stari_ucitelji = list(self.ucitelji.all())
         self.id = None
+        if novi_semester is not None:
+            self.semester = novi_semester
         self.save()
         for ucitelj in stari_ucitelji:
             self.ucitelji.add(ucitelj)
