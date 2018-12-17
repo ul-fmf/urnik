@@ -15,14 +15,13 @@ Including another URLconf
 """
 from django.conf import settings
 from django.conf.urls import include, url
-from django.contrib import admin
-from django.contrib.auth import views as auth_views
+from django.contrib import admin, auth
 import urnik.views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^accounts/logout/$', auth_views.logout, name='logout'),
-    url(r'^accounts/login/$', auth_views.login,  {'template_name': 'admin/login.html'}, name='login'),
+    url(r'^accounts/logout/$', auth.logout, name='logout'),
+    url(r'^accounts/login/$', auth.login,  {'template_name': 'admin/login.html'}, name='login'),
     url(r'^$', urnik.views.zacetna_stran, name='zacetna_stran'),
     url(r'^urnik/$', urnik.views.kombiniran_pogled, name='kombiniran_pogled'),
     url(r'^kombiniran/$', urnik.views.kombiniran_pogled_form, name='kombiniran_pogled_form'),

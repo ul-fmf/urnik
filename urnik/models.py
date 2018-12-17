@@ -380,8 +380,8 @@ class Srecanje(models.Model):
         (PREDAVANJA, 'predavanja'), (SEMINAR, 'seminar'),
         (VAJE, 'vaje'), (LABORATORIJSKE_VAJE, 'laboratorijske vaje'),
     )
-    semester = models.ForeignKey('urnik.Semester')
-    predmet = models.ForeignKey('urnik.Predmet', null=True, blank=True, on_delete=models.CASCADE)
+    semester = models.ForeignKey('urnik.Semester', on_delete=models.PROTECT)
+    predmet = models.ForeignKey('urnik.Predmet', null=True, blank=True, on_delete=models.SET_NULL)
     tip = models.CharField(max_length=1, choices=TIP, blank=True)
     oznaka = models.CharField(max_length=64, blank=True)
     ucitelji = models.ManyToManyField('urnik.Oseba', blank=True)
