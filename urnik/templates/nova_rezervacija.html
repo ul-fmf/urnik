@@ -1,0 +1,62 @@
+{% extends 'osnova.html' %}
+{% block content %}
+  <div class="container">
+    <p>
+      <span class="flow-text">Na tej strani lahko rezervirate učilnice.
+      Prosimo, da rezervirate le učilnice, ki jih potrebujete.</span>
+    </p>
+    {% if not delno_izpolnjena %}
+      <p>
+        Pred rezervacijo preverite, ali je učilnica prosta. Za to imate na voljo
+        <a href="{% url 'proste' %}">iskalnik prostih učilnic</a>, od koder lahko direktno izberete učilnico za
+        rezervacijo.
+      </p>
+    {% endif %}
+    <form action="{% url 'nova_rezervacija' %}" method="post">
+      {% csrf_token %}
+      <ul id="rezervacije-form">
+        {% for field in form %}
+          <li id="field-{{ field.auto_id }}">
+            <label>{{ field.help_text }}</label>
+            {{ field.errors }}
+            {{ field }}
+          </li>
+        {% endfor %}
+      </ul>
+      <input type="submit" value="Rezerviraj" class="btn">
+    </form>
+  </div>
+{% endblock %}
+
+{% block footer %}
+  <script>
+      $(document).ready(function () {
+          $('.datepicker').datepicker({
+              'format': 'd. m. yyyy',
+              'firstDay': 1,
+              'showClearBtn': true,
+              'i18n': {
+                  'cancel': 'Prekliči',
+                  'clear': 'Počisti',
+                  'months': ['Januar', 'Februar', 'Marec', 'April', 'Maj', 'Junij', 'Julij', 'Avgust', 'September', 'Oktober', 'November', 'December'],
+                  'monthsShort': ['Jan', 'Feb', 'Mar', 'Apr', 'Maj', 'Jun', 'Jul', 'Avg', 'Sep', 'Okt', 'Nov', 'Dec'],
+                  'weekdays': ['Nedelja', 'Ponedeljek', 'Torek', 'Sreda', 'Četrtek', 'Petek', 'Sobota'],
+                  'weekdaysShort': ['Ned', 'Pon', 'Tor', 'Sre', 'Čet', 'Pet', 'Sob'],
+                  'weekdaysAbbrev': ['N', 'P', 'T', 'S', 'Č', 'P', 'S'],
+              }
+          });
+          $('select').formSelect({
+              'dropdownOptions': {
+                  'constrainWidth': true,
+              }
+          });
+      });
+  </script>
+  {% if delno_izpolnjena %}
+    <script>
+        $(document).ready(function () {
+            $("#id_opomba").focus();
+        });
+    </script>
+  {% endif %}
+{% endblock %}

@@ -81,6 +81,7 @@
   <li><a href="{% url 'zacetna_stran' %}"><i class="material-icons left">home</i>Domov</a></li>
   <li><a href="{% url 'kombiniran_pogled_form' %}"><i class="material-icons left">schedule</i>Kombiniran pogled</a></li>
   <li><a href="{% url 'rezervacije' %}"><i class="material-icons left">border_color</i>Rezervacije učilnic</a></li>
+  <li><a href="{% url 'nova_rezervacija' %}"><i class="material-icons left">assignment</i>Nova rezervacija</a></li>
   <li><a href="{% url 'proste' %}"><i class="material-icons left">event_available</i>Proste učilnice</a></li>
   <li><a href="javascript:window.print();"><i class="material-icons left">print</i>Natisni stran</a></li>
   {% if user.is_authenticated %}
@@ -101,13 +102,14 @@
 <script>
     M.AutoInit();
     var search_urls = {
-        "Meni: Urnik" : "{% url 'zacetna_stran' %}",
-        "Meni: Kombiniran pogled" : "{% url 'kombiniran_pogled_form' %}",
-        "Meni: Rezervacije učilnic" : "{% url 'rezervacije' %}",
-        "Meni: Proste učilnice" : "{% url 'proste' %}",
-        "Meni: Natisni stran" : "javascript:window.print();",
-        "Meni: Prijava napake" : "{% url 'bugreport' %}",
-        "Meni: Navodila in pomoč" : "{% url 'help' %}",
+        "Meni: Urnik": "{% url 'zacetna_stran' %}",
+        "Meni: Kombiniran pogled": "{% url 'kombiniran_pogled_form' %}",
+        "Meni: Rezervacije učilnic": "{% url 'rezervacije' %}",
+        "Meni: Nova rezervacija": "{% url 'nova_rezervacija' %}",
+        "Meni: Proste učilnice": "{% url 'proste' %}",
+        "Meni: Natisni stran": "javascript:window.print();",
+        "Meni: Prijava napake": "{% url 'bugreport' %}",
+        "Meni: Navodila in pomoč": "{% url 'help' %}",
 
         {% for letnik in letniki_search %}
             "{{ letnik }} ({{letnik.kratica}})": "{% url 'urnik_letnika' letnik.id %}",{% endfor %}

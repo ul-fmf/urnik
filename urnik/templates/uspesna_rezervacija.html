@@ -1,0 +1,11 @@
+{% extends 'osnova.html' %}
+{% block content %}
+  <div class="container">
+    <p>
+      <span class="flow-text">Uspešno ste rezervirali!</span>
+    </p>
+    <p>
+      Pojdite na <a href="{% url 'rezervacije' %}">vse rezervacije</a> ali pa <a href="{% url 'zacetna_stran' %}">domov</a>.
+    </p>
+  </div>
+{% endblock %}
