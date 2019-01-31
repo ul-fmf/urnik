@@ -15,8 +15,8 @@
   {% if barve %}
     <div class='right-panel' id='informacije'>
       <ul class="collapsible" data-collapsible="expandable">
-        <li>
-          <div class="collapsible-header active">
+        <li class="active">
+          <div class="collapsible-header">
             <i class="material-icons">line_style</i>Legenda
           </div>
           <div class="collapsible-body">
@@ -45,8 +45,8 @@
   <div class='right-panel' id='informacije'>
     <ul class="collapsible" data-collapsible="expandable">
       {% if nacin == 'urejanje' %}
-        <li>
-          <div class="collapsible-header active">
+        <li class="active">
+          <div class="collapsible-header">
             <i class="material-icons">inbox</i>Odložišče
           </div>
           <div class="collapsible-body">
@@ -58,8 +58,8 @@
         {% include '_prekrivanja.html' %}
 
       {% elif nacin == 'premikanje' %}
-        <li>
-          <div class="collapsible-header active">
+        <li class="active">
+          <div class="collapsible-header">
             <i class="material-icons">open_with</i> Premikanje srečanja
           </div>
           <div class="collapsible-body">
@@ -76,8 +76,8 @@
             </form>
           </div>
         </li>
-        <li>
-          <div class="collapsible-header active">
+        <li class="active">
+          <div class="collapsible-header">
             <i class="material-icons">line_style</i>Legenda terminov
           </div>
           <div class="collapsible-body">
@@ -95,8 +95,8 @@
             <div class="legenda srecanje zaseden">brez kakršnihkoli učilnic</div>
           </div>
         </li>
-        <li>
-          <div class="collapsible-header active">
+        <li class="active">
+          <div class="collapsible-header">
             <i class="material-icons">line_style</i>Legenda učilnic
           </div>
           <div class="collapsible-body">

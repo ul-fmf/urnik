@@ -1,4 +1,11 @@
-/* general */
+html {
+    font-family: "Roboto", sans-serif;
+}
+
+input[type="checkbox"] + span:not(.lever) {
+    padding-left: 25px;
+}
+
 .padded {
     padding: 5px;
 }
@@ -123,14 +130,15 @@ nav {
 }
 .side-icon {
     margin: 0 32px 0 0;
-    color: rgba(0,0,0,0.54);
+    color: rgba(0, 0, 0, 0.54);
     float: left;
 }
-.side-nav, #sidenav-overlay {
+
+.sidenav, .sidenav-overlay {
     top: 64px;
 }
 @media only screen and (max-width: 600px) {
-    .side-nav, #sidenav-overlay {
+    .sidenav, .sidenav-overlay {
         top: 56px;
     }
 }
@@ -152,9 +160,13 @@ nav {
     padding-left: 2.5rem;
     width: calc(100% - 2.5rem);
     height: 64px;
+    color: #fff;
+    margin-bottom: 0px;
 }
+
 #search-wrapper input[type="search"]:focus {
     border-bottom: 1px solid #039be5;
+    color: #333;
     box-shadow: 0 1px 0 0 #039be5;
 }
 @media only screen and (max-width: 600px) {
@@ -167,14 +179,16 @@ nav {
 }
 #search-wrapper form label {
     margin-top: -12px;
-    margin-left: -16px;
 }
+
 #search-wrapper form label i {
     font-size: 28px;
     color: #fff;
 }
+
 #search-wrapper ul.autocomplete-content {
     margin-bottom: 0px;
+    position: initial;
 }
 
 #search-wrapper ul.autocomplete-content li {
@@ -740,9 +754,9 @@ nav {
     margin-left: 15px;
 }
 
-#proste-ucilnice-panel [type="checkbox"] + label {
+#proste-ucilnice-panel label input[type="checkbox"] + span {
     padding-left: 25px;
-    margin-right: 15px;
+    margin-right: 12px;
 }
 
 /* front page */
@@ -764,6 +778,16 @@ nav {
 }
 
 /* front page */
+#firstpage-menu tbody tr,
+table.highlight tbody tr {
+    border-bottom: none;
+}
+
+#firstpage-menu tr th,
+table.highlight tr th {
+    padding-bottom: 3px;
+}
+
 #firstpage-menu tbody tr td ul {
     list-style-type: none;
     margin: 0px;
