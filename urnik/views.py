@@ -2,6 +2,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.core.cache import cache
 from django.http import QueryDict, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 from django.utils.dateparse import parse_date
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
@@ -105,11 +106,40 @@ def nova_rezervacija(request, ucilnica_id=None, ura=None, teden=None, dan_v_tedn
     return render(request, 'nova_rezervacija.html', {'form': form, 'delno_izpolnjena': ucilnica_id is not None})
 
 
+@staff_member_required
+def preglej_rezervacije(request):
+    rezervacije = Rezervacija.objects.filter(dan__gte=timezone.now(), potrjena=False)
+    return render(request, 'preglej_rezervacije.html', {'rezervacije': rezervacije})
+
+
+@staff_member_required
+@require_POST
+def potrdi_rezervacijo(request):
+    r = get_object_or_404(Rezervacija, pk=request.POST['r-pk'])
+    r.potrjena = True
+    r.save()
+    return redirect(reverse('preglej_rezervacije'))
+
+
+@staff_member_required
+@require_POST
+def izbrisi_rezervacijo(request):
+    get_object_or_404(Rezervacija, pk=request.POST['r-pk']).delete()
+    return redirect(reverse('preglej_rezervacije'))
+
+
+@staff_member_required
+@require_POST
+def potrdi_vse_rezervacije(request):
+    Rezervacija.objects.filter(dan__gte=timezone.now(), potrjena=False).update(potrjena=True)
+    return redirect(reverse('preglej_rezervacije'))
+
+
 def urnik(request, srecanja, naslov, barve=None):
     legenda = barve
     if barve is None:
         barve = Predmet.objects.filter(srecanja__in=srecanja).distinct()
-    if request.user.is_authenticated and request.session.get('urejanje', False):
+    if request.user.is_staff and request.session.get('urejanje', False):
         if request.META['QUERY_STRING']:
             next_url = '{}?{}'.format(request.path, request.META['QUERY_STRING'])
         else:

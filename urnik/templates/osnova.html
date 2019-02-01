@@ -60,31 +60,40 @@
         </form>
       </div>
     </div> <!-- nav wrapper -->
-    <ul id="user-dropdown" class="dropdown-content">
-      <li class="disabled hide-on-med-and-up">
-        <a href="#!"><i class="material-icons">person</i>{{ user.get_full_name|default:user.get_username }}</a>
-      </li>
-      <li class="divider hide-on-med-and-up"></li>
-      <li><a href="{% url 'admin:index' %}"><i class="material-icons">settings</i>administracija</a></li>
-      <li><a href="{% url 'preklopi_urejanje' %}">
-        {% if request.session.urejanje %}
-          <i class="material-icons">visibility</i>izklopi urejanje
-        {% else %}
-          <i class="material-icons">edit</i>vklopi urejanje
+    {% if user.is_authenticated %}
+      <ul id="user-dropdown" class="dropdown-content">
+        <li class="disabled hide-on-med-and-up">
+          <a href="#!"><i class="material-icons">person</i>{{ user.get_full_name|default:user.get_username }}</a>
+        </li>
+        <li class="divider hide-on-med-and-up"></li>
+        {% if user.is_staff %}
+          <li><a href="{% url 'admin:index' %}"><i class="material-icons">settings</i>administracija</a></li>
+          <li><a href="{% url 'preklopi_urejanje' %}">
+            {% if request.session.urejanje %}
+              <i class="material-icons">visibility</i>izklopi urejanje
+            {% else %}
+              <i class="material-icons">edit</i>vklopi urejanje
+            {% endif %}
+          </a></li>
         {% endif %}
-      </a></li>
-      <li><a href="{% url 'logout' %}"><i class="material-icons">exit_to_app</i>odjavi me</a></li>
-    </ul>
+        <li><a href="{% url 'logout' %}"><i class="material-icons">exit_to_app</i>odjavi me</a></li>
+      </ul>
+    {% endif %}
   </nav>
 </div> <!-- navbar fixed -->
 <ul class="sidenav" id="side-menu"> <!-- side navigation -->
   <li><a href="{% url 'zacetna_stran' %}"><i class="material-icons left">home</i>Domov</a></li>
   <li><a href="{% url 'kombiniran_pogled_form' %}"><i class="material-icons left">schedule</i>Kombiniran pogled</a></li>
   <li><a href="{% url 'rezervacije' %}"><i class="material-icons left">border_color</i>Rezervacije učilnic</a></li>
-  <li><a href="{% url 'nova_rezervacija' %}"><i class="material-icons left">assignment</i>Nova rezervacija</a></li>
+  {% if user.is_authenticated %}
+    <li><a href="{% url 'nova_rezervacija' %}"><i class="material-icons left">assignment</i>Nova rezervacija</a></li>
+  {% endif %}
+  {% if user.is_staff %}
+    <li><a href="{% url 'preglej_rezervacije' %}"><i class="material-icons left">visibility</i>Preglej rezervacije</a></li>
+  {% endif %}
   <li><a href="{% url 'proste' %}"><i class="material-icons left">event_available</i>Proste učilnice</a></li>
   <li><a href="javascript:window.print();"><i class="material-icons left">print</i>Natisni stran</a></li>
-  {% if user.is_authenticated %}
+  {% if user.is_staff %}
     <li><a href="{% url 'printall' %}"><span class="tripple-icon side-icon">
       <i class="material-icons">print</i>
       <i class="material-icons">print</i>
@@ -105,7 +114,13 @@
         "Meni: Urnik": "{% url 'zacetna_stran' %}",
         "Meni: Kombiniran pogled": "{% url 'kombiniran_pogled_form' %}",
         "Meni: Rezervacije učilnic": "{% url 'rezervacije' %}",
+    {% if user.is_authenticated %}
         "Meni: Nova rezervacija": "{% url 'nova_rezervacija' %}",
+    {% endif %}
+    {% if user.is_staff %}
+        "Meni: Preglej rezervacije": "{% url 'preglej_rezervacije' %}",
+        "Meni: Natisni vse": "{% url 'printall' %}",
+    {% endif %}
         "Meni: Proste učilnice": "{% url 'proste' %}",
         "Meni: Natisni stran": "javascript:window.print();",
         "Meni: Prijava napake": "{% url 'bugreport' %}",

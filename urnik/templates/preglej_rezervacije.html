@@ -1,0 +1,58 @@
+{% extends 'osnova.html' %}
+{% block content %}
+  <div class="container">
+    <p>
+      <span class="flow-text">Pregled nepotrjenih rezervacij</span>
+    </p>
+
+    <table id="nepotrjene-rezervacije">
+      <thead>
+      <th>
+        <form action="{% url 'potrdi_vse_rezervacije' %}" method="post" onsubmit="return window.confirm('Ste prepričani, da želite potrditi VSE rezervacije?');">
+          {{ csrf }}
+          <input type="submit" value="Potrdi vse" name="confirm" class="btn">
+        </form>
+      </th>
+      <th>Datum</th>
+      <th style="width: 70px;">Od &ndash; do</th>
+      <th style="width: 200px;">Osebe</th>
+      <th>Učilnice</th>
+      <th>Razlog</th>
+      <th></th>
+      </thead>
+      <tbody>
+      {% for r in rezervacije %}
+        <tr>
+          <td>
+            <form action="{% url 'potrdi_rezervacijo' %}" method="post">
+              {% csrf_token %}
+              <input type="hidden" name="r-pk" value="{{ r.pk }}">
+              <input type="submit" value="Potrdi" name="confirm" class="btn">
+            </form>
+          </td>
+          <td>{{ r.dan }}</td>
+          <td>{{ r.od }} &ndash; {{ r.do }}</td>
+          <td>
+            {% for o in r.osebe.all %}
+              <a href="{% url 'urnik_osebe' o.pk %}">{{ o }}</a>{% if not forloop.last %},{% endif %}
+            {% endfor %}
+          </td>
+          <td>
+            {% for u in r.ucilnice.all %}
+              <a href="{% url 'urnik_ucilnice' u.pk %}">{{ u }}</a>{% if not forloop.last %},{% endif %}
+            {% endfor %}
+          </td>
+          <td>{{ r.opomba }}</td>
+          <td>
+            <form action="{% url 'izbrisi_rezervacijo' %}" method="post" onsubmit="return window.confirm('Ste prepričani, da želite izbrisati to rezervacijo?');">
+              {% csrf_token %}
+              <input type="hidden" name="r-pk" value="{{ r.pk }}">
+              <input type="submit" value="Izbriši" name="confirm" class="btn cancel">
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

@@ -6,6 +6,10 @@ input[type="checkbox"] + span:not(.lever) {
     padding-left: 25px;
 }
 
+.container {
+    margin-bottom: 20px;
+}
+
 .padded {
     padding: 5px;
 }
@@ -909,4 +913,15 @@ table.highlight tr th {
 #rezervacije-form #field-id_opomba {
     display: inline-block;
     width: 100%;
+}
+#nepotrjene-rezervacije tr td {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+.cancel.btn {
+    background-color: #c62828;
+}
+.cancel.btn:hover,
+.cancel.btn:active {
+    background-color: #f44336;
 }
