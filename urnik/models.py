@@ -544,7 +544,7 @@ class Rezervacija(models.Model):
                                       limit_choices_to={'tip__in': Ucilnica.OBJAVLJENI_TIPI}, verbose_name='Učilnice')
     osebe = models.ManyToManyField('urnik.Oseba', help_text='Osebe, ki si lastijo to rezervacijo.')
     dan = models.DateField(verbose_name='Dan začetka', blank=False, null=False, help_text='Za kateri dan želite rezervirati.')
-    dan_konca = models.DateField(blank=True, null=True, verbose_name='Dan konca', help_text='Dan konca rezervacije. Izpolni le, če je drugačen od začetka.')
+    dan_konca = models.DateField(blank=True, null=True, verbose_name='Dan konca', help_text='Dan konca rezervacije. Izpolnite le, če je drugačen od začetka.')
     MOZNE_URE = tuple((u, str(u)+":00") for u in range(MIN_URA, MAX_URA+1))
     od = models.PositiveSmallIntegerField(blank=False, null=False, choices=MOZNE_URE, help_text='Od katere ure želite rezervirati.')
     do = models.PositiveSmallIntegerField(blank=False, null=False, choices=MOZNE_URE, help_text='Do katere ure želite rezervirati.')
@@ -591,3 +591,21 @@ class RezevacijeForm(ModelForm):
             'opomba': TextInput(attrs={'placeholder': 'npr. izpit Analiza 1 FIN'}),
         }
 
+    def clean_date(self):
+        date = self.cleaned_data['date']
+        if date < datetime.date.today():
+            raise ValidationError("Datum rezervacije mora biti v prihodnosti.")
+        return date
+
+    def clean(self):
+        cleaned = super().clean()
+        if cleaned.get('od') >= cleaned.get('do'):
+            raise ValidationError("Ura začetka rezervacije mora biti pred uro konca rezervacije.")
+
+        konec = cleaned.get('dan_konca')
+        if konec:
+            dan = cleaned.get('dan')
+            if dan == konec:
+                cleaned['dan_konca'] = None
+            elif dan > konec:
+                raise ValidationError("Dan začetka rezervacije moda biti pred dnevom konca rezervacije.")

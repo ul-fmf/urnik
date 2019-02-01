@@ -1,12 +1,12 @@
 from django.contrib.admin.views.decorators import staff_member_required
-from django.core.cache import cache
-from django.http import QueryDict, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, redirect, render
-from django.utils import timezone
-from django.utils.dateparse import parse_date
 from django.contrib.auth.decorators import login_required
+from django.core.cache import cache
+from django.http import QueryDict
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils.dateparse import parse_date
 from django.views.decorators.http import require_POST
+
 from .models import *
 
 
@@ -108,7 +108,7 @@ def nova_rezervacija(request, ucilnica_id=None, ura=None, teden=None, dan_v_tedn
 
 @staff_member_required
 def preglej_rezervacije(request):
-    rezervacije = Rezervacija.objects.filter(dan__gte=timezone.now(), potrjena=False)
+    rezervacije = Rezervacija.objects.prihajajoce().filter(potrjena=False)
     return render(request, 'preglej_rezervacije.html', {'rezervacije': rezervacije})
 
 
@@ -131,7 +131,7 @@ def izbrisi_rezervacijo(request):
 @staff_member_required
 @require_POST
 def potrdi_vse_rezervacije(request):
-    Rezervacija.objects.filter(dan__gte=timezone.now(), potrjena=False).update(potrjena=True)
+    Rezervacija.objects.prihajajoce().filter(potrjena=False).update(potrjena=True)
     return redirect(reverse('preglej_rezervacije'))
 
 

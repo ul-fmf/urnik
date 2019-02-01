@@ -9,11 +9,11 @@
       <thead>
       <th>
         <form action="{% url 'potrdi_vse_rezervacije' %}" method="post" onsubmit="return window.confirm('Ste prepričani, da želite potrditi VSE rezervacije?');">
-          {{ csrf }}
+          {% csrf_token %}
           <input type="submit" value="Potrdi vse" name="confirm" class="btn">
         </form>
       </th>
-      <th>Datum</th>
+      <th style="width: 100px;">Datum</th>
       <th style="width: 70px;">Od &ndash; do</th>
       <th style="width: 200px;">Osebe</th>
       <th>Učilnice</th>
@@ -30,7 +30,13 @@
               <input type="submit" value="Potrdi" name="confirm" class="btn">
             </form>
           </td>
-          <td>{{ r.dan }}</td>
+          <td>
+            {% if r.dan_konca %}
+              {{ r.dan|date:"D, j. b" }} &ndash; {{ r.dan_konca|date:"D, j. b" }}
+            {% else %}
+              {{ r.dan|date:"D, j. b" }}
+            {% endif %}
+          </td>
           <td>{{ r.od }} &ndash; {{ r.do }}</td>
           <td>
             {% for o in r.osebe.all %}

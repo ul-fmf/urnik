@@ -5,7 +5,10 @@
       <span class="flow-text">Uspešno ste rezervirali!</span>
     </p>
     <p>
-      Pojdite na <a href="{% url 'rezervacije' %}">vse rezervacije</a> ali pa <a href="{% url 'zacetna_stran' %}">domov</a>.
+      Naredite <a href="{% url 'nova_rezervacija' %}">še eno rezervacijo</a>,
+      pojdite na <a href="{% url 'rezervacije' %}">vse rezervacije</a>,
+      iščite <a href="{% url 'proste' %}">proste učilnice</a>
+      ali pa pojdite <a href="{% url 'zacetna_stran' %}">domov</a>.
     </p>
   </div>
 {% endblock %}
