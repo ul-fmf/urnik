@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from django.db.models import Prefetch
 from django.forms import ModelForm, CheckboxSelectMultiple, TextInput, DateInput, NumberInput
 
+from urnik.utils import teden_dneva
 from .layout import nastavi_sirine_srecanj, nastavi_barve
 
 MIN_URA, MAX_URA = 7, 20
@@ -202,6 +203,16 @@ class Semester(models.Model):
         for srecanje in self.srecanja.all():
             srecanje.podvoji(novi_semester=novi_semester)
         return novi_semester
+
+    def prihodnji_tedni(self):
+        razlika = datetime.timedelta(weeks=1)
+        tedni = set()
+        dan = datetime.date.today()
+        while dan < self.do:
+            tedni.add(teden_dneva(dan))
+            dan += razlika
+        tedni.add(teden_dneva(self.do))
+        return tedni
 
 
 class SrecanjeQuerySet(models.QuerySet):

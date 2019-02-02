@@ -7,13 +7,8 @@ from django.urls import reverse
 from django.utils.dateparse import parse_date
 from django.views.decorators.http import require_POST
 
+from urnik.utils import teden_dneva
 from .models import *
-
-
-def teden_dneva(dan):
-    ponedeljek = dan - datetime.timedelta(days=dan.weekday())
-    nedelja = ponedeljek + datetime.timedelta(days=6)
-    return (ponedeljek, nedelja)
 
 
 def izbrani_semester(request):
@@ -112,8 +107,8 @@ def preglej_rezervacije(request):
     return render(request, 'preglej_rezervacije.html', {'rezervacije': rezervacije})
 
 
-@staff_member_required
 @require_POST
+@staff_member_required
 def potrdi_rezervacijo(request):
     r = get_object_or_404(Rezervacija, pk=request.POST['r-pk'])
     r.potrjena = True
@@ -121,15 +116,15 @@ def potrdi_rezervacijo(request):
     return redirect(reverse('preglej_rezervacije'))
 
 
-@staff_member_required
 @require_POST
+@staff_member_required
 def izbrisi_rezervacijo(request):
     get_object_or_404(Rezervacija, pk=request.POST['r-pk']).delete()
     return redirect(reverse('preglej_rezervacije'))
 
 
-@staff_member_required
 @require_POST
+@staff_member_required
 def potrdi_vse_rezervacije(request):
     Rezervacija.objects.prihajajoce().filter(potrjena=False).update(potrjena=True)
     return redirect(reverse('preglej_rezervacije'))
@@ -229,20 +224,23 @@ def proste_ucilnice(request):
     velikost &= {v[0] for v in UcilnicaQuerySet.VELIKOST}
     if not velikost: velikost = None
 
-    proste = ProsteUcilnice(ucilnice, tip, velikost)
+    semester = izbrani_semester(request)
+    proste = ProsteUcilnice(ucilnice.filter(tip__in=tip).ustrezne_velikosti(velikost))
     if teden:
-        proste.upostevaj_rezervacije(teden)
+        proste.upostevaj_rezervacije_za_teden(teden)
         # teh semestrov bi moralo biti 0 ali 1
         prekrivajoci_semestri = Semester.objects.filter(od__lte=teden, do__gte=teden)
         for semester in prekrivajoci_semestri:
             proste.dodaj_srecanja_semestra(semester)
     else:
-        proste.dodaj_srecanja_semestra(izbrani_semester(request))
+        proste.dodaj_srecanja_semestra(semester)
 
     termini = proste.dobi_termine()
     for t in termini:
         t.filtriraj_ucilnice(pokazi_zasedene=pokazi_zasedene)
 
+    mozni_tedni = set(teden_dneva(d) for r in Rezervacija.objects.prihajajoce() for d in r.dnevi())
+    mozni_tedni.update(semester.prihodnji_tedni())
     return render(request, 'proste_ucilnice.html', {
         'naslov': 'Proste učilnice',
         'termini': termini,
@@ -256,7 +254,7 @@ def proste_ucilnice(request):
         # possible values
         'mozne_velikosti_ucilnic': UcilnicaQuerySet.VELIKOST,
         'mozni_tipi_ucilnic': [u for u in Ucilnica.TIP if u[0] in Ucilnica.OBJAVLJENI_TIPI],
-        'mozni_tedni': sorted(set(teden_dneva(d) for r in Rezervacija.objects.prihajajoce() for d in r.dnevi())),
+        'mozni_tedni': sorted(mozni_tedni),
         'ustrezne_ucilnice': list(ucilnice),
     })
 
