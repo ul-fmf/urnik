@@ -7,6 +7,7 @@ from django.urls import reverse
 from django.utils.dateparse import parse_date
 from django.views.decorators.http import require_POST
 
+from urnik.iskanik_konfliktov import ProsteUcilnice
 from urnik.utils import teden_dneva
 from .models import *
 
@@ -22,6 +23,7 @@ def izbrani_semester(request):
             semester = Semester.objects.filter(objavljen=True).latest('od')
         cache.set(kljuc_semestra, semester, None)
     return semester
+
 
 def zacetna_stran(request):
     ucilnice = Ucilnica.objects.objavljene()
@@ -102,9 +104,50 @@ def nova_rezervacija(request, ucilnica_id=None, ura=None, teden=None, dan_v_tedn
 
 
 @staff_member_required
-def preglej_rezervacije(request):
-    rezervacije = Rezervacija.objects.prihajajoce().filter(potrjena=False)
-    return render(request, 'preglej_rezervacije.html', {'rezervacije': rezervacije})
+def preglej_rezervacije(request, nepotrjene=False):
+    rezervacije = Rezervacija.objects.prihajajoce()
+    if nepotrjene:
+        rezervacije = rezervacije.filter(potrjena=False)
+    rezervacije = rezervacije.prefetch_related(
+        'ucilnice', 'osebe').order_by('dan', 'od', 'pk')
+
+    # TODO: factor this out in a class
+    prihodnji_semestri = Semester.objects.filter(do__gte=datetime.date.today())
+    ucilnice = set()
+    semestri = set()
+    datumi = set()
+    for r in rezervacije:
+        ucilnice.update(r.ucilnice.all())
+        semestri.update(s for s in prihodnji_semestri if r.zacetek <= s.do and s.od <= r.konec)
+        datumi.update(r.dnevi())
+
+    zasedenost_ucilnic = defaultdict(lambda: defaultdict(list))
+    for s in Srecanje.objects.filter(semester__in=semestri, ucilnica__in=ucilnice).prefetch_related('semester'):
+        for d in s.dnevi():
+            zasedenost_ucilnic[s.ucilnica_id][d].append(s)
+
+    rezerviranost_ucilnic = defaultdict(lambda: defaultdict(list))
+    for r in rezervacije:
+        for u in r.ucilnice.all():
+            for d in r.dnevi():
+                rezerviranost_ucilnic[u][d].append(r)
+
+    def konflikti_z_rezervacijo(r: Rezervacija):
+        dnevi = defaultdict(lambda: {'r': [], 's': []})
+        for u in r.ucilnice.all():
+            for d in r.dnevi():
+                for s in zasedenost_ucilnic[u][d]:
+                    if r.se_po_urah_prekriva(s.od, s.do):
+                        dnevi[d]['s'].append(s)
+                for r2 in rezerviranost_ucilnic[u][d]:
+                    if r2 != r and r.se_po_urah_prekriva(r2.od, r2.do):
+                        dnevi[d]['r'].append(r2)
+        return dnevi
+
+    data = [{'rezervacija': r, 'konflikti': dict(konflikti_z_rezervacijo(r))} for r in rezervacije]
+    for x in data:
+        x['st_konfliktov'] = sum(len(k) for y in x['konflikti'].values() for k in y.values())
+    return render(request, 'preglej_rezervacije.html', {'entries': data, 'nepotrjene': nepotrjene})
 
 
 @require_POST

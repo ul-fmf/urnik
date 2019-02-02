@@ -41,12 +41,13 @@
                   {{ rezervacija.opomba }}
                 </small>
                 {% if user.is_staff %}
+                  {# TODO: to se je pokvarilo pri uvedbi večdnevnih rezervacij #}
                   {% for konflikt in rezervacija.konflikti %}
                     <span class="new badge red" data-badge-caption="">
-                {{ konflikt.predmet }},
-                {{ konflikt.od }}–{{ konflikt.do }},
-                {{ konflikt.ucitelji.all|join:", " }}
-              </span>
+                      {{ konflikt.predmet }},
+                      {{ konflikt.od }}–{{ konflikt.do }},
+                      {{ konflikt.ucitelji.all|join:", " }}
+                    </span>
                   {% endfor %}
                 {% endif %}
               </li>

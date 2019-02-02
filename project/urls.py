@@ -29,6 +29,7 @@ urlpatterns = [
     url(r'^nova-rezervacija/$', urnik.views.nova_rezervacija, name='nova_rezervacija'),
     url(r'^nova-rezervacija/(?P<ucilnica_id>\d+)/(?P<ura>\d+)/(?P<teden>[0-9-]*)/(?P<dan_v_tednu>[0-6])/$', urnik.views.nova_rezervacija, name='nova_rezervacija_za_ucilnico'),
     url(r'^preglej-rezervacije/$', urnik.views.preglej_rezervacije, name='preglej_rezervacije'),
+    url(r'^preglej-rezervacije/nepotrjene/$', urnik.views.preglej_rezervacije, name='preglej_nepotrjene_rezervacije', kwargs={'nepotrjene': True}),
     url(r'^potrdi-rezervacijo/$', urnik.views.potrdi_rezervacijo, name='potrdi_rezervacijo'),
     url(r'^potrdi-vse-rezervacije/$', urnik.views.potrdi_vse_rezervacije, name='potrdi_vse_rezervacije'),
     url(r'^izbrisi-rezervacijo/$', urnik.views.izbrisi_rezervacijo, name='izbrisi_rezervacijo'),

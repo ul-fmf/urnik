@@ -918,6 +918,14 @@ table.highlight tr th {
     padding-top: 5px;
     padding-bottom: 5px;
 }
+#nepotrjene-rezervacije tbody tr {
+    border-bottom: none;
+    border-top: 1px solid rgba(0,0,0,0.12);
+}
+
+#nepotrjene-rezervacije tr.konflikti {
+    border-top: none;
+}
 .cancel.btn {
     background-color: #c62828;
 }

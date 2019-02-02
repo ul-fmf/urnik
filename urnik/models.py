@@ -1,5 +1,5 @@
 import datetime
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from copy import deepcopy
 from django.db import models
 from django.core.exceptions import ValidationError
@@ -335,69 +335,6 @@ class TerminUrejanje(Termin):
             self.zasedenost = 'deloma_proste_alternative'
 
 
-class ProsteUcilniceTermin(Termin):
-    HUE_PRAZEN = 120  # zelena
-    HUE_POLN = 0  # rdeca
-
-    def __init__(self, dan, ura, ustrezne_ucilnice, zasedene_ucilnice, rezervirane_ucilnice):
-        super().__init__(dan, ura)
-        zasedene_pks = {u.pk for u in zasedene_ucilnice}
-        rezervirane_pks = {u.pk for u in rezervirane_ucilnice}
-        # Vse ustrezne proste ucilnice.
-        self.proste = [u for u in ustrezne_ucilnice if u.pk not in zasedene_pks and u.pk not in rezervirane_pks]
-        # Vse ustrezne ucilnice, ki so pa zasedene, ker je tam stalno srečanje. Vrednosti so razlogi za zasedenost.
-        self.zasedene = [(u, r) for u, r in zasedene_ucilnice.items() if u.pk not in rezervirane_pks]
-        # Vse ustrezne ucilnice, ki so pa zasedene, ker so rezervirane. Vrednosti so razlogi za zasedenost.
-        self.rezervirane = list(rezervirane_ucilnice.items())
-        # ucilnice, ki bodo prikazane, skupaj s stanjem in razlogom
-        self.prikazane_ucilnice = []
-
-    def filtriraj_ucilnice(self, pokazi_zasedene):
-        vse = [('prosta', u, None) for u in self.proste]
-        if pokazi_zasedene:
-            vse.extend([('rezervirana', u, r) for u, r in self.rezervirane])
-            vse.extend([('zasedena', u, r) for u, r in self.zasedene])
-        self.prikazane_ucilnice = sorted(vse, key=lambda x: x[1])
-
-    def hue(self):
-        h = self.HUE_PRAZEN if self.proste else self.HUE_POLN
-        return "{:.0f}".format(h)
-
-
-class ProsteUcilnice(object):
-    def __init__(self, ustrezne_ucilnice, tip, velikost):
-        self.ustrezne = ustrezne_ucilnice.filter(tip__in=tip).ustrezne_velikosti(velikost)
-        self.zasedenost_ucilnic = defaultdict(dict)
-        self.rezerviranost_ucilnic = defaultdict(dict)
-
-    def dodaj_srecanja_semestra(self, semester):
-        for srecanje in semester.srecanja.select_related('ucilnica', 'predmet').prefetch_related('ucitelji'
-                                       ).filter(ucilnica__in=self.ustrezne).exclude(ura__isnull=True):
-            for i in range(srecanje.trajanje):
-                self.zasedenost_ucilnic[srecanje.dan, srecanje.ura + i][srecanje.ucilnica] = srecanje
-
-    def upostevaj_rezervacije(self, teden):
-        for rezervacija in Rezervacija.objects.v_tednu(
-            teden
-        ).prefetch_related(
-            Prefetch(
-                'ucilnice',
-                queryset=Ucilnica.objects.filter(pk__in=self.ustrezne)
-            ),
-            'osebe'
-        ):
-            for ucilnica in rezervacija.ucilnice.all():
-                for dan in rezervacija.dnevi():
-                    for ura in range(rezervacija.od, rezervacija.do):
-                        self.rezerviranost_ucilnic[dan.isoweekday(), ura][ucilnica] = rezervacija
-
-    def dobi_termine(self):
-        termini = [ProsteUcilniceTermin(d, u, self.ustrezne, self.zasedenost_ucilnic[d, u],
-                                        self.rezerviranost_ucilnic[d, u])
-                   for d in range(1, len(DNEVI) + 1) for u in range(MIN_URA, MAX_URA)]
-        return termini
-
-
 class Srecanje(models.Model):
     PREDAVANJA, SEMINAR, VAJE, LABORATORIJSKE_VAJE = 'P', 'S', 'V', 'L'
     TIP = (
@@ -530,6 +467,14 @@ class Srecanje(models.Model):
                 )
         return termini
 
+    def dnevi(self):
+        dan = self.semester.od
+        dan_konca = self.semester.do
+        razlika = datetime.timedelta(weeks=1)
+        while dan <= dan_konca:
+            yield dan
+            dan += razlika
+
 
 class RezervacijaQuerySet(models.QuerySet):
 
@@ -564,6 +509,20 @@ class Rezervacija(models.Model):
 
     objects = RezervacijaQuerySet.as_manager()
 
+    @property
+    def zacetek(self):
+        return self.dan
+
+    @property
+    def konec(self):
+        return self.dan_konca or self.dan
+
+    def __str__(self):
+        if self.dan_konca:
+            return "Rezervacija od {} do {}, {}–{} za {}".format(self.zacetek, self.konec, self.od, self.do, self.opomba)
+        else:
+            return "Rezervacija dne {}, {}–{} za {}".format(self.zacetek, self.od, self.do, self.opomba)
+
     class Meta:
         verbose_name_plural = 'rezervacije'
         default_related_name = 'rezervacije'
@@ -571,7 +530,7 @@ class Rezervacija(models.Model):
 
     def dnevi(self):
         dan = self.dan
-        dan_konca = self.dan_konca or dan
+        dan_konca = self.konec
         razlika = datetime.timedelta(days=1)
         while dan <= dan_konca:
             yield dan
@@ -588,6 +547,21 @@ class Rezervacija(models.Model):
                     continue
                 else:
                     yield srecanje
+
+    # def konflikti_po_dnevih(self):
+    #     konflikti = OrderedDict((d, []) for d in self.dnevi())
+    #     for ucilnica in self.ucilnice.all():
+    #         for srecanje in ucilnica.srecanja.all():
+    #             if self.dan.weekday() + 1 != srecanje.dan or not srecanje.od:
+    #                 continue
+    #             elif srecanje.do <= self.od:
+    #                 continue
+    #             elif self.do <= srecanje.od:
+    #                 continue
+    #             else:
+    #                 konflikti[srecanje.]
+    def se_po_urah_prekriva(self, od, do):
+        return self.od < do and od < self.do
 
 
 class RezevacijeForm(ModelForm):
@@ -620,3 +594,53 @@ class RezevacijeForm(ModelForm):
                 cleaned['dan_konca'] = None
             elif dan > konec:
                 raise ValidationError("Dan začetka rezervacije moda biti pred dnevom konca rezervacije.")
+
+
+        def konflikti_srecanja(ucilnice):
+            semester_okoli_datuma = Semester.objects.filter(od__lte=self.cleaned_data['dan'], do__gte=self.cleaned_data['dan'])
+            for ucilnica in ucilnice.all():
+                for srecanje in ucilnica.srecanja.filter(semester__in=semester_okoli_datuma):
+                    if self.cleaned_data['dan'].weekday() + 1 != srecanje.dan or not srecanje.od:
+                        continue
+                    elif srecanje.do <= self.cleaned_data['od']:
+                        continue
+                    elif self.cleaned_data['do'] <= srecanje.od:
+                        continue
+                    else:
+                        yield srecanje
+
+        def konflikti_rezervacije(ucilnice):
+            for ucilnica in ucilnice.all():
+                for rezervacija in ucilnica.rezervacije.filter(dan = self.cleaned_data['dan']).exclude(id=self.instance.id):
+                    if rezervacija.do <= self.cleaned_data['od']:
+                        continue
+                    elif self.cleaned_data['do'] <= rezervacija.od:
+                        continue
+                    else:
+                        yield rezervacija
+
+        errors = []
+        dan = self.cleaned_data['dan'].strftime('%d. %b %Y')
+        if 'ucilnice' in self.cleaned_data:
+            for srecanje in konflikti_srecanja(self.cleaned_data['ucilnice']):
+                errors.append(ValidationError(
+                    'Vaša rezervacija se prekriva s predmetom %(predmet)s (%(semester)s), ki se izvaja %(dan)s od %(od)i do %(do)i.',
+                    params={
+                        'predmet': srecanje.predmet,
+                        'semester': srecanje.semester,
+                        'dan': dan,
+                        'od': srecanje.od,
+                        'do': srecanje.do
+                    },
+                ))
+            for rezervacija in konflikti_rezervacije(self.cleaned_data['ucilnice']):
+                errors.append(ValidationError(
+                    'Vaša rezervacija se prekriva z rezervacijo osebe %(oseba)s, podana z razlogom %(razlog)s, na %(dan)s od %(od)i do %(do)i.',
+                    params={
+                        'oseba': rezervacija.osebe.first() if rezervacija.osebe.count() >= 1 else '(neznan)',
+                        'razlog': rezervacija.opomba,
+                        'dan': dan,
+                        'od': rezervacija.od,
+                        'do': rezervacija.do
+                    },
+                ))

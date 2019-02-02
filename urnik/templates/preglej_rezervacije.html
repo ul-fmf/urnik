@@ -2,63 +2,126 @@
 {% block content %}
   <div class="container">
     <p>
-      <span class="flow-text">Pregled nepotrjenih rezervacij</span>
+      <span class="flow-text">Administratorski pregled rezervacij</span>
     </p>
 
-    <table id="nepotrjene-rezervacije">
-      <thead>
-      <th>
-        <form action="{% url 'potrdi_vse_rezervacije' %}" method="post" onsubmit="return window.confirm('Ste prepričani, da želite potrditi VSE rezervacije?');">
-          {% csrf_token %}
-          <input type="submit" value="Potrdi vse" name="confirm" class="btn">
-        </form>
-      </th>
-      <th style="width: 100px;">Datum</th>
-      <th style="width: 70px;">Od &ndash; do</th>
-      <th style="width: 200px;">Osebe</th>
-      <th>Učilnice</th>
-      <th>Razlog</th>
-      <th></th>
-      </thead>
-      <tbody>
-      {% for r in rezervacije %}
+    <ul class="tabs">
+      <li class="tab col s3">
+        <a {% if not nepotrjene %}class="active" {% endif %}target="_self"
+           href="{% url 'preglej_rezervacije' %}">Vse</a>
+      </li>
+      <li class="tab col s3">
+        <a {% if nepotrjene %}class="active" {% endif %}target="_self"
+           href="{% url 'preglej_nepotrjene_rezervacije' %}">Nepotrjene</a>
+      </li>
+    </ul>
+
+
+    {% if not entries %}
+      <p>Trenutno ni nepotrjenih rezervacij.</p>
+    {% else %}
+
+      <table id="nepotrjene-rezervacije">
+        <thead>
         <tr>
-          <td>
-            <form action="{% url 'potrdi_rezervacijo' %}" method="post">
+          <th>
+            <form action="{% url 'potrdi_vse_rezervacije' %}" method="post"
+                  onsubmit="return window.confirm('Ste prepričani, da želite potrditi VSE rezervacije?');">
               {% csrf_token %}
-              <input type="hidden" name="r-pk" value="{{ r.pk }}">
-              <input type="submit" value="Potrdi" name="confirm" class="btn">
+              <input type="submit" value="Potrdi vse" name="confirm" class="btn">
             </form>
-          </td>
-          <td>
-            {% if r.dan_konca %}
-              {{ r.dan|date:"D, j. b" }} &ndash; {{ r.dan_konca|date:"D, j. b" }}
-            {% else %}
-              {{ r.dan|date:"D, j. b" }}
-            {% endif %}
-          </td>
-          <td>{{ r.od }} &ndash; {{ r.do }}</td>
-          <td>
-            {% for o in r.osebe.all %}
-              <a href="{% url 'urnik_osebe' o.pk %}">{{ o }}</a>{% if not forloop.last %},{% endif %}
-            {% endfor %}
-          </td>
-          <td>
-            {% for u in r.ucilnice.all %}
-              <a href="{% url 'urnik_ucilnice' u.pk %}">{{ u }}</a>{% if not forloop.last %},{% endif %}
-            {% endfor %}
-          </td>
-          <td>{{ r.opomba }}</td>
-          <td>
-            <form action="{% url 'izbrisi_rezervacijo' %}" method="post" onsubmit="return window.confirm('Ste prepričani, da želite izbrisati to rezervacijo?');">
-              {% csrf_token %}
-              <input type="hidden" name="r-pk" value="{{ r.pk }}">
-              <input type="submit" value="Izbriši" name="confirm" class="btn cancel">
-            </form>
-          </td>
+          </th>
+          <th>Status</th>
+          <th style="width: 100px;">Datum</th>
+          <th style="width: 70px;">Od&ndash;do</th>
+          <th style="width: 200px;">Osebe</th>
+          <th>Učilnice</th>
+          <th>Razlog</th>
+          <th></th>
         </tr>
-      {% endfor %}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+        {% for e in entries %}
+          {% with r=e.rezervacija %}
+            <tr>
+              <td>
+                <form action="{% url 'potrdi_rezervacijo' %}" method="post">
+{#                  <a href="{% url 'admin:rezervacija_choice_change' r.pk %}"><i class="material-icons">edit</i></a>#}
+                  {% csrf_token %}
+                  <input type="hidden" name="r-pk" value="{{ r.pk }}">
+                  <input type="submit" value="Potrdi" name="confirm" class="btn">
+                </form>
+              </td>
+              <td>
+                {% if e.konflikti %}
+                  <i class="material-icons orange-text">warning</i> ({{ e.st_konfliktov }})
+                {% else %}
+                  <i class="material-icons green-text">check</i>
+                {% endif %}
+              </td>
+              <td>
+                {% if r.dan_konca %}
+                  {{ r.dan|date:"D, j. b" }} &ndash; {{ r.dan_konca|date:"D, j. b" }}
+                {% else %}
+                  {{ r.dan|date:"D, j. b" }}
+                {% endif %}
+              </td>
+              <td>{{ r.od }}&ndash;{{ r.do }}</td>
+              <td>
+                {% for o in r.osebe.all %}
+                  <a href="{% url 'urnik_osebe' o.pk %}">{{ o }}</a>{% if not forloop.last %},{% endif %}
+                {% endfor %}
+              </td>
+              <td>
+                {% for u in r.ucilnice.all %}
+                  <a href="{% url 'urnik_ucilnice' u.pk %}">{{ u }}</a>{% if not forloop.last %},{% endif %}
+                {% endfor %}
+              </td>
+              <td>{{ r.opomba }}
+                {{ k }}
+              </td>
+              <td>
+                <form action="{% url 'izbrisi_rezervacijo' %}" method="post"
+                      onsubmit="return window.confirm('Ste prepričani, da želite izbrisati to rezervacijo?');">
+                  {% csrf_token %}
+                  <input type="hidden" name="r-pk" value="{{ r.pk }}">
+                  <input type="submit" value="Izbriši" name="confirm" class="btn cancel">
+                </form>
+              </td>
+            </tr>
+            {% if e.konflikti %}
+              <tr class="konflikti">
+                <td colspan="42"><!-- large enough :) -->
+                  <dl>
+                    {% for d, konflikti in e.konflikti.items %}
+                      <dt>Konflikti dne {{ d|date:"D, j. b" }}:</dt>
+                      <dd>
+                        <ul>
+                          {% for rez in konflikti.r %}
+                            <li>
+                              Rezervacija
+                              {% if not rez.osebe %}
+                                neznane osebe
+                              {% elif rez.osebe.all|length_is:1 %}
+                                osebe {{ rez.osebe.all.0 }}
+                              {% else %}
+                                oseb {{ rez.osebe.all|join:", " }}
+                              {% endif %}
+                              od {{ rez.od }} do {{ rez.do }}
+                              z razlogom &raquo;{{ rez.opomba }}&laquo;.
+                            </li>
+                          {% endfor %}
+                        </ul>
+                      </dd>
+                    {% endfor %}
+                  </dl>
+                </td>
+              </tr>
+            {% endif %}
+          {% endwith %}
+        {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
   </div>
 {% endblock %}
