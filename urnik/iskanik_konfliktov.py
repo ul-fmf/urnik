@@ -1,8 +1,9 @@
-from collections import defaultdict
+import datetime
+from collections import defaultdict, namedtuple
 
 from django.db.models import Prefetch
 
-from urnik.models import Termin, Rezervacija, Ucilnica, DNEVI, MIN_URA, MAX_URA
+from urnik.models import Termin, Rezervacija, Ucilnica, DNEVI, MIN_URA, MAX_URA, Srecanje, Semester, RezervacijaQuerySet
 
 
 class ProsteUcilniceTermin(Termin):
@@ -38,7 +39,6 @@ class ProsteUcilnice(object):
     """Zgradi strukturo, ki omogoca hitro iskanje prekrivanj za dane ucilnice glede na uro in dan v tednu."""
     def __init__(self, ucilnice):
         self.ucilnice = set(ucilnice)
-        print(self.ucilnice)
         self.zasedenost_ucilnic = defaultdict(dict)
         self.rezerviranost_ucilnic = defaultdict(dict)
 
@@ -69,3 +69,59 @@ class ProsteUcilnice(object):
                    for d in range(1, len(DNEVI) + 1) for u in range(MIN_URA, MAX_URA)]
         return termini
 
+
+class IskalnikKonfliktov(object):
+    """Zgradi strukturo, ki omogoca hitro iskanje prekrivanj glede na datum in učilnico."""
+
+    def __init__(self, ucilnice):
+        self.ucilnice = set(ucilnice)
+        self.zasedenost_ucilnic = defaultdict(list)
+        self.rezerviranost_ucilnic = defaultdict(list)
+
+    def dodaj_srecanja(self, semestri):
+        for s in Srecanje.objects.filter(semester__in=semestri, ucilnica__in=self.ucilnice
+                                         ).select_related('semester', 'predmet', 'ucilnica'):
+            for d in s.dnevi():
+                self.zasedenost_ucilnic[s.ucilnica_id, d].append(s)
+
+    def dodaj_rezervacije(self, rezervacije):
+        for r in rezervacije:
+            for u in r.ucilnice.all():
+                for d in r.dnevi():
+                    self.rezerviranost_ucilnic[u, d].append(r)
+
+    @staticmethod
+    def za_rezervacije(rezervacije: RezervacijaQuerySet):
+        min_datum = datetime.date.max
+        max_datum = datetime.date.min
+        for r in rezervacije:
+            if r.zacetek < min_datum:
+                min_datum = r.zacetek
+            if r.konec > max_datum:
+                max_datum = r.konec
+
+        prihodnji_semestri = Semester.objects.filter(do__gte=min_datum, od__lte=max_datum)
+        ucilnice = set()
+        semestri = set()
+        for r in rezervacije:
+            ucilnice.update(r.ucilnice.all())
+            semestri.update(s for s in prihodnji_semestri if r.zacetek <= s.do and s.od <= r.konec)
+
+        iskalnik = IskalnikKonfliktov(ucilnice)
+        iskalnik.dodaj_srecanja(semestri)
+        iskalnik.dodaj_rezervacije(rezervacije)
+        return iskalnik
+
+    def konflikti_z_rezervacijo(self, r: Rezervacija):
+        dnevi = defaultdict(lambda: namedtuple('Konfikt', ['srecanja', 'rezervacije'], defaults=([], []))())
+        for u in r.ucilnice.all():
+            if u not in self.ucilnice:
+                raise ValueError("Struktura iskanja ni bila pripravljena za iskanje konfliktov v učinici {}".format(u))
+            for d in r.dnevi():
+                for s in self.zasedenost_ucilnic[u, d]:
+                    if r.se_po_urah_prekriva(s.od, s.do):
+                        dnevi[d].srecanja.append(s)
+                for r2 in self.rezerviranost_ucilnic[u, d]:
+                    if r2 != r and r.se_po_urah_prekriva(r2.od, r2.do):
+                        dnevi[d].rezervacije.append(r2)
+        return dict(dnevi)

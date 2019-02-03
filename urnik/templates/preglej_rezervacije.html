@@ -46,7 +46,7 @@
             <tr>
               <td>
                 <form action="{% url 'potrdi_rezervacijo' %}" method="post">
-{#                  <a href="{% url 'admin:rezervacija_choice_change' r.pk %}"><i class="material-icons">edit</i></a>#}
+                  <a href="{% url 'admin:urnik_rezervacija_change' r.pk %}"><i class="material-icons">edit</i></a>
                   {% csrf_token %}
                   <input type="hidden" name="r-pk" value="{{ r.pk }}">
                   <input type="submit" value="Potrdi" name="confirm" class="btn">
@@ -54,7 +54,8 @@
               </td>
               <td>
                 {% if e.konflikti %}
-                  <i class="material-icons orange-text">warning</i> ({{ e.st_konfliktov }})
+                  <i class="material-icons orange-text">warning</i>
+                  <span class="st-konfliktov">({{ e.st_konfliktov }})</span>
                 {% else %}
                   <i class="material-icons green-text">check</i>
                 {% endif %}
@@ -97,7 +98,7 @@
                       <dt>Konflikti dne {{ d|date:"D, j. b" }}:</dt>
                       <dd>
                         <ul>
-                          {% for rez in konflikti.r %}
+                          {% for rez in konflikti.rezervacije %}
                             <li>
                               Rezervacija
                               {% if not rez.osebe %}
@@ -109,6 +110,13 @@
                               {% endif %}
                               od {{ rez.od }} do {{ rez.do }}
                               z razlogom &raquo;{{ rez.opomba }}&laquo;.
+                            </li>
+                          {% endfor %}
+                          {% for s in konflikti.srecanja %}
+                            <li>
+                              V {{ s.ucilnica }} poteka predmet
+                              {{ s.predmet }}
+                              od {{ s.od }} do {{ s.do }}.
                             </li>
                           {% endfor %}
                         </ul>

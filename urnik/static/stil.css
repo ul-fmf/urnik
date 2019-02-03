@@ -918,6 +918,12 @@ table.highlight tr th {
     padding-top: 5px;
     padding-bottom: 5px;
 }
+#nepotrjene-rezervacije tr td a i {
+    vertical-align: middle;
+}
+#nepotrjene-rezervacije tr td span.st-konfliktov {
+    vertical-align: super;
+}
 #nepotrjene-rezervacije tbody tr {
     border-bottom: none;
     border-top: 1px solid rgba(0,0,0,0.12);
