@@ -34,7 +34,8 @@
                 </li>
               {% endifchanged %}
               <li class="collection-item">
-                {% if not rezervacija.potrjena %}
+                {# TODO remove requirement for user authentication #}
+                {% if user.is_authenticated and not rezervacija.potrjena %}
                   <i class="material-icons grey-text left tooltipped"
                      data-position="left" data-tooltip="Še nepotrjena s strani referata"
                      title="Še nepotrjena s strani referata">help</i>

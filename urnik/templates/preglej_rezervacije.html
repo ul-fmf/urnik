@@ -83,7 +83,8 @@
               </td>
               <td>
                 <form action="{% url 'izbrisi_rezervacijo' %}" method="post"
-                      onsubmit="return window.confirm('Ste prepričani, da želite izbrisati to rezervacijo?');">
+                      onsubmit="return window.confirm('Ste prepričani, da želite izbrisati to ' +
+                       'rezervacijo?\nV primeru izbrisa bi bilo dobro obvestiti osebe: {{ r.osebe.all|join:", " }}.');">
                   {% csrf_token %}
                   <input type="hidden" name="r-pk" value="{{ r.pk }}">
                   <input type="submit" value="Izbriši" name="confirm" class="btn cancel">
