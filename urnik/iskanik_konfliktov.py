@@ -70,58 +70,82 @@ class ProsteUcilnice(object):
         return termini
 
 
+class Konflikt(object):
+    def __init__(self):
+        self.srecanja = []
+        self.rezervacije = []
+
+    @property
+    def st_konfliktov(self):
+        return len(self.srecanja) + len(self.rezervacije)
+
+    def __bool__(self):
+        return self.st_konfliktov > 0
+
+
 class IskalnikKonfliktov(object):
     """Zgradi strukturo, ki omogoca hitro iskanje prekrivanj glede na datum in učilnico."""
 
-    def __init__(self, ucilnice):
+    def __init__(self, ucilnice, min_datum, max_datum):
         self.ucilnice = set(ucilnice)
+        self.min_datum = min_datum
+        self.max_datum = max_datum
         self.zasedenost_ucilnic = defaultdict(list)
         self.rezerviranost_ucilnic = defaultdict(list)
 
-    def dodaj_srecanja(self, semestri):
+    def dodaj_srecanja(self):
+        self.dodaj_srecanja_semestrov(Semester.objects.v_obdobju(self.min_datum, self.max_datum))
+
+    def dodaj_srecanja_semestrov(self, semestri):
         for s in Srecanje.objects.filter(semester__in=semestri, ucilnica__in=self.ucilnice
-                                         ).select_related('semester', 'predmet', 'ucilnica'):
-            for d in s.dnevi():
+                                         ).exclude(ura__isnull=True).select_related('semester', 'predmet', 'ucilnica'):
+            for d in s.dnevi_med(self.min_datum, self.max_datum):
                 self.zasedenost_ucilnic[s.ucilnica_id, d].append(s)
 
     def dodaj_rezervacije(self, rezervacije):
         for r in rezervacije:
             for u in r.ucilnice.all():
-                for d in r.dnevi():
+                for d in r.dnevi_med(self.min_datum, self.max_datum):
                     self.rezerviranost_ucilnic[u, d].append(r)
 
     @staticmethod
     def za_rezervacije(rezervacije: RezervacijaQuerySet):
         min_datum = datetime.date.max
         max_datum = datetime.date.min
+        ucilnice = set()
         for r in rezervacije:
             if r.zacetek < min_datum:
                 min_datum = r.zacetek
             if r.konec > max_datum:
                 max_datum = r.konec
-
-        prihodnji_semestri = Semester.objects.filter(do__gte=min_datum, od__lte=max_datum)
-        ucilnice = set()
-        semestri = set()
-        for r in rezervacije:
             ucilnice.update(r.ucilnice.all())
-            semestri.update(s for s in prihodnji_semestri if r.zacetek <= s.do and s.od <= r.konec)
 
-        iskalnik = IskalnikKonfliktov(ucilnice)
-        iskalnik.dodaj_srecanja(semestri)
+        iskalnik = IskalnikKonfliktov(ucilnice, min_datum, max_datum)
+        iskalnik.dodaj_srecanja()
         iskalnik.dodaj_rezervacije(rezervacije)
         return iskalnik
 
     def konflikti_z_rezervacijo(self, r: Rezervacija):
-        dnevi = defaultdict(lambda: namedtuple('Konfikt', ['srecanja', 'rezervacije'], defaults=([], []))())
         for u in r.ucilnice.all():
-            if u not in self.ucilnice:
-                raise ValueError("Struktura iskanja ni bila pripravljena za iskanje konfliktov v učinici {}".format(u))
             for d in r.dnevi():
-                for s in self.zasedenost_ucilnic[u, d]:
-                    if r.se_po_urah_prekriva(s.od, s.do):
-                        dnevi[d].srecanja.append(s)
-                for r2 in self.rezerviranost_ucilnic[u, d]:
-                    if r2 != r and r.se_po_urah_prekriva(r2.od, r2.do):
-                        dnevi[d].rezervacije.append(r2)
-        return dict(dnevi)
+                k = self.konflikti(u, d, r.od, r.do, r)
+                if k:
+                    yield u, d, k
+
+    def konflikti(self, ucilnica, datum, od, do, ignore=None):
+        """Vrne konflikte z dejavnostjo, ki bi v ucilnici `ucilnica` potekala dne `datum` od ure `od` do `do`."""
+        konflikti = Konflikt()
+        if ucilnica not in self.ucilnice:
+            raise ValueError("Struktura iskanja ni bila pripravljena za iskanje konfliktov v učinici {}".format(ucilnica))
+        if not (self.min_datum <= datum <= self.max_datum):
+            raise ValueError("Struktura iskanja ni bila pripravljena za iskanje konfliktov dne {}".format(datum))
+
+        for s in self.zasedenost_ucilnic[ucilnica, datum]:
+            if s != ignore and s.se_po_urah_prekriva(od, do):
+                konflikti.srecanja.append(s)
+
+        for r in self.rezerviranost_ucilnic[ucilnica, datum]:
+            if r != ignore and r.se_po_urah_prekriva(od, do):
+                konflikti.rezervacije.append(r)
+
+        return konflikti

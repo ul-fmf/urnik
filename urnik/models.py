@@ -13,6 +13,7 @@ MIN_URA, MAX_URA = 7, 20
 ENOTA_VISINE = 1 / (MAX_URA - MIN_URA)
 DNEVI = ('ponedeljek', 'torek', 'sreda', 'četrtek', 'petek')
 ENOTA_SIRINE = 1 / len(DNEVI)
+DAYS_IN_WEEK = 7
 
 
 class OsebaQuerySet(models.QuerySet):
@@ -180,11 +181,18 @@ class Predmet(models.Model):
         return ', '.join(letnik.kratica for letnik in self.letniki.all())
 
 
+class SemesterQuerySet(models.QuerySet):
+    def v_obdobju(self, od, do):
+        return self.filter(do__gte=od, od__lte=do)
+
+
 class Semester(models.Model):
     ime = models.CharField(max_length=192)
     od = models.DateField()
     do = models.DateField()
     objavljen = models.BooleanField(default=False)
+
+    objects = SemesterQuerySet.as_manager()
 
     class Meta:
         verbose_name_plural = 'semestri'
@@ -379,6 +387,9 @@ class Srecanje(models.Model):
         if self.ura:
             return self.ura + self.trajanje
 
+    def se_po_urah_prekriva(self, od, do):
+        return self.od < do and od < self.do
+
     def podvoji(self, novi_semester=None):
         stari_ucitelji = list(self.ucitelji.all())
         self.id = None
@@ -467,9 +478,11 @@ class Srecanje(models.Model):
                 )
         return termini
 
-    def dnevi(self):
-        dan = self.semester.od
-        dan_konca = self.semester.do
+    def dnevi_med(self, od, do):
+        od = max(od, self.semester.od)
+        dan = od + datetime.timedelta((self.dan - (od.weekday()+1)) % DAYS_IN_WEEK)
+        assert dan.weekday() + 1 == self.dan, "Ups."
+        dan_konca = min(self.semester.do, do)
         razlika = datetime.timedelta(weeks=1)
         while dan <= dan_konca:
             yield dan
@@ -536,30 +549,14 @@ class Rezervacija(models.Model):
             yield dan
             dan += razlika
 
-    def konflikti(self):
-        for ucilnica in self.ucilnice.all():
-            for srecanje in ucilnica.srecanja.all():
-                if self.dan.weekday() + 1 != srecanje.dan or not srecanje.od:
-                    continue
-                elif srecanje.do <= self.od:
-                    continue
-                elif self.do <= srecanje.od:
-                    continue
-                else:
-                    yield srecanje
+    def dnevi_med(self, od, do):
+        dan = max(self.zacetek, od)
+        dan_konca = min(self.konec, do)
+        razlika = datetime.timedelta(days=1)
+        while dan <= dan_konca:
+            yield dan
+            dan += razlika
 
-    # def konflikti_po_dnevih(self):
-    #     konflikti = OrderedDict((d, []) for d in self.dnevi())
-    #     for ucilnica in self.ucilnice.all():
-    #         for srecanje in ucilnica.srecanja.all():
-    #             if self.dan.weekday() + 1 != srecanje.dan or not srecanje.od:
-    #                 continue
-    #             elif srecanje.do <= self.od:
-    #                 continue
-    #             elif self.do <= srecanje.od:
-    #                 continue
-    #             else:
-    #                 konflikti[srecanje.]
     def se_po_urah_prekriva(self, od, do):
         return self.od < do and od < self.do
 

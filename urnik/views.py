@@ -54,13 +54,18 @@ def kombiniran_pogled_form(request):
 
 
 def rezervacije(request):
-    rezervacije = []
     queryset = Rezervacija.objects.prihajajoce().prefetch_related(
         'ucilnice',
         'osebe',
         'ucilnice__srecanja__ucitelji',
         'ucilnice__srecanja__predmet',
     )
+    racunaj_konflikte = request.user.is_staff
+
+    if racunaj_konflikte:
+        iskalnik = IskalnikKonfliktov.za_rezervacije(queryset)
+
+    rezervacije = []
     for rezervacija in queryset:
         for ucilnica in rezervacija.ucilnice.all():
             for dan in rezervacija.dnevi():
@@ -73,6 +78,8 @@ def rezervacije(request):
                     'dan': dan,
                     'teden': teden_dneva(dan),
                 })
+                if racunaj_konflikte:
+                    rezervacije[-1]['konflikti'] = iskalnik.konflikti(ucilnica, dan, rezervacija.od, rezervacija.do, ignore=rezervacija)
     rezervacije.sort(key=lambda r: (r['dan'], r['ucilnica'].oznaka, r['od']))
     return render(request, 'rezervacije.html', {
         'naslov': 'Rezervacije učilnic',
@@ -112,9 +119,9 @@ def preglej_rezervacije(request, nepotrjene=False):
         'ucilnice', 'osebe').order_by('dan', 'od', 'pk')
 
     iskalnik = IskalnikKonfliktov.za_rezervacije(rezervacije)
-    data = [{'rezervacija': r, 'konflikti': iskalnik.konflikti_z_rezervacijo(r)} for r in rezervacije]
+    data = [{'rezervacija': r, 'konflikti': list(iskalnik.konflikti_z_rezervacijo(r))} for r in rezervacije]
     for x in data:
-        x['st_konfliktov'] = sum(len(k.srecanja) + len(k.rezervacije) for k in x['konflikti'].values())
+        x['st_konfliktov'] = sum(k.st_konfliktov for _, _, k in x['konflikti'])
     return render(request, 'preglej_rezervacije.html', {'entries': data, 'nepotrjene': nepotrjene})
 
 

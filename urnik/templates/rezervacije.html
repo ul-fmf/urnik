@@ -40,17 +40,27 @@
                   {{ rezervacija.osebe.all|join:", " }},
                   {{ rezervacija.opomba }}
                 </small>
-                {% if user.is_staff %}
-                  {# TODO: to se je pokvarilo pri uvedbi večdnevnih rezervacij #}
-                  {% for konflikt in rezervacija.konflikti %}
-                    <span class="new badge red" data-badge-caption="">
-                      {{ konflikt.predmet }},
-                      {{ konflikt.od }}–{{ konflikt.do }},
-                      {{ konflikt.ucitelji.all|join:", " }}
-                    </span>
-                  {% endfor %}
+                {% if user.is_staff and rezervacija.konflikti %}
+                  <span class="right">({{ rezervacija.konflikti.st_konfliktov }})</span>
+                  <i class="material-icons orange-text right">warning</i>
                 {% endif %}
               </li>
+              {% if user.is_staff and rezervacija.konflikti %}
+                <li class="collection-item"><ul>
+                  {% for rez in rezervacija.konflikti.rezervacije %}
+                    <li><b>Konflikt:</b>
+                      Učilnico {{ rezervacija.ucilnica }} je od {{ rez.od }} do {{ rez.do }}
+                      rezervirala oseba {{ rez.osebe.all.0|default:"neznan" }}
+                      z razlogom &raquo;{{ rez.opomba }}&laquo;.
+                    </li>
+                  {% endfor %}
+                  {% for s in rezervacija.konflikti.srecanja %}
+                    <li>
+                      V učilnici {{ s.ucilnica }} od {{ s.od }} do {{ s.do }} poteka predmet {{ s.predmet }}.
+                    </li>
+                  {% endfor %}
+                </ul></li>
+              {% endif %}
             {% endfor %}
           </ul>
         </div>
