@@ -89,7 +89,7 @@
     <li><a href="{% url 'nova_rezervacija' %}"><i class="material-icons left">assignment</i>Nova rezervacija</a></li>
   {% endif %}
   {% if user.is_staff %}
-    <li><a href="{% url 'preglej_rezervacije' %}"><i class="material-icons left">visibility</i>Preglej nove rezervacije</a></li>
+    <li><a href="{% url 'preglej_nepotrjene_rezervacije' %}"><i class="material-icons left">visibility</i>Preglej nove rezervacije</a></li>
   {% endif %}
   <li><a href="{% url 'proste' %}"><i class="material-icons left">event_available</i>Proste učilnice</a></li>
   <li><a href="javascript:window.print();"><i class="material-icons left">print</i>Natisni stran</a></li>
@@ -118,7 +118,7 @@
         "Meni: Nova rezervacija": "{% url 'nova_rezervacija' %}",
     {% endif %}
     {% if user.is_staff %}
-        "Meni: Preglej nove rezervacije": "{% url 'preglej_rezervacije' %}",
+        "Meni: Preglej nove rezervacije": "{% url 'preglej_nepotrjene_rezervacije' %}",
         "Meni: Natisni vse": "{% url 'printall' %}",
     {% endif %}
         "Meni: Proste učilnice": "{% url 'proste' %}",
