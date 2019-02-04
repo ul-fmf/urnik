@@ -87,3 +87,9 @@ DNEVI_TOZILNIK = ["ponedeljek", "torek", "sredo", "četrtek", "petek", "soboto",
 @register.filter()
 def dan_tozilnik(day):
     return DNEVI_TOZILNIK[int(day)-1]
+
+
+DNEVI_TOZILNIK_MNOZINA = ["ponedeljkih", "torkih", "sredah", "četrtkih", "petkih", "sobotah", "nedeljah"]
+@register.filter()
+def dan_tozilnik_mnozina(day):
+    return DNEVI_TOZILNIK_MNOZINA[int(day)-1]

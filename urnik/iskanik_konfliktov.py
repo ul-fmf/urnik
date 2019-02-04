@@ -1,5 +1,5 @@
 import datetime
-from collections import defaultdict, namedtuple
+from collections import defaultdict
 
 from django.db.models import Prefetch
 
@@ -81,6 +81,10 @@ class Konflikt(object):
 
     def __bool__(self):
         return self.st_konfliktov > 0
+
+    def __str__(self):
+        return "Konflikti:\n  rezervacije:\n{}\n  predmeti:\n{}".format("\n    ".join(map(str, self.rezervacije)),
+                                                                        "\n    ".join(map(str, self.srecanja)))
 
 
 class IskalnikKonfliktov(object):

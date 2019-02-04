@@ -257,7 +257,8 @@ def proste_ucilnice(request):
     for t in termini:
         t.filtriraj_ucilnice(pokazi_zasedene=pokazi_zasedene)
 
-    mozni_tedni = set(teden_dneva(d) for r in Rezervacija.objects.prihajajoce() for d in r.dnevi())
+    now = datetime.date.today()
+    mozni_tedni = set(teden_dneva(d) for r in Rezervacija.objects.prihajajoce() for d in r.dnevi() if d >= now)
     mozni_tedni.update(semester.prihodnji_tedni())
     return render(request, 'proste_ucilnice.html', {
         'naslov': 'Proste učilnice',

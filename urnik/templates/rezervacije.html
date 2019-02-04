@@ -34,6 +34,11 @@
                 </li>
               {% endifchanged %}
               <li class="collection-item">
+                {% if not rezervacija.potrjena %}
+                  <i class="material-icons grey-text left tooltipped"
+                     data-position="left" data-tooltip="Še nepotrjena s strani referata"
+                     title="Še nepotrjena s strani referata">help</i>
+                {% endif %}
                 {{ rezervacija.ucilnica }},
                 {{ rezervacija.od }}–{{ rezervacija.do }},
                 <small>
