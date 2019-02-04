@@ -866,51 +866,51 @@ table.highlight tr th {
     padding-top: 0;
 }
 
-#rezervacije-form > li {
+.rezervacije-form > li {
     margin-right: 30px;
     margin-top: 30px;
 }
 
-#rezervacije-form > li > label {
+.rezervacije-form > li > label {
     font-size: 1rem;
     font-weight: bold;
     color: #333;
 }
-#rezervacije-form input::placeholder {
+.rezervacije-form input::placeholder {
     color: #999;
 }
-#rezervacije-form #id_ucilnice {
+.rezervacije-form #id_ucilnice {
     margin-top: 10px;
 }
-#rezervacije-form #field-id_ucilnice #id_ucilnice li {
+.rezervacije-form #field-id_ucilnice #id_ucilnice li {
     display: inline;
 }
 
-#rezervacije-form #field-id_ucilnice #id_ucilnice li label {
+.rezervacije-form #field-id_ucilnice #id_ucilnice li label {
     color: #333;
 }
 
-#rezervacije-form #field-id_ucilnice #id_ucilnice li label input[type="checkbox"] + span {
+.rezervacije-form #field-id_ucilnice #id_ucilnice li label input[type="checkbox"] + span {
     padding-left: 25px;
     margin-right: 12px;
 }
-#rezervacije-form > li > .select-wrapper li {
+.rezervacije-form > li > .select-wrapper li {
     min-height: 30px;
 }
-#rezervacije-form > li > .select-wrapper li span {
+.rezervacije-form > li > .select-wrapper li span {
     padding: 3px 10px 2px 10px;
 }
-#rezervacije-form #field-id_do,
-#rezervacije-form #field-id_od,
-#rezervacije-form #field-id_dan,
-#rezervacije-form #field-id_dan_konca {
+.rezervacije-form #field-id_do,
+.rezervacije-form #field-id_od,
+.rezervacije-form #field-id_dan,
+.rezervacije-form #field-id_dan_konca {
     float: left;
 }
-#rezervacije-form #field-id_opomba,
-#rezervacije-form #field-id_od {
+.rezervacije-form #field-id_opomba,
+.rezervacije-form #field-id_od {
     clear: both;
 }
-#rezervacije-form #field-id_opomba {
+.rezervacije-form #field-id_opomba {
     display: inline-block;
     width: 100%;
 }

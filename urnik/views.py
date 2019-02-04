@@ -90,9 +90,17 @@ def rezervacije(request):
 @login_required
 def nova_rezervacija(request, ucilnica_id=None, ura=None, teden=None, dan_v_tednu=None):
     if request.method == 'POST':
-        form = RezevacijeForm(request.POST)
+        form = RezevacijeForm(request.POST, dovoli_prekrivanja=True)
         if form.is_valid():
             return render(request, 'uspesna_rezervacija.html', {})
+
+        # če so edine napake prekrivanja, omogočimo uporabniku, da vseeno rezervira
+        if all(error.code == RezevacijeForm.PREKRIVANJA
+               for _, error_list in form.errors.as_data().items() for error in error_list):
+            form = RezevacijeForm(request.POST, dovoli_prekrivanja=True)
+        else:
+            form = RezevacijeForm(request.POST, dovoli_prekrivanja=False)
+
     else:
         form = RezevacijeForm()
         if ucilnica_id:
@@ -107,6 +115,7 @@ def nova_rezervacija(request, ucilnica_id=None, ura=None, teden=None, dan_v_tedn
                 teden += datetime.timedelta(days=int(dan_v_tednu))
                 form.fields['dan'].initial = teden.strftime('%d. %m. %Y').lstrip('0').replace('. 0', '. ')
             except: pass
+
     return render(request, 'nova_rezervacija.html', {'form': form, 'delno_izpolnjena': ucilnica_id is not None})
 
 
