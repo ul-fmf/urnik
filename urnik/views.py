@@ -141,21 +141,21 @@ def potrdi_rezervacijo(request):
     r = get_object_or_404(Rezervacija, pk=request.POST['r-pk'])
     r.potrjena = True
     r.save()
-    return redirect(reverse('preglej_rezervacije'))
+    return redirect(reverse('preglej_nepotrjene_rezervacije'))
 
 
 @require_POST
 @staff_member_required
 def izbrisi_rezervacijo(request):
     get_object_or_404(Rezervacija, pk=request.POST['r-pk']).delete()
-    return redirect(reverse('preglej_rezervacije'))
+    return redirect(reverse('preglej_nepotrjene_rezervacije'))
 
 
 @require_POST
 @staff_member_required
 def potrdi_vse_rezervacije(request):
     Rezervacija.objects.prihajajoce().filter(potrjena=False).update(potrjena=True)
-    return redirect(reverse('preglej_rezervacije'))
+    return redirect(reverse('preglej_nepotrjene_rezervacije'))
 
 
 def urnik(request, srecanja, naslov, barve=None):

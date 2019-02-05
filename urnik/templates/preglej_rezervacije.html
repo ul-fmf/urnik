@@ -45,12 +45,17 @@
           {% with r=e.rezervacija %}
             <tr>
               <td>
-                <form action="{% url 'potrdi_rezervacijo' %}" method="post">
+                {% if not r.potrjena %}
+                  <form action="{% url 'potrdi_rezervacijo' %}" method="post">
+                    <a href="{% url 'admin:urnik_rezervacija_change' r.pk %}"><i class="material-icons">edit</i></a>
+                    {% csrf_token %}
+                    <input type="hidden" name="r-pk" value="{{ r.pk }}">
+                    <input type="submit" value="Potrdi" name="confirm" class="btn">
+                  </form>
+                {% else %}
                   <a href="{% url 'admin:urnik_rezervacija_change' r.pk %}"><i class="material-icons">edit</i></a>
-                  {% csrf_token %}
-                  <input type="hidden" name="r-pk" value="{{ r.pk }}">
-                  <input type="submit" value="Potrdi" name="confirm" class="btn">
-                </form>
+                  Že potrjena.
+                {% endif %}
               </td>
               <td>
                 {% if e.konflikti %}
@@ -84,7 +89,7 @@
               <td>
                 <form action="{% url 'izbrisi_rezervacijo' %}" method="post"
                       onsubmit="return window.confirm('Ste prepričani, da želite izbrisati to ' +
-                       'rezervacijo?\nV primeru izbrisa bi bilo dobro obvestiti osebe: {{ r.osebe.all|join:", " }}.');">
+                          'rezervacijo?\nV primeru izbrisa bi bilo dobro obvestiti osebe: {{ r.osebe.all|join:", " }}.');">
                   {% csrf_token %}
                   <input type="hidden" name="r-pk" value="{{ r.pk }}">
                   <input type="submit" value="Izbriši" name="confirm" class="btn cancel">
