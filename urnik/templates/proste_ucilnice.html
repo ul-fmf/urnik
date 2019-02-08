@@ -38,11 +38,11 @@
       </a>
       <ul id='teden-dropdown' class='dropdown-content'>
         {% if teden %}
-          <li><a href="{% add_get teden=None %}">Splošen teden</a></li>
+          <li><a href="{% url_with_get teden=None %}">Splošen teden</a></li>
         {% endif %}
         {% for mozen_teden in mozni_tedni %}
           {% if mozen_teden.0|date:"Y-m-d" != teden %}
-            <li><a href="{% add_get teden=mozen_teden.0|date:"Y-m-d" pr="1" %}">{{ mozen_teden.0 | fmt_teden }}</a></li>
+            <li><a href="{% url_with_get teden=mozen_teden.0|date:"Y-m-d" pr="1" %}">{{ mozen_teden.0 | fmt_teden }}</a></li>
           {% endif %}
         {% endfor %}
       </ul>
@@ -87,7 +87,7 @@
     <div class="card-action">
       <div class="switch-option">Pokaži zasedene:
         <span class="switch nobr"><label>Ne<a {# tukaj uporabimo onclick, da propagata JS evente naprej in takoj switchne switch #}
-            onclick="window.location ='{% if pokazi_zasedene %}{% add_get pz="0" %}{% else %}{% add_get pz="1" %}{% endif %}';"
+            onclick="window.location ='{% if pokazi_zasedene %}{% url_with_get pz="0" %}{% else %}{% url_with_get pz="1" %}{% endif %}';"
         ><input type="checkbox" {% if pokazi_zasedene %}checked{% endif %}><span class="lever"></span></a>Da</label></span>
       </div>
     </div>

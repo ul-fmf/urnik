@@ -121,9 +121,10 @@ def nova_rezervacija(request, ucilnica_id=None, ura=None, teden=None, dan_v_tedn
 
 
 @staff_member_required
-def preglej_rezervacije(request, nepotrjene=False):
+def preglej_rezervacije(request):
     rezervacije = Rezervacija.objects.prihajajoce()
-    if nepotrjene:
+    rezervacije_filter = request.GET.get('filter', 'nepotrjene')
+    if rezervacije_filter != 'all':
         rezervacije = rezervacije.filter(potrjena=False)
     rezervacije = rezervacije.prefetch_related(
         'ucilnice', 'osebe').order_by('dan', 'od', 'pk')
@@ -132,7 +133,7 @@ def preglej_rezervacije(request, nepotrjene=False):
     data = [{'rezervacija': r, 'konflikti': list(iskalnik.konflikti_z_rezervacijo(r))} for r in rezervacije]
     for x in data:
         x['st_konfliktov'] = sum(k.st_konfliktov for _, _, k in x['konflikti'])
-    return render(request, 'preglej_rezervacije.html', {'entries': data, 'nepotrjene': nepotrjene})
+    return render(request, 'preglej_rezervacije.html', {'entries': data, 'filter': rezervacije_filter})
 
 
 @require_POST
@@ -141,21 +142,21 @@ def potrdi_rezervacijo(request):
     r = get_object_or_404(Rezervacija, pk=request.POST['r-pk'])
     r.potrjena = True
     r.save()
-    return redirect(reverse('preglej_nepotrjene_rezervacije'))
+    return redirect(request.POST.get('redirect') or reverse('preglej_rezervacije'))
 
 
 @require_POST
 @staff_member_required
 def izbrisi_rezervacijo(request):
     get_object_or_404(Rezervacija, pk=request.POST['r-pk']).delete()
-    return redirect(reverse('preglej_nepotrjene_rezervacije'))
+    return redirect(request.POST.get('redirect') or reverse('preglej_rezervacije'))
 
 
 @require_POST
 @staff_member_required
 def potrdi_vse_rezervacije(request):
     Rezervacija.objects.prihajajoce().filter(potrjena=False).update(potrjena=True)
-    return redirect(reverse('preglej_nepotrjene_rezervacije'))
+    return redirect(request.POST.get('redirect') or reverse('preglej_rezervacije'))
 
 
 def urnik(request, srecanja, naslov, barve=None):

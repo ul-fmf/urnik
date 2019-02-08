@@ -1,4 +1,5 @@
 {% extends 'osnova.html' %}
+{% load tags %}
 {% block content %}
   <div class="container">
     <p>
@@ -7,12 +8,12 @@
 
     <ul class="tabs">
       <li class="tab col s3">
-        <a {% if not nepotrjene %}class="active" {% endif %}target="_self"
-           href="{% url 'preglej_rezervacije' %}">Vse</a>
+        <a {% if filter == 'all' %}class="active" {% endif %}target="_self"
+           href="{% url_with_get filter='all' %}">Vse</a>
       </li>
       <li class="tab col s3">
-        <a {% if nepotrjene %}class="active" {% endif %}target="_self"
-           href="{% url 'preglej_nepotrjene_rezervacije' %}">Nepotrjene</a>
+        <a {% if filter == 'nepotrjene' %}class="active" {% endif %}target="_self"
+           href="{% url_with_get filter='nepotrjene' %}">Nepotrjene</a>
       </li>
     </ul>
 
@@ -29,6 +30,7 @@
                   onsubmit="return window.confirm('Ste prepričani, da želite potrditi VSE rezervacije?');">
               {% csrf_token %}
               <input type="submit" value="Potrdi vse" name="confirm" class="btn">
+              <input type="hidden" value="{% url_with_get %}" name="redirect">
             </form>
           </th>
           <th>Status</th>
@@ -50,6 +52,7 @@
                     <a href="{% url 'admin:urnik_rezervacija_change' r.pk %}"><i class="material-icons">edit</i></a>
                     {% csrf_token %}
                     <input type="hidden" name="r-pk" value="{{ r.pk }}">
+                    <input type="hidden" value="{% url_with_get %}" name="redirect">
                     <input type="submit" value="Potrdi" name="confirm" class="btn">
                   </form>
                 {% else %}
@@ -92,6 +95,7 @@
                           'rezervacijo?\nV primeru izbrisa bi bilo dobro obvestiti osebe: {{ r.osebe.all|join:", " }}.');">
                   {% csrf_token %}
                   <input type="hidden" name="r-pk" value="{{ r.pk }}">
+                  <input type="hidden" value="{% url_with_get %}" name="redirect">
                   <input type="submit" value="Izbriši" name="confirm" class="btn cancel">
                 </form>
               </td>

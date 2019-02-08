@@ -57,7 +57,7 @@ def pobarvajvec(barve):
 
 
 @register.simple_tag(takes_context=True)
-def add_get(context, **kwargs):
+def url_with_get(context, **kwargs):
     request = context['request']
     if request is None:
         return ''
