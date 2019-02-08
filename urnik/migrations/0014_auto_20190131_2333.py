@@ -2,6 +2,7 @@
 
 from django.db import migrations, models
 import django.db.models.deletion
+import django.utils.timezone
 
 
 class Migration(migrations.Migration):
@@ -11,6 +12,12 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.AddField(
+            model_name='rezervacija',
+            name='cas_rezervacije',
+            field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now, help_text='Čas, ko je bila rezervacija narejena.'),
+            preserve_default=False,
+        ),
         migrations.AddField(
             model_name='rezervacija',
             name='potrjena',
@@ -24,7 +31,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='rezervacija',
             name='dan_konca',
-            field=models.DateField(blank=True, help_text='Dan konca rezervacije. Izpolni le, če je drugačen od začetka', null=True, verbose_name='Dan konca'),
+            field=models.DateField(blank=True, help_text='Dan konca rezervacije. Izpolnite le, če je drugačen od začetka.', null=True, verbose_name='Dan konca'),
         ),
         migrations.AlterField(
             model_name='rezervacija',
@@ -49,7 +56,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='rezervacija',
             name='ucilnice',
-            field=models.ManyToManyField(help_text='Izberite učilnice, ki jih želite rezervirati.', limit_choices_to={'tip__in': ('M', 'F', 'R', 'P')}, related_name='rezervacije', to='urnik.Ucilnica', verbose_name='Učilnice    '),
+            field=models.ManyToManyField(help_text='Izberite učilnice, ki jih želite rezervirati.', limit_choices_to={'tip__in': ('M', 'F', 'R', 'P')}, related_name='rezervacije', to='urnik.Ucilnica', verbose_name='Učilnice'),
         ),
         migrations.AlterField(
             model_name='srecanje',

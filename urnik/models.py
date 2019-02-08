@@ -524,6 +524,7 @@ class Rezervacija(models.Model):
     do = models.PositiveSmallIntegerField(blank=False, null=False, choices=MOZNE_URE, help_text='Do katere ure želite rezervirati.')
     opomba = models.CharField(max_length=192, blank=False, null=False, help_text='Razlog za rezervacijo.')
     potrjena = models.BooleanField(default=False, null=False, help_text='Ali so to rezervacijo potrdili posvečeni ljudje.')
+    cas_rezervacije = models.DateTimeField(auto_now_add=True, help_text="Čas, ko je bila rezervacija narejena.")
 
     objects = RezervacijaQuerySet.as_manager()
 
@@ -611,9 +612,7 @@ class RezevacijeForm(ModelForm):
                 self.add_error(None, ValidationError("Dan začetka rezervacije moda biti "
                                                      "pred dnevom konca rezervacije."))
         ignoriraj = cleaned.get('ignoriraj_prekrivanja')
-        print("ignoriraj", ignoriraj)
         if not ignoriraj:
-            print("ne ignoriraj")
             self._preveri_konflikte(cleaned)
 
         return self.cleaned_data
