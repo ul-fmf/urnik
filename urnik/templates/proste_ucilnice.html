@@ -26,7 +26,7 @@
       Če ni na izbiro, za ta teden še nihče ni naredil rezervacije.
     </div>
     <div class="card-action">
-      <a class="teden-dropdown-button btn" id="teden-dropdown-btn" href="#" data-activates='teden-dropdown'>
+      <a class="teden-dropdown-button btn" id="teden-dropdown-btn" href="#" data-target='teden-dropdown'>
         <span>
           {% if not teden %}
             Splošen teden
@@ -38,11 +38,11 @@
       </a>
       <ul id='teden-dropdown' class='dropdown-content'>
         {% if teden %}
-          <li><a href="{% add_get teden=None %}">Splošen teden</a></li>
+          <li><a href="{% url_with_get teden=None %}">Splošen teden</a></li>
         {% endif %}
         {% for mozen_teden in mozni_tedni %}
           {% if mozen_teden.0|date:"Y-m-d" != teden %}
-            <li><a href="{% add_get teden=mozen_teden.0|date:"Y-m-d" pr=True %}">{{ mozen_teden.0 | fmt_teden }}</a></li>
+            <li><a href="{% url_with_get teden=mozen_teden.0|date:"Y-m-d" pr="1" %}">{{ mozen_teden.0 | fmt_teden }}</a></li>
           {% endif %}
         {% endfor %}
       </ul>
@@ -57,13 +57,17 @@
         Omejite izbiro na tipe učilnic, ki vam ustrezajo.
         <hr class="separator">
         {% for id, name in mozni_tipi_ucilnic %}
-          <input type="checkbox" id="{{ id }}" name="{{ id }}" {% if id in tipi %}checked{% endif %}>
-          <label for="{{ id }}">{{ name }}</label>
+          <label for="{{ id }}">
+            <input type="checkbox" id="{{ id }}" name="{{ id }}" {% if id in tipi %}checked{% endif %}>
+            <span>{{ name }}</span>
+          </label>
         {% endfor %}
         <hr class="separator">
         {% for id, name in mozne_velikosti_ucilnic %}
-          <input type="checkbox" id="{{ id }}" name="{{ id }}" {% if id in velikosti %}checked{% endif %}>
-          <label for="{{ id }}">{{ name }}</label>
+          <label for="{{ id }}">
+            <input type="checkbox" id="{{ id }}" name="{{ id }}" {% if id in velikosti %}checked{% endif %}>
+            <span>{{ name }}</span>
+          </label>
         {% endfor %}
       </div>
       <div class="card-action">
@@ -83,7 +87,7 @@
     <div class="card-action">
       <div class="switch-option">Pokaži zasedene:
         <span class="switch nobr"><label>Ne<a {# tukaj uporabimo onclick, da propagata JS evente naprej in takoj switchne switch #}
-            onclick="window.location ='{% if pokazi_zasedene %}{% add_get pz=False %}{% else %}{% add_get pz=True %}{% endif %}';"
+            onclick="window.location ='{% if pokazi_zasedene %}{% url_with_get pz="0" %}{% else %}{% url_with_get pz="1" %}{% endif %}';"
         ><input type="checkbox" {% if pokazi_zasedene %}checked{% endif %}><span class="lever"></span></a>Da</label></span>
       </div>
     </div>
@@ -101,7 +105,7 @@
                   constrainWidth: true, // Does not change width of dropdown to that of the activator
                   hover: false, // Activate on hover
                   gutter: 0, // Spacing from edge
-                  belowOrigin: true, // Displays dropdown below the button
+                  coverTrigger: false, // Displays dropdown below the button
                   alignment: 'left', // Displays dropdown with edge aligned to the left of button
                   stopPropagation: false // Stops event propagation
               }

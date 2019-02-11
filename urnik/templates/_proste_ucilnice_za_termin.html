@@ -13,8 +13,11 @@
             {% if stanje == 'prosta' %}
               <a href="{% url 'urnik_ucilnice' ucilnica.pk %}">Učilnica {{ ucilnica.oznaka }}</a>
               je prosta v {{ termin.dan|dan_tozilnik }} ob {{ termin.ura }}ih.
-              {#  TODO: odkomentiraj ko bo narejen obrazec za rezervacije  #}
-              {#  <a href="#" class="nobr">Rezerviraj <i class="material-icons">open_in_new</i></a>#}
+              {% if user.is_authenticated %}
+                <a href="{% url 'nova_rezervacija_za_ucilnico' ucilnica.pk termin.ura teden|date:"Y-m-d" termin.dan %}"
+                   target="_blank" class="nobr">
+                Rezerviraj <i class="material-icons">open_in_new</i></a>
+              {% endif %}
             {% elif stanje == 'rezervirana' %}
               <a href="{% url 'urnik_ucilnice' ucilnica.pk %}">Učilnico {{ ucilnica.oznaka }}</a>
               je od {{ razlog.od }}ih do {{ razlog.do }}ih rezervirala oseba
@@ -26,9 +29,9 @@
               z razlogom: &quot;{{ razlog.opomba|default:"neznan" }}&quot;.
             {% elif stanje == 'zasedena' %}
               <a href="{% url 'urnik_ucilnice' ucilnica.pk %}">Učilnica {{ ucilnica.oznaka }}</a>
-              je zasedena v {{ razlog.dan | dan_tozilnik }} ob {{ razlog.ura }}ih
+              je zasedena ob {{ razlog.dan | dan_tozilnik_mnozina }} ob {{ razlog.ura }}ih
               saj tam poteka predmet <a href="{% url 'urnik_predmeta' razlog.predmet.pk %}">
-              &quot;{{ razlog.predmet }}&quot;</a>, ki ga izvaja
+              {{ razlog.predmet }}</a>, ki ga izvaja
               {% if razlog.ucitelji.all.0 %}
                 <a href="{% url 'urnik_osebe' razlog.ucitelji.all.0.pk %}">{{ razlog.ucitelji.all.0 }}</a>.
               {% else %}

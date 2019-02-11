@@ -15,6 +15,9 @@
           <ul>
             <li><a href="{% url 'kombiniran_pogled_form' %}"><i class="material-icons left">schedule</i>Kombiniran pogled</a></li>
             <li><a href="{% url 'rezervacije' %}"><i class="material-icons left">border_color</i>Rezervacije učilnic</a></li>
+            {% if user.is_authenticated %}
+              <li><a href="{% url 'nova_rezervacija' %}"><i class="material-icons left">assignment</i>Nova rezervacija</a></li>
+            {% endif %}
             <li><a href="{% url 'proste' %}"><i class="material-icons left">event_available</i>Proste učilnice</a></li>
             <li><a href="{% url 'bugreport' %}"><i class="material-icons left">bug_report</i>Prijava napake</a></li>
             <li><a href="{% url 'help' %}"><i class="material-icons left">help</i>Navodila in pomoč</a></li>

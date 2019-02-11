@@ -1,0 +1,76 @@
+{% extends 'osnova.html' %}
+{% block content %}
+  <div class="container">
+    <p>
+      <span class="flow-text">Na tej strani lahko rezervirate učilnice.
+      Prosimo, da rezervirate le učilnice, ki jih potrebujete.</span>
+    </p>
+    {% if not delno_izpolnjena %}
+      <p>
+        Pred rezervacijo preverite, ali je učilnica prosta. Za to imate na voljo
+        <a href="{% url 'proste' %}">iskalnik prostih učilnic</a>, od koder lahko direktno izberete učilnico za
+        rezervacijo. <br>Če izberete več učilnic in več dni, boste za vsak dan od začeta do konca rezervirali vse učilnice
+        za izbrane ure.
+      </p>
+    {% endif %}
+    <form action="{% url 'nova_rezervacija' %}" method="post">
+      {% csrf_token %}
+      <ul class="rezervacije-form">
+        {% for field in form %}
+          {% if field.name != 'ignoriraj_prekrivanja' %}
+            <li id="field-{{ field.auto_id }}">
+              <label>{{ field.help_text }}</label>
+              {{ field.errors }}
+              {{ field }}
+            </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+      {{ form.non_field_errors }}
+      {% if form.ignoriraj_prekrivanja %}
+        <ul class="rezervacije-form">
+          <li id="{{ form.ignoriraj_prekrivanja.auto_id }}">
+            <label>
+              {{ form.ignoriraj_prekrivanja }}
+              <span>{{ form.ignoriraj_prekrivanja.help_text }}</span>
+            </label>
+          </li>
+        </ul>
+      {% endif %}
+      <input type="submit" value="Rezerviraj" class="btn">
+    </form>
+  </div>
+{% endblock %}
+
+{% block footer %}
+  <script>
+      $(document).ready(function () {
+          $('.datepicker').datepicker({
+              'format': 'd. m. yyyy',
+              'firstDay': 1,
+              'showClearBtn': true,
+              'i18n': {
+                  'cancel': 'Prekliči',
+                  'clear': 'Počisti',
+                  'months': ['Januar', 'Februar', 'Marec', 'April', 'Maj', 'Junij', 'Julij', 'Avgust', 'September', 'Oktober', 'November', 'December'],
+                  'monthsShort': ['Jan', 'Feb', 'Mar', 'Apr', 'Maj', 'Jun', 'Jul', 'Avg', 'Sep', 'Okt', 'Nov', 'Dec'],
+                  'weekdays': ['Nedelja', 'Ponedeljek', 'Torek', 'Sreda', 'Četrtek', 'Petek', 'Sobota'],
+                  'weekdaysShort': ['Ned', 'Pon', 'Tor', 'Sre', 'Čet', 'Pet', 'Sob'],
+                  'weekdaysAbbrev': ['N', 'P', 'T', 'S', 'Č', 'P', 'S'],
+              }
+          });
+          $('select').formSelect({
+              'dropdownOptions': {
+                  'constrainWidth': true,
+              }
+          });
+      });
+  </script>
+  {% if delno_izpolnjena %}
+    <script>
+        $(document).ready(function () {
+            $("#id_opomba").focus();
+        });
+    </script>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends 'osnova.html' %}
+{% block content %}
+  <div class="container">
+    <p>
+      <span class="flow-text">Uspešno ste rezervirali
+        {{ rezervacija.ucilnice.all|join:", " }}
+        {% if rezervacija.dan_konca %}
+          od {{ rezervacija.dan|date:"D, j. b" }} do {{ rezervacija.dan_konca|date:"D, j. b" }}
+        {% else %}
+          za {{ rezervacija.dan|date:"D, j. b" }}
+        {% endif %}
+        od {{ rezervacija.od }}:00 do {{ rezervacija.do }}:00
+        z razlogom {{ rezervacija.opomba }}.
+        {% if user.is_staff %}
+          <br>
+          <a href="{% url 'admin:urnik_rezervacija_change' rezervacija.pk %}">Uredi rezervacijo <i class="material-icons">edit</i></a>
+        {% endif %}
+      </span>
+    </p>
+    <p>
+      Naredite <a href="{% url 'nova_rezervacija' %}">še eno rezervacijo</a>,
+      pojdite na <a href="{% url 'rezervacije' %}">vse rezervacije</a>,
+      iščite <a href="{% url 'proste' %}">proste učilnice</a>
+      ali pa pojdite <a href="{% url 'zacetna_stran' %}">domov</a>.
+    </p>
+  </div>
+{% endblock %}

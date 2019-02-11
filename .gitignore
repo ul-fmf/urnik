@@ -8,6 +8,7 @@ uvoz
 fabfile.py
 
 # Virtualenv
+venv
 venv3
 
 # Pycharm

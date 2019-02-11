@@ -6,54 +6,74 @@
   Stran z rezervacijami je še v delu. V kratkem bo omogočen tudi obrazec za
   rezervacijo, zaenkrat pa rezervacije še vedno javljajte v študentski referat.
   <b>Pred tem prosimo preverite, da je učilnica, ki jo želite rezervirati,
-  prosta.</b> Spodaj lahko preverite, katere učilnice so že rezervirane, če pa
+    prosta.</b> Spodaj lahko preverite, katere učilnice so že rezervirane, če pa
   želite rezervacijo med semestrom, preverite tudi
   <a href="{% url 'zacetna_stran' %}">urnik</a>.
   Za lažje iskanje prostih učilnic lahko uporabite tudi
   <a href="{% url 'proste' %}">iskalnik prostih učilnic</a>.
   Pri sporočanju rezervacije prosim napišite katero predavalnico, kdaj in zakaj jo želite.
 </p>
-
-{% regroup rezervacije by teden as rezervacije_po_tednih %}
-{% for teden in rezervacije_po_tednih %}
-  <ul class="collapsible" data-collapsible="expandable" id="rezervacije-list">
-    <li>
-      <div class="collapsible-header {% if forloop.counter <= 2 %}active{% endif %}">
-        <h5>
-          {{ teden.grouper.0|date:"j. F" }} – {{ teden.grouper.1|date:"j. F Y" }}
-        </h5>
-      </div>
-      <div class="collapsible-body">
-        <ul class="collection with-header">
-          {% for rezervacija in teden.list %}
-            {% ifchanged %}
-              <li class="collection-header">
-                <strong>{{ rezervacija.dan|date:"l, j. F" }}</strong>
+{% if not rezervacije %}
+  <p>Trenutno ni aktivnih rezervacij.</p>
+{% else %}
+  {% regroup rezervacije by teden as rezervacije_po_tednih %}
+  {% for teden in rezervacije_po_tednih %}
+    <ul class="collapsible" data-collapsible="expandable" id="rezervacije-list">
+      <li{% if forloop.counter <= 2 %} class="active"{% endif %}>
+        <div class="collapsible-header">
+          <h5>
+            {{ teden.grouper.0|date:"j. F" }} – {{ teden.grouper.1|date:"j. F Y" }}
+          </h5>
+        </div>
+        <div class="collapsible-body">
+          <ul class="collection with-header">
+            {% for rezervacija in teden.list %}
+              {% ifchanged %}
+                <li class="collection-header">
+                  <strong>{{ rezervacija.dan|date:"l, j. F" }}</strong>
+                </li>
+              {% endifchanged %}
+              <li class="collection-item">
+                {# TODO remove requirement for user authentication #}
+                {% if user.is_authenticated and not rezervacija.potrjena %}
+                  <i class="material-icons grey-text left tooltipped"
+                     data-position="left" data-tooltip="Še nepotrjena s strani referata"
+                     title="Še nepotrjena s strani referata">help</i>
+                {% endif %}
+                {{ rezervacija.ucilnica }},
+                {{ rezervacija.od }}–{{ rezervacija.do }},
+                <small>
+                  {{ rezervacija.osebe.all|join:", " }},
+                  {{ rezervacija.opomba }}
+                </small>
+                {% if user.is_staff and rezervacija.konflikti %}
+                  <span class="right">({{ rezervacija.konflikti.st_konfliktov }})</span>
+                  <i class="material-icons orange-text right">warning</i>
+                {% endif %}
               </li>
-            {% endifchanged %}
-            <li class="collection-item">
-              {{ rezervacija.ucilnica }},
-              {{ rezervacija.od }}–{{ rezervacija.do }},
-              <small>
-                {{ rezervacija.osebe.all|join:", " }},
-                {{ rezervacija.opomba }}
-              </small>
-              {% if user.is_staff %}
-                {% for konflikt in rezervacija.konflikti %}
-                  <span class="new badge red" data-badge-caption="">
-            {{ konflikt.predmet }},
-            {{ konflikt.od }}–{{ konflikt.do }},
-            {{ konflikt.ucitelji.all|join:", " }}
-        </span>
-                {% endfor %}
+              {% if user.is_staff and rezervacija.konflikti %}
+                <li class="collection-item"><ul>
+                  {% for rez in rezervacija.konflikti.rezervacije %}
+                    <li><b>Konflikt:</b>
+                      Učilnico {{ rezervacija.ucilnica }} je od {{ rez.od }} do {{ rez.do }}
+                      rezervirala oseba {{ rez.osebe.all.0|default:"neznan" }}
+                      z razlogom &raquo;{{ rez.opomba }}&laquo;.
+                    </li>
+                  {% endfor %}
+                  {% for s in rezervacija.konflikti.srecanja %}
+                    <li>
+                      V učilnici {{ s.ucilnica }} od {{ s.od }} do {{ s.do }} poteka predmet {{ s.predmet }}.
+                    </li>
+                  {% endfor %}
+                </ul></li>
               {% endif %}
-            </li>
-          {% endfor %}
-        </ul>
-      </div>
-    </li>
-  </ul>
-{% endfor %}
+            {% endfor %}
+          </ul>
+        </div>
+      </li>
+    </ul>
+  {% endfor %}
+{% endif %}
 
 </div>
 {% endblock content %}

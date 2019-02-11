@@ -1,17 +1,15 @@
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 from django.http import QueryDict
 from django.shortcuts import get_object_or_404, redirect, render
-from django.utils.dateparse import parse_date
-from django.contrib.auth.decorators import login_required
 from django.urls import reverse
+from django.utils.dateparse import parse_date
 from django.views.decorators.http import require_POST
+
+from urnik.iskanik_konfliktov import ProsteUcilnice, IskalnikKonfliktov
+from urnik.utils import teden_dneva
 from .models import *
-
-
-def teden_dneva(dan):
-    ponedeljek = dan - datetime.timedelta(days=dan.weekday())
-    nedelja = ponedeljek + datetime.timedelta(days=6)
-    return (ponedeljek, nedelja)
 
 
 def izbrani_semester(request):
@@ -25,6 +23,7 @@ def izbrani_semester(request):
             semester = Semester.objects.filter(objavljen=True).latest('od')
         cache.set(kljuc_semestra, semester, None)
     return semester
+
 
 def zacetna_stran(request):
     ucilnice = Ucilnica.objects.objavljene()
@@ -55,13 +54,18 @@ def kombiniran_pogled_form(request):
 
 
 def rezervacije(request):
-    rezervacije = []
     queryset = Rezervacija.objects.prihajajoce().prefetch_related(
         'ucilnice',
         'osebe',
         'ucilnice__srecanja__ucitelji',
         'ucilnice__srecanja__predmet',
     )
+    racunaj_konflikte = request.user.is_staff
+
+    if racunaj_konflikte:
+        iskalnik = IskalnikKonfliktov.za_rezervacije(queryset)
+
+    rezervacije = []
     for rezervacija in queryset:
         for ucilnica in rezervacija.ucilnice.all():
             for dan in rezervacija.dnevi():
@@ -74,6 +78,8 @@ def rezervacije(request):
                     'dan': dan,
                     'teden': teden_dneva(dan),
                 })
+                if racunaj_konflikte:
+                    rezervacije[-1]['konflikti'] = iskalnik.konflikti(ucilnica, dan, rezervacija.od, rezervacija.do, ignore=rezervacija)
     rezervacije.sort(key=lambda r: (r['dan'], r['ucilnica'].oznaka, r['od']))
     return render(request, 'rezervacije.html', {
         'naslov': 'Rezervacije učilnic',
@@ -81,11 +87,83 @@ def rezervacije(request):
     })
 
 
+@login_required
+def nova_rezervacija(request, ucilnica_id=None, ura=None, teden=None, dan_v_tednu=None):
+    if request.method == 'POST':
+        form = RezevacijeForm(request.POST, dovoli_prekrivanja=True)
+        if form.is_valid():
+            rezervacija = form.save()
+            return render(request, 'uspesna_rezervacija.html', {'rezervacija': rezervacija})
+
+        # če so edine napake prekrivanja, omogočimo uporabniku, da vseeno rezervira
+        if all(error.code == RezevacijeForm.PREKRIVANJA
+               for _, error_list in form.errors.as_data().items() for error in error_list):
+            form = RezevacijeForm(request.POST, dovoli_prekrivanja=True)
+        else:
+            form = RezevacijeForm(request.POST, dovoli_prekrivanja=False)
+
+    else:
+        form = RezevacijeForm()
+        if ucilnica_id:
+            form.fields['ucilnice'].initial = [ucilnica_id]
+            try:
+                ura = int(ura)
+                form.fields['od'].initial = ura
+                form.fields['do'].initial = ura+1
+            except: pass
+            try:
+                teden = datetime.datetime.strptime(teden, "%Y-%m-%d")
+                teden += datetime.timedelta(days=int(dan_v_tednu))
+                form.fields['dan'].initial = teden.strftime('%d. %m. %Y').lstrip('0').replace('. 0', '. ')
+            except: pass
+
+    return render(request, 'nova_rezervacija.html', {'form': form, 'delno_izpolnjena': ucilnica_id is not None})
+
+
+@staff_member_required
+def preglej_rezervacije(request):
+    rezervacije = Rezervacija.objects.prihajajoce()
+    rezervacije_filter = request.GET.get('filter', 'nepotrjene')
+    if rezervacije_filter != 'all':
+        rezervacije = rezervacije.filter(potrjena=False)
+    rezervacije = rezervacije.prefetch_related(
+        'ucilnice', 'osebe').order_by('dan', 'od', 'pk')
+
+    iskalnik = IskalnikKonfliktov.za_rezervacije(rezervacije)
+    data = [{'rezervacija': r, 'konflikti': list(iskalnik.konflikti_z_rezervacijo(r))} for r in rezervacije]
+    for x in data:
+        x['st_konfliktov'] = sum(k.st_konfliktov for _, _, k in x['konflikti'])
+    return render(request, 'preglej_rezervacije.html', {'entries': data, 'filter': rezervacije_filter})
+
+
+@require_POST
+@staff_member_required
+def potrdi_rezervacijo(request):
+    r = get_object_or_404(Rezervacija, pk=request.POST['r-pk'])
+    r.potrjena = True
+    r.save()
+    return redirect(request.POST.get('redirect') or reverse('preglej_rezervacije'))
+
+
+@require_POST
+@staff_member_required
+def izbrisi_rezervacijo(request):
+    get_object_or_404(Rezervacija, pk=request.POST['r-pk']).delete()
+    return redirect(request.POST.get('redirect') or reverse('preglej_rezervacije'))
+
+
+@require_POST
+@staff_member_required
+def potrdi_vse_rezervacije(request):
+    Rezervacija.objects.prihajajoce().filter(potrjena=False).update(potrjena=True)
+    return redirect(request.POST.get('redirect') or reverse('preglej_rezervacije'))
+
+
 def urnik(request, srecanja, naslov, barve=None):
     legenda = barve
     if barve is None:
         barve = Predmet.objects.filter(srecanja__in=srecanja).distinct()
-    if request.user.is_authenticated and request.session.get('urejanje', False):
+    if request.user.is_staff and request.session.get('urejanje', False):
         if request.META['QUERY_STRING']:
             next_url = '{}?{}'.format(request.path, request.META['QUERY_STRING'])
         else:
@@ -175,20 +253,24 @@ def proste_ucilnice(request):
     velikost &= {v[0] for v in UcilnicaQuerySet.VELIKOST}
     if not velikost: velikost = None
 
-    proste = ProsteUcilnice(ucilnice, tip, velikost)
+    semester = izbrani_semester(request)
+    proste = ProsteUcilnice(ucilnice.filter(tip__in=tip).ustrezne_velikosti(velikost))
     if teden:
-        proste.upostevaj_rezervacije(teden)
+        proste.upostevaj_rezervacije_za_teden(teden)
         # teh semestrov bi moralo biti 0 ali 1
-        prekrivajoci_semestri = Semester.objects.filter(od__lte=teden,do__gte=teden)
+        prekrivajoci_semestri = Semester.objects.filter(od__lte=teden, do__gte=teden)
         for semester in prekrivajoci_semestri:
             proste.dodaj_srecanja_semestra(semester)
     else:
-        proste.dodaj_srecanja_semestra(izbrani_semester(request))
+        proste.dodaj_srecanja_semestra(semester)
 
     termini = proste.dobi_termine()
     for t in termini:
         t.filtriraj_ucilnice(pokazi_zasedene=pokazi_zasedene)
 
+    now = datetime.date.today()
+    mozni_tedni = set(teden_dneva(d) for r in Rezervacija.objects.prihajajoce() for d in r.dnevi() if d >= now)
+    mozni_tedni.update(semester.prihodnji_tedni())
     return render(request, 'proste_ucilnice.html', {
         'naslov': 'Proste učilnice',
         'termini': termini,
@@ -202,7 +284,7 @@ def proste_ucilnice(request):
         # possible values
         'mozne_velikosti_ucilnic': UcilnicaQuerySet.VELIKOST,
         'mozni_tipi_ucilnic': [u for u in Ucilnica.TIP if u[0] in Ucilnica.OBJAVLJENI_TIPI],
-        'mozni_tedni': sorted(set(teden_dneva(d) for r in Rezervacija.objects.prihajajoce() for d in r.dnevi())),
+        'mozni_tedni': sorted(mozni_tedni),
         'ustrezne_ucilnice': list(ucilnice),
     })
 
@@ -219,7 +301,7 @@ def proste_ucilnice_filter(request):
     return response
 
 
-@login_required
+@staff_member_required
 def premakni_srecanje(request, srecanje_id):
     srecanje = get_object_or_404(Srecanje, id=srecanje_id)
     if request.method == 'POST':
@@ -242,21 +324,21 @@ def premakni_srecanje(request, srecanje_id):
         })
 
 
-@login_required
+@staff_member_required
 def podvoji_srecanje(request, srecanje_id):
     srecanje = get_object_or_404(Srecanje, id=srecanje_id)
     srecanje.podvoji()
     return redirect(request.META.get('HTTP_REFERER', reverse('zacetna_stran')))
 
 
-@login_required
+@staff_member_required
 def odlozi_srecanje(request, srecanje_id):
     srecanje = get_object_or_404(Srecanje, id=srecanje_id)
     srecanje.odlozi()
     return redirect(request.META.get('HTTP_REFERER', reverse('zacetna_stran')))
 
 
-@login_required
+@staff_member_required
 def nastavi_trajanje_srecanja(request, srecanje_id):
     srecanje = get_object_or_404(Srecanje, id=srecanje_id)
     trajanje = int(request.POST['trajanje'])
@@ -264,7 +346,7 @@ def nastavi_trajanje_srecanja(request, srecanje_id):
     return redirect(request.META.get('HTTP_REFERER', reverse('zacetna_stran')))
 
 
-@login_required
+@staff_member_required
 def preklopi_urejanje(request):
     request.session['urejanje'] = not request.session.get('urejanje', False)
     return redirect(request.META.get('HTTP_REFERER', reverse('zacetna_stran')))
