@@ -576,8 +576,8 @@ class RezevacijeForm(ModelForm):
         fields = ['ucilnice', 'dan', 'dan_konca', 'od', 'do', 'opomba']
         widgets = {
             'ucilnice': CheckboxSelectMultiple(),
-            'dan': DateInput(attrs={'placeholder': 'npr. 15. 1. 2019'}),
-            'dan_konca': DateInput(attrs={'placeholder': 'ponavadi prazno, lahko tudi npr. 17. 1. 2019'}),
+            'dan': DateInput(attrs={'placeholder': 'npr. 15. 1. 2019', 'class': 'datepicker'}),
+            'dan_konca': DateInput(attrs={'placeholder': 'ponavadi prazno, lahko tudi npr. 17. 1. 2019', 'class': 'datepicker'}),
             'opomba': TextInput(attrs={'placeholder': 'npr. izpit Analiza 1 FIN'}),
         }
 
@@ -598,6 +598,9 @@ class RezevacijeForm(ModelForm):
 
     def clean(self):
         cleaned = super().clean()
+        if self.errors:
+            return cleaned
+
         od = cleaned.get('od')
         do = cleaned.get('do')
         if od >= do:
