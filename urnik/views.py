@@ -113,7 +113,7 @@ def nova_rezervacija(request, ucilnica_id=None, ura=None, teden=None, dan_v_tedn
             except: pass
             try:
                 teden = datetime.datetime.strptime(teden, "%Y-%m-%d")
-                teden += datetime.timedelta(days=int(dan_v_tednu))
+                teden += datetime.timedelta(days=int(dan_v_tednu)-1)
                 form.fields['dan'].initial = teden.strftime('%d. %m. %Y').lstrip('0').replace('. 0', '. ')
             except: pass
 
