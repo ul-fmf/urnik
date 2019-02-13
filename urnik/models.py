@@ -4,9 +4,9 @@ from copy import deepcopy
 
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.forms import ModelForm, CheckboxSelectMultiple, TextInput, DateInput, BooleanField, HiddenInput, \
-    CheckboxInput
+from django.forms import ModelForm, CheckboxSelectMultiple, TextInput, DateInput, BooleanField
 from django.template import defaultfilters
+from django.conf import settings
 
 from urnik.templatetags.tags import dan_tozilnik_mnozina
 from urnik.utils import teden_dneva
@@ -516,7 +516,7 @@ class RezervacijaQuerySet(models.QuerySet):
 class Rezervacija(models.Model):
     ucilnice = models.ManyToManyField('urnik.Ucilnica', blank=False, help_text='Izberite učilnice, ki jih želite rezervirati.',
                                       limit_choices_to={'tip__in': Ucilnica.OBJAVLJENI_TIPI}, verbose_name='Učilnice')
-    osebe = models.ManyToManyField('urnik.Oseba', help_text='Osebe, ki si lastijo to rezervacijo.')
+    osebe = models.ManyToManyField('urnik.Oseba', verbose_name='Osebe', help_text='Osebe, ki si lastijo to rezervacijo.')
     dan = models.DateField(verbose_name='Dan začetka', blank=False, null=False, help_text='Za kateri dan želite rezervirati.')
     dan_konca = models.DateField(blank=True, null=True, verbose_name='Dan konca', help_text='Dan konca rezervacije. Izpolnite le, če je drugačen od začetka.')
     MOZNE_URE = tuple((u, str(u)+":00") for u in range(MIN_URA, MAX_URA+1))
@@ -524,7 +524,8 @@ class Rezervacija(models.Model):
     do = models.PositiveSmallIntegerField(blank=False, null=False, choices=MOZNE_URE, help_text='Do katere ure želite rezervirati.')
     opomba = models.CharField(max_length=192, blank=False, null=False, help_text='Razlog za rezervacijo.')
     potrjena = models.BooleanField(default=False, null=False, help_text='Ali so to rezervacijo potrdili posvečeni ljudje.')
-    cas_rezervacije = models.DateTimeField(auto_now_add=True, help_text="Čas, ko je bila rezervacija narejena.")
+    avtor_rezervacije = models.ForeignKey(settings.AUTH_USER_MODEL, null=False, help_text='Kdo je dejansko naredil rezervacijo.', on_delete=models.CASCADE)
+    cas_rezervacije = models.DateTimeField(auto_now_add=True, help_text="Datum in čas, ko je bila rezervacija narejena.", verbose_name='Datum in čas rezervacije')
 
     objects = RezervacijaQuerySet.as_manager()
 
@@ -639,7 +640,7 @@ class RezevacijeForm(ModelForm):
                 for r in konflikti.rezervacije:
                     oseba = r.osebe.all()[:1]
                     self.add_error(None, ValidationError(
-                        'Vaša rezervacija se prekriva z rezervacijo osebe %(oseba)s %(dan)s '
+                        'Vaša rezervacija bi se prekrivala z rezervacijo osebe %(oseba)s %(dan)s '
                         'od %(od)i do %(do)i z razlogom %(razlog)s.',
                         params={
                             'oseba': oseba[0] if oseba else 'neznan',
@@ -654,7 +655,7 @@ class RezevacijeForm(ModelForm):
 
                 for s in konflikti.srecanja:
                     self.add_error(None, ValidationError(
-                        'Vaša rezervacija se prekriva s predmetom %(predmet)s (%(semester)s), ki se izvaja '
+                        'Vaša rezervacija bi se prekrivala s predmetom %(predmet)s (%(semester)s), ki se izvaja '
                         'ob %(dan_v_tednu)s od %(od)i do %(do)i.',
                         params={
                             'predmet': s.predmet,

@@ -39,6 +39,8 @@
           <th style="width: 200px;">Osebe</th>
           <th>Učilnice</th>
           <th>Razlog</th>
+          <th>Čas</th>
+          <th>Avtor</th>
           <th></th>
         </tr>
         </thead>
@@ -89,6 +91,8 @@
               <td>{{ r.opomba }}
                 {{ k }}
               </td>
+              <td>{{ r.cas_rezervacije|date:"D, j. b, H:m" }}</td>
+              <td>{{ r.avtor_rezervacije.get_full_name|default:r.avtor_rezervacije.username }}</td>
               <td>
                 <form action="{% url 'izbrisi_rezervacijo' %}" method="post"
                       onsubmit="return window.confirm('Ste prepričani, da želite izbrisati to ' +

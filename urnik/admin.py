@@ -143,6 +143,7 @@ class RezervacijaAdmin(admin.ModelAdmin):
         'ucilnice',
         'osebe',
     )
+    readonly_fields = ('cas_rezervacije', 'avtor_rezervacije')
 
     def seznam_oseb(self, obj):
         return ', '.join(str(oseba) for oseba in obj.osebe.all())
