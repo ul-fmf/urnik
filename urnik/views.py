@@ -76,6 +76,7 @@ def rezervacije(request):
                     'do': rezervacija.do,
                     'opomba': rezervacija.opomba,
                     'dan': dan,
+                    'potrjena': rezervacija.potrjena,
                     'teden': teden_dneva(dan),
                 })
                 if racunaj_konflikte:
@@ -113,7 +114,7 @@ def nova_rezervacija(request, ucilnica_id=None, ura=None, teden=None, dan_v_tedn
             except: pass
             try:
                 teden = datetime.datetime.strptime(teden, "%Y-%m-%d")
-                teden += datetime.timedelta(days=int(dan_v_tednu))
+                teden += datetime.timedelta(days=int(dan_v_tednu)-1)
                 form.fields['dan'].initial = teden.strftime('%d. %m. %Y').lstrip('0').replace('. 0', '. ')
             except: pass
 
@@ -258,8 +259,7 @@ def proste_ucilnice(request):
     if teden:
         proste.upostevaj_rezervacije_za_teden(teden)
         # teh semestrov bi moralo biti 0 ali 1
-        prekrivajoci_semestri = Semester.objects.filter(od__lte=teden, do__gte=teden)
-        for semester in prekrivajoci_semestri:
+        for semester in Semester.objects.v_obdobju(teden, teden + datetime.timedelta(days=5)):
             proste.dodaj_srecanja_semestra(semester)
     else:
         proste.dodaj_srecanja_semestra(semester)

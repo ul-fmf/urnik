@@ -9,8 +9,8 @@
       <p>
         Pred rezervacijo preverite, ali je učilnica prosta. Za to imate na voljo
         <a href="{% url 'proste' %}">iskalnik prostih učilnic</a>, od koder lahko direktno izberete učilnico za
-        rezervacijo. <br>Če izberete več učilnic in več dni, boste za vsak dan od začeta do konca rezervirali vse učilnice
-        za izbrane ure.
+        rezervacijo. <br>Če izberete več učilnic in več dni, boste za vsak dan od začeta do konca rezervirali vse
+        učilnice za izbrane ure.
       </p>
     {% endif %}
     <form action="{% url 'nova_rezervacija' %}" method="post">
@@ -20,8 +20,8 @@
           {% if field.name != 'ignoriraj_prekrivanja' %}
             <li id="field-{{ field.auto_id }}">
               <label>{{ field.help_text }}</label>
-              {{ field.errors }}
               {{ field }}
+              {{ field.errors }}
             </li>
           {% endif %}
         {% endfor %}

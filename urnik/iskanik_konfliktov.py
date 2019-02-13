@@ -110,7 +110,7 @@ class IskalnikKonfliktov(object):
         for r in rezervacije:
             for u in r.ucilnice.all():
                 for d in r.dnevi_med(self.min_datum, self.max_datum):
-                    self.rezerviranost_ucilnic[u, d].append(r)
+                    self.rezerviranost_ucilnic[u.pk, d].append(r)
 
     @staticmethod
     def za_rezervacije(rezervacije: RezervacijaQuerySet):
@@ -144,11 +144,11 @@ class IskalnikKonfliktov(object):
         if not (self.min_datum <= datum <= self.max_datum):
             raise ValueError("Struktura iskanja ni bila pripravljena za iskanje konfliktov dne {}".format(datum))
 
-        for s in self.zasedenost_ucilnic[ucilnica, datum]:
+        for s in self.zasedenost_ucilnic[ucilnica.pk, datum]:
             if s != ignore and s.se_po_urah_prekriva(od, do):
                 konflikti.srecanja.append(s)
 
-        for r in self.rezerviranost_ucilnic[ucilnica, datum]:
+        for r in self.rezerviranost_ucilnic[ucilnica.pk, datum]:
             if r != ignore and r.se_po_urah_prekriva(od, do):
                 konflikti.rezervacije.append(r)
 
