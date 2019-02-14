@@ -46,12 +46,12 @@
                   {{ rezervacija.osebe.all|join:", " }},
                   {{ rezervacija.opomba }}
                 </small>
-                {% if user.is_staff and rezervacija.konflikti %}
+                {% if user.is_staff and not rezervacija.potrjena and rezervacija.konflikti %}
                   <span class="right">({{ rezervacija.konflikti.st_konfliktov }})</span>
                   <i class="material-icons orange-text right">warning</i>
                 {% endif %}
               </li>
-              {% if user.is_staff and rezervacija.konflikti %}
+              {% if user.is_staff and not rezervacija.potrjena and rezervacija.konflikti %}
                 <li class="collection-item"><ul>
                   {% for rez in rezervacija.konflikti.rezervacije %}
                     <li><b>Konflikt:</b>
