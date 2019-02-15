@@ -96,6 +96,7 @@ def nova_rezervacija(request, ucilnica_id=None, ura=None, teden=None, dan_v_tedn
             rezervacija = form.save(commit=False)
             rezervacija.avtor_rezervacije = request.user
             rezervacija.save()
+            rezervacija.save_m2m()
             return render(request, 'uspesna_rezervacija.html', {'rezervacija': rezervacija})
 
         # če so edine napake prekrivanja, omogočimo uporabniku, da vseeno rezervira
