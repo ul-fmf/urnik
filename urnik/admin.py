@@ -161,6 +161,11 @@ class RezervacijaAdmin(admin.ModelAdmin):
             'osebe',
         )
 
+    def save_model(self, request, obj, form, change):
+        obj.avtor_rezervacije = request.user
+        super().save_model(request, obj, form, change)
+
+
 @admin.register(Srecanje)
 class SrecanjeAdmin(admin.ModelAdmin):
     list_filter = (
