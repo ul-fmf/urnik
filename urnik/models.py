@@ -2,11 +2,11 @@ import datetime
 from collections import defaultdict
 from copy import deepcopy
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.forms import ModelForm, CheckboxSelectMultiple, TextInput, DateInput, BooleanField
+from django.forms import ModelForm, CheckboxSelectMultiple, TextInput, DateInput, BooleanField, ModelMultipleChoiceField
 from django.template import defaultfilters
-from django.conf import settings
 
 from urnik.templatetags.tags import dan_tozilnik_mnozina
 from urnik.utils import teden_dneva
@@ -38,6 +38,13 @@ class Oseba(models.Model):
         verbose_name_plural = 'osebe'
         default_related_name = 'osebe'
         ordering = ('priimek', 'ime')
+
+    @property
+    def priimek_ime(self):
+        if self.ime:
+            return '{} {}'.format(self.priimek, self.ime)
+        else:
+            return self.priimek
 
     def __str__(self):
         if self.ime:
@@ -514,18 +521,18 @@ class RezervacijaQuerySet(models.QuerySet):
 
 
 class Rezervacija(models.Model):
-    ucilnice = models.ManyToManyField('urnik.Ucilnica', blank=False, help_text='Izberite učilnice, ki jih želite rezervirati.',
+    ucilnice = models.ManyToManyField('urnik.Ucilnica', blank=False, help_text='Izberite učilnice, ki jih želite rezervirati',
                                       limit_choices_to={'tip__in': Ucilnica.OBJAVLJENI_TIPI}, verbose_name='Učilnice')
-    osebe = models.ManyToManyField('urnik.Oseba', verbose_name='Osebe', help_text='Osebe, ki si lastijo to rezervacijo.')
-    dan = models.DateField(verbose_name='Dan začetka', blank=False, null=False, help_text='Za kateri dan želite rezervirati.')
-    dan_konca = models.DateField(blank=True, null=True, verbose_name='Dan konca', help_text='Dan konca rezervacije. Izpolnite le, če je drugačen od začetka.')
+    osebe = models.ManyToManyField('urnik.Oseba', verbose_name='Osebe', help_text='Osebe, ki si lastijo to rezervacijo')
+    dan = models.DateField(verbose_name='Dan začetka', blank=False, null=False, help_text='Za kateri dan želite rezervirati')
+    dan_konca = models.DateField(blank=True, null=True, verbose_name='Dan konca', help_text='Dan konca rezervacije; izpolnite le, če je drugačen od začetka')
     MOZNE_URE = tuple((u, str(u)+":00") for u in range(MIN_URA, MAX_URA+1))
-    od = models.PositiveSmallIntegerField(blank=False, null=False, choices=MOZNE_URE, help_text='Od katere ure želite rezervirati.')
-    do = models.PositiveSmallIntegerField(blank=False, null=False, choices=MOZNE_URE, help_text='Do katere ure želite rezervirati.')
-    opomba = models.CharField(max_length=192, blank=False, null=False, help_text='Razlog za rezervacijo.')
-    potrjena = models.BooleanField(default=False, null=False, help_text='Ali so to rezervacijo potrdili posvečeni ljudje.')
-    avtor_rezervacije = models.ForeignKey(settings.AUTH_USER_MODEL, null=False, help_text='Kdo je dejansko naredil rezervacijo.', on_delete=models.CASCADE)
-    cas_rezervacije = models.DateTimeField(auto_now_add=True, help_text="Datum in čas, ko je bila rezervacija narejena.", verbose_name='Datum in čas rezervacije')
+    od = models.PositiveSmallIntegerField(blank=False, null=False, choices=MOZNE_URE, help_text='Od katere ure želite rezervirati')
+    do = models.PositiveSmallIntegerField(blank=False, null=False, choices=MOZNE_URE, help_text='Do katere ure želite rezervirati')
+    opomba = models.CharField(max_length=192, blank=False, null=False, help_text='Razlog za rezervacijo')
+    potrjena = models.BooleanField(default=False, null=False, help_text='Ali so to rezervacijo potrdili posvečeni ljudje')
+    avtor_rezervacije = models.ForeignKey(settings.AUTH_USER_MODEL, null=False, help_text='Kdo je dejansko naredil rezervacijo', on_delete=models.CASCADE)
+    cas_rezervacije = models.DateTimeField(auto_now_add=True, help_text="Datum in čas, ko je bila rezervacija narejena", verbose_name='Datum in čas rezervacije')
 
     objects = RezervacijaQuerySet.as_manager()
 
@@ -568,13 +575,20 @@ class Rezervacija(models.Model):
         return self.od < do and od < self.do
 
 
+class RezervacijeModelMultipleChoiceField(ModelMultipleChoiceField):
+    def label_from_instance(self, obj):
+        return obj.priimek_ime
+
+
 class RezevacijeForm(ModelForm):
 
     PREKRIVANJA = 'prekrivanja'
 
+    osebe = RezervacijeModelMultipleChoiceField(queryset=Oseba.objects.all())
+
     class Meta:
         model = Rezervacija
-        fields = ['ucilnice', 'dan', 'dan_konca', 'od', 'do', 'opomba']
+        fields = ['ucilnice', 'osebe', 'dan', 'dan_konca', 'od', 'do', 'opomba']
         widgets = {
             'ucilnice': CheckboxSelectMultiple(),
             'dan': DateInput(attrs={'placeholder': 'npr. 15. 1. 2019', 'class': 'datepicker'}),
