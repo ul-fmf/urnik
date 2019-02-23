@@ -32,6 +32,8 @@ class Oseba(models.Model):
     priimek = models.CharField(max_length=192)
     email = models.EmailField(blank=True)
     domaca_stran = models.CharField(max_length=192, blank=True)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
+
     objects = OsebaQuerySet.as_manager()
 
     class Meta:
