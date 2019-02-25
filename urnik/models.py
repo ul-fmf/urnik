@@ -32,7 +32,7 @@ class Oseba(models.Model):
     priimek = models.CharField(max_length=192)
     email = models.EmailField(blank=True)
     domaca_stran = models.CharField(max_length=192, blank=True)
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name='oseba')
 
     objects = OsebaQuerySet.as_manager()
 

@@ -1,0 +1,51 @@
+{% extends 'osnova.html' %}
+{% block content %}
+  <main class="valign-wrapper">
+    <div class="container">
+    <div style="margin-top: 80px;"></div>
+      {% if form.errors or form.non_field_errors %}
+        <div class="row">
+          <div class="col s8 offset-s2">
+            <div class="card red lighten-5">
+              <div class="card-content red-text">
+                <span class="card-title">Podatki za prijavo niso pravilni.</span>
+                <p>
+                  Če ste geslo pozabili, se obrnite na informacijsko pomoč na vaši matični organizaciji. Če pa ste
+                  prepričani, da ste tako poštni naslov kot geslo vpisali pravilno, o napaki obvestite <a
+                    href="mailto:boter@fmf.uni-lj.si?subject=Težava ob prijavi&body=-- Napišite, s katerim uporabniškim imenom ste se poskusili prijaviti. GESLA NE VPISUJTE. --">skrbnika
+                  strani</a>.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+      <form action="{{ app_path }}" method="post">
+        <div class="row">
+          <div class="input-field col s8 offset-s2">
+            <i class="material-icons prefix">email</i>
+            <input id="id_username" type="text" placeholder="ime.priimek@btr.uni-lj.si" name="username" required
+                   autofocus>
+            <label for="id_username">Univerzitetni poštni naslov</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col s8 offset-s2">
+            <i class="material-icons prefix">lock</i>
+            <input id="id_password" type="password" placeholder="geslo, ki ga uporabljate na matični organizaciji"
+                   name="password">
+            <label for="id_password">Geslo</label>
+          </div>
+        </div>
+        <div class="row">
+          {% csrf_token %}
+          <div class="col s8 offset-s2 center-align">
+            <button class="btn btn-large waves-effect waves-light">
+              <i class="material-icons left">account_circle</i> Prijavi me
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </main>
+{% endblock content %}

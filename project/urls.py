@@ -22,8 +22,8 @@ import urnik.views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('accounts/login/', auth_views.LoginView.as_view(template_name='admin/login.html'), name='login'),
-    path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('', urnik.views.zacetna_stran, name='zacetna_stran'),
     path('urnik/', urnik.views.kombiniran_pogled, name='kombiniran_pogled'),
     path('kombiniran/', urnik.views.kombiniran_pogled_form, name='kombiniran_pogled_form'),

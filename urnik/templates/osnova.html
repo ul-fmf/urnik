@@ -43,7 +43,9 @@
             <a class="dropdown-trigger" href="#!" data-target="user-dropdown">
               <i class="material-icons right" id="dropdown-arrow">arrow_drop_down</i>
               <span class="hide-on-small-and-down" id="user-name">{{ user.get_full_name|default:user.get_username }}</span>
-              <i class="material-icons right" id="mode-indicator">{% if request.session.urejanje %}edit{% else %}visibility{% endif %}</i>
+              {% if user.is_staff %}
+                <i class="material-icons right" id="mode-indicator">{% if request.session.urejanje %}edit{% else %}visibility{% endif %}</i>
+              {% endif %}
             </a>
           </li>
         </ul>

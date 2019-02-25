@@ -5,7 +5,7 @@ from urnik.models import Oseba
 
 
 @receiver(populate_user)
-def connect_oseba_to_user(sender,  user =None, ldap_user=None, **kwargs):
+def connect_oseba_to_user(sender,  user=None, ldap_user=None, **kwargs):
     if user is None:
         return
     user.save()
