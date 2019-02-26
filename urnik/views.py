@@ -108,6 +108,10 @@ def nova_rezervacija(request, ucilnica_id=None, ura=None, teden=None, dan_v_tedn
 
     else:
         form = RezevacijeForm()
+        try:
+            form.fields['osebe'].initial = [request.user.oseba]
+        except Oseba.DoesNotExist:
+            pass
         if ucilnica_id:
             form.fields['ucilnice'].initial = [ucilnica_id]
             try:

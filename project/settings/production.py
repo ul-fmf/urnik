@@ -1,3 +1,6 @@
+import ldap
+from django_auth_ldap.config import LDAPSearch
+
 from .common import *
 
 with open('/srv/urnik/etc/secretkey.txt') as f:
@@ -25,3 +28,6 @@ DATABASES = {
         }
     },
 }
+
+with open('/srv/boterdev/etc/ldap_password.txt') as f:
+    AUTH_LDAP_BIND_PASSWORD = f.read().strip()

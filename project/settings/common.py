@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 
 import os
 
+import ldap
+from django_auth_ldap.config import LDAPSearch
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -121,3 +124,21 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
+
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+
+AUTHENTICATION_BACKENDS = (
+    'django_auth_ldap.backend.LDAPBackend',
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+AUTH_LDAP_SERVER_URI = 'ldap://dcv1fmf.fmf.uni-lj.si:3268,ldap://dcv2fmf.fmf.uni-lj.si:3268'
+AUTH_LDAP_BIND_DN = 'ldap.pretnar@fmf.uni-lj.si'
+
+AUTH_LDAP_USER_SEARCH = LDAPSearch('dc=uni-lj,dc=si', ldap.SCOPE_SUBTREE, '(mail=%(user)s)')
+AUTH_LDAP_USER_ATTR_MAP = {
+    'first_name': 'givenName',
+    'last_name': 'sn',
+    'email': 'mail'
+}

@@ -21,3 +21,22 @@ MIDDLEWARE.insert(0, 'silk.middleware.SilkyMiddleware')
 INSTALLED_APPS += [
     'silk',
 ]
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django_auth_ldap': {
+            'level': 'DEBUG',
+            'handlers': ['console'],
+        },
+    },
+}
+
+with open('ldap_password.txt') as f:
+    AUTH_LDAP_BIND_PASSWORD = f.read().strip()
