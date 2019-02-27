@@ -87,13 +87,13 @@
   <li><a href="{% url 'zacetna_stran' %}"><i class="material-icons left">home</i>Domov</a></li>
   <li><a href="{% url 'kombiniran_pogled_form' %}"><i class="material-icons left">schedule</i>Kombiniran pogled</a></li>
   <li><a href="{% url 'rezervacije' %}"><i class="material-icons left">border_color</i>Rezervacije učilnic</a></li>
+  <li><a href="{% url 'proste' %}"><i class="material-icons left">event_available</i>Proste učilnice</a></li>
   {% if user.is_authenticated %}
     <li><a href="{% url 'nova_rezervacija' %}"><i class="material-icons left">assignment</i>Nova rezervacija</a></li>
   {% endif %}
   {% if user.is_staff %}
     <li><a href="{% url 'preglej_rezervacije' %}"><i class="material-icons left">visibility</i>Preglej nove rezervacije</a></li>
   {% endif %}
-  <li><a href="{% url 'proste' %}"><i class="material-icons left">event_available</i>Proste učilnice</a></li>
   <li><a href="javascript:window.print();"><i class="material-icons left">print</i>Natisni stran</a></li>
   {% if user.is_staff %}
     <li><a href="{% url 'printall' %}"><span class="tripple-icon side-icon">
