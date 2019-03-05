@@ -587,6 +587,7 @@ class RezevacijeForm(ModelForm):
     PREKRIVANJA = 'prekrivanja'
 
     osebe = RezervacijeModelMultipleChoiceField(queryset=Oseba.objects.all())
+    use_required_attribute = False
 
     class Meta:
         model = Rezervacija

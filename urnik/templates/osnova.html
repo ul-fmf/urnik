@@ -45,10 +45,16 @@
               <span class="hide-on-small-and-down" id="user-name">{{ user.get_full_name|default:user.get_username }}</span>
               {% if user.is_staff %}
                 <i class="material-icons right" id="mode-indicator">{% if request.session.urejanje %}edit{% else %}visibility{% endif %}</i>
+              {% else %}
+                <i class="material-icons right">account_circle</i>
               {% endif %}
             </a>
           </li>
         </ul>
+      {% else %}
+        <a class="right" href="{% url 'login' %}">
+          <i class="material-icons right" style="margin-right: 15px;">account_circle</i>
+          <span class="hide-on-small-and-down">Prijava</span></a>
       {% endif %}
 
       <!-- middle search: Preserve the order: left, right first, then middle -->

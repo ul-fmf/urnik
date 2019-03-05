@@ -3,16 +3,10 @@
 <div class="container">
 
 <p class="flow-text">
-  Stran z rezervacijami je še v delu. V kratkem bo omogočen tudi obrazec za
-  rezervacijo, zaenkrat pa rezervacije še vedno javljajte v študentski referat.
-  <b>Pred tem prosimo preverite, da je učilnica, ki jo želite rezervirati,
-    prosta.</b> Spodaj lahko preverite, katere učilnice so že rezervirane, če pa
-  želite rezervacijo med semestrom, preverite tudi
-  <a href="{% url 'zacetna_stran' %}">urnik</a>.
-  Za lažje iskanje prostih učilnic lahko uporabite tudi
-  <a href="{% url 'proste' %}">iskalnik prostih učilnic</a>.
-  Pri sporočanju rezervacije prosim napišite katero predavalnico, kdaj in zakaj jo želite.
+  Nove rezervacije najlažje naredite prek <a href="{% url 'proste' %}">iskalnika prostih učilnic</a>,
+  lahko pa uporabite tudi obrazec za <a href="{% url 'nova_rezervacija' %}">novo rezervacijo</a>.
 </p>
+
 {% if not rezervacije %}
   <p>Trenutno ni aktivnih rezervacij.</p>
 {% else %}
@@ -34,8 +28,7 @@
                 </li>
               {% endifchanged %}
               <li class="collection-item">
-                {# TODO remove requirement for user authentication #}
-                {% if user.is_authenticated and not rezervacija.potrjena %}
+                {% if not rezervacija.potrjena %}
                   <i class="material-icons grey-text left tooltipped"
                      data-position="left" data-tooltip="Še nepotrjena s strani referata"
                      title="Še nepotrjena s strani referata">help</i>
