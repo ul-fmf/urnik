@@ -31,7 +31,6 @@ za svoj operacijski sistem in jo naložiš z ukazom:
 
 Pazi, da pri tem `37` in `amd64` zamenjaš z ustrezno verzijo in arhitekturo pythona v virtualnem okolju.
 
-
 #### Apliciraj migracije
 Če boš uporabljal anonimizirano bazo, jo prej premakni v mapo `project` in preimenuj v `db.sqlite3` ter šele nato apliciraj migracije.
 ```
@@ -43,4 +42,4 @@ python manage.py migrate
 python manage.py runserver
 ```
 Da bo pri zagonu vse teklo gladko si pripravi še prazno datoteko z geslom za ldap, ki je za lokalni razvoj ne rabiš,
-na strežniku pa je potrebna. Naredi prazno datoteko ``ldap_password.txt`` v glavni mapi projekta (zraven `manage.py` ).
+na strežniku pa je potrebna. Naredi prazno datoteko ``ldap_password.txt`` v glavni mapi projekta (zraven `manage.py`).
