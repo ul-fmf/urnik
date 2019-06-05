@@ -129,6 +129,7 @@ class RezervacijaAdmin(admin.ModelAdmin):
         'seznam_ucilnic',
         'seznam_oseb',
         'dan',
+        'dan_konca',
         'od',
         'do',
         'opomba',

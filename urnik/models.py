@@ -519,7 +519,7 @@ class RezervacijaQuerySet(models.QuerySet):
         )
 
     def prihajajoce(self):
-        return self.filter(dan__gte=datetime.date.today())
+        return self.filter(dan__gte=datetime.date.today()) | self.filter(dan_konca__gte=datetime.date.today())
 
 
 class Rezervacija(models.Model):
