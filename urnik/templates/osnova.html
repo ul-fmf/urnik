@@ -27,8 +27,13 @@
   <nav>
     <div class="nav-wrapper">
       <a href="#!" class="brand-logo center" id="urnik-logo"> <!-- top centred logo: absolute -->
-        <i class="large material-icons hide-on-med-and-down">schedule</i>
+        <i class="large material-icons hide-on-med-and-down">{% if ogled_starega_semestra %}history{% else %}schedule{% endif %}</i>
         {{ naslov|default:izbrani_semester.ime }}
+        {% if ogled_starega_semestra and naslov %}
+        <small>
+          ({{ izbrani_semester.ime }})
+        </small>
+        {% endif %}
       </a>
 
       <!-- left menu -->
@@ -108,6 +113,7 @@
       <i class="material-icons">print</i>
     </span>Natisni več hkrati</a></li>
   {% endif %}
+  <li><a href="{% url 'izbira_semestra' %}"><i class="material-icons left">history</i>Ogled starejših urnikov</a></li>
   <li><a href="{% url 'bugreport' %}"><i class="material-icons left">bug_report</i>Prijava napake</a></li>
   <li><a href="{% url 'help' %}"><i class="material-icons left">help</i>Navodila in pomoč</a></li>
 </ul> <!-- side nav -->
@@ -131,6 +137,7 @@
     {% endif %}
         "Meni: Proste učilnice": "{% url 'proste' %}",
         "Meni: Natisni stran": "javascript:window.print();",
+        "Meni: Ogled starejših urnikov": "{% url 'izbira_semestra' %}",
         "Meni: Prijava napake": "{% url 'bugreport' %}",
         "Meni: Navodila in pomoč": "{% url 'help' %}",
 

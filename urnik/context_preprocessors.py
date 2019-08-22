@@ -11,5 +11,6 @@ def search_data(request):
 
 def izbrani_semester(request):
     return {
-        'izbrani_semester': views.izbrani_semester(request)
+        'izbrani_semester': views.izbrani_semester(request),
+        'ogled_starega_semestra': views.ogled_starega_semestra(request),
     }

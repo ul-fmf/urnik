@@ -1,6 +1,5 @@
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
-from django.core.cache import cache
 from django.http import QueryDict
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -13,17 +12,28 @@ from .models import *
 
 
 def izbrani_semester(request):
-    urejanje = request.session.get('urejanje', False)
-    kljuc_semestra = 'semester_za_urejanje' if urejanje else 'semester_za_ogled'
-    semester = cache.get(kljuc_semestra)
-    if not semester:
-        if urejanje:
-            semester = Semester.objects.latest('od')
-        else:
-            semester = Semester.objects.filter(objavljen=True).latest('od')
-        cache.set(kljuc_semestra, semester, None)
-    return semester
+    if request.session.get('urejanje', False):
+        return Semester.objects.latest('od')
+    semester_id = request.session.get('semester_id')
+    if semester_id:
+        try:
+            return Semester.objects.get(pk=semester_id)
+        except:
+            pass
+    return Semester.objects.filter(objavljen=True).latest('od')
 
+def ogled_starega_semestra(request):
+    urejanje = request.session.get('urejanje', False)
+    semester_id = request.session.get('semester_id')
+    return not urejanje and semester_id is not None
+
+def izberi_semester(request, semester_id=None):
+    if semester_id:
+        semester_id = get_object_or_404(Semester, id=semester_id)
+        request.session['semester_id'] = semester_id.id
+    else:
+        del request.session['semester_id']
+    return redirect(request.META.get('HTTP_REFERER', reverse('zacetna_stran')))
 
 def zacetna_stran(request):
     ucilnice = Ucilnica.objects.objavljene()
@@ -33,6 +43,12 @@ def zacetna_stran(request):
             Letnik.objects.filter(oddelek=Letnik.FIZIKA),
         ],
         'ucilnice': ucilnice,
+    })
+
+def izbira_semestra(request):
+    semestri = Semester.objects.filter(objavljen=True)
+    return render(request, 'izbira_semestra.html', {
+        'semestri': semestri,
     })
 
 
