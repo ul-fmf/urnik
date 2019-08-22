@@ -558,12 +558,10 @@ class Rezervacija(models.Model):
         ordering = ('dan', 'od', 'do')
 
     def dnevi(self):
-        dan = self.dan
-        dan_konca = self.konec
-        razlika = datetime.timedelta(days=1)
-        while dan <= dan_konca:
-            yield dan
-            dan += razlika
+        return self.dnevi_med(self.zacetek, self.konec)
+
+    def prihajajoci_dnevi(self):
+        return self.dnevi_med(datetime.date.today(), self.konec)
 
     def dnevi_med(self, od, do):
         dan = max(self.zacetek, od)

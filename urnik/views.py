@@ -84,7 +84,7 @@ def rezervacije(request):
     rezervacije = []
     for rezervacija in queryset:
         for ucilnica in rezervacija.ucilnice.all():
-            for dan in rezervacija.dnevi():
+            for dan in rezervacija.prihajajoci_dnevi():
                 rezervacije.append({
                     'ucilnica': ucilnica,
                     'osebe': rezervacija.osebe,
