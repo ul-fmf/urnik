@@ -33,7 +33,7 @@ def izberi_semester(request, semester_id=None):
         request.session['semester_id'] = semester_id.id
     else:
         del request.session['semester_id']
-    return redirect(request.META.get('HTTP_REFERER', reverse('zacetna_stran')))
+    return redirect(reverse('zacetna_stran'))
 
 def zacetna_stran(request):
     ucilnice = Ucilnica.objects.objavljene()
@@ -49,6 +49,7 @@ def izbira_semestra(request):
     semestri = Semester.objects.filter(objavljen=True)
     return render(request, 'izbira_semestra.html', {
         'semestri': semestri,
+        'naslov': 'Ogled starejših urnikov'
     })
 
 
