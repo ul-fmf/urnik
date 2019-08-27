@@ -125,9 +125,9 @@ STATIC_URL = '/static/'
 
 FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 
-LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/'
+LOGIN_URL = 'login'  # name of the login url pattern
+LOGIN_REDIRECT_URL = 'zacetna_stran'  # name of the landing page url pattern
+LOGOUT_REDIRECT_URL = 'zacetna_stran'  # name of the landing page url pattern
 
 AUTHENTICATION_BACKENDS = (
     'django_auth_ldap.backend.LDAPBackend',
