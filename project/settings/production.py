@@ -14,8 +14,6 @@ ALLOWED_HOSTS = ['urnik.fmf.uni-lj.si']
 
 STATIC_URL = '/static/'
 
-LOGIN_URL = '/accounts/login/'
-
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
