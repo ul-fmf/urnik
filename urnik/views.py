@@ -32,7 +32,8 @@ def izberi_semester(request, semester_id=None):
         semester_id = get_object_or_404(Semester, id=semester_id)
         request.session['semester_id'] = semester_id.id
     else:
-        del request.session['semester_id']
+        if 'semester_id' in request.session:
+            del request.session['semester_id']
     return redirect(reverse('zacetna_stran'))
 
 def zacetna_stran(request):
