@@ -13,9 +13,9 @@
       <tr>
         <td>
           <ul>
-            <li><a href="{% url 'kombiniran_pogled_form' %}"><i class="material-icons left">schedule</i>Kombiniran pogled</a></li>
+            <li><a href="{% url 'kombiniran_pogled_form' semester_id=izbrani_semester_id %}"><i class="material-icons left">schedule</i>Kombiniran pogled</a></li>
             <li><a href="{% url 'rezervacije' %}"><i class="material-icons left">border_color</i>Rezervacije učilnic</a></li>
-            <li><a href="{% url 'proste' %}"><i class="material-icons left">event_available</i>Proste učilnice</a></li>
+            <li><a href="{% url 'proste' semester_id=izbrani_semester_id %}"><i class="material-icons left">event_available</i>Proste učilnice</a></li>
             {% if user.is_authenticated %}
               <li><a href="{% url 'nova_rezervacija' %}"><i class="material-icons left">assignment</i>Nova rezervacija</a></li>
             {% endif %}
@@ -43,7 +43,7 @@
           {% for letnik in smer_l.list %}
             <tr>
               <td class="padded">
-                  <a href="{% url 'urnik_letnika' letnik.id %}">{{ letnik.leto }}</a>
+                  <a href="{% url 'urnik_letnika' letnik_id=letnik.id semester_id=izbrani_semester_id %}">{{ letnik.leto }}</a>
               </td>
             </tr>
           {% endfor %}
@@ -63,7 +63,7 @@
       {% for ucilnica in ucilnice %}
         <tr>
           <td class="padded">
-            <a href="{% url 'urnik_ucilnice' ucilnica.id %}">{{ ucilnica.oznaka }}</a>
+            <a href="{% url 'urnik_ucilnice' ucilnica_id=ucilnica.id semester_id=izbrani_semester_id %}">{{ ucilnica.oznaka }}</a>
             <small>
               {% if ucilnica.tip == ucilnica.RACUNALNISKA %}
                 <i class="tiny material-icons">computer</i>

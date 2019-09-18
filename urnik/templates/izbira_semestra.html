@@ -9,9 +9,9 @@
     {% for semester in semestri %}
     <li>
       {% if forloop.counter == semestri|length %}
-      <a href="{% url 'izberi_trenutni_semester' %}">{{ semester }}</a> – trenutni semester
+      <a href="{% url 'zacetna_stran' %}">{{ semester }}</a> – trenutni semester
       {% else %}
-      <a href="{% url 'izberi_semester' semester.pk %}">{{ semester }}</a>
+      <a href="{% url 'zacetna_stran' semester.pk %}">{{ semester }}</a>
       {% endif %}
     </li>
     {% endfor %}

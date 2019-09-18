@@ -13,4 +13,5 @@ def izbrani_semester(request):
     return {
         'izbrani_semester': views.izbrani_semester(request),
         'ogled_starega_semestra': views.ogled_starega_semestra(request),
+        'izbrani_semester_id': views.izbrani_semester_id(request),
     }
