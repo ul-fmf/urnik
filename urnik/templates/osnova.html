@@ -24,10 +24,10 @@
 
 <body>
 <div class="navbar-fixed">
-  <nav>
+  <nav class="{{ ogled_starega_semestra|yesno:"old-semester,current-semester" }}">
     <div class="nav-wrapper">
       <a href="#!" class="brand-logo center" id="urnik-logo"> <!-- top centred logo: absolute -->
-        <i class="large material-icons hide-on-med-and-down">{% if ogled_starega_semestra %}history{% else %}schedule{% endif %}</i>
+        <i class="large material-icons hide-on-med-and-down">{{ ogled_starega_semestra|yesno:"history,schedule" }}</i>
         {{ naslov|default:izbrani_semester.ime }}
         {% if ogled_starega_semestra and naslov %}
         <small>
@@ -119,6 +119,12 @@
   <li><a href="{% url 'bugreport' %}"><i class="material-icons left">bug_report</i>Prijava napake</a></li>
   <li><a href="{% url 'help' %}"><i class="material-icons left">help</i>Navodila in pomoč</a></li>
 </ul> <!-- side nav -->
+{% if ogled_starega_semestra %}
+  <div id="old-semester-note" class="card">
+    Gledate pretekel semester. <a href="{% url 'zacetna_stran' %}">Nazaj na aktualen semester.</a>
+    <i class="material-icons close-icon" onclick="$(this.parentNode).fadeOut(200);">close</i>
+  </div>
+{% endif %}
 
 {% block content %}{% endblock content %}
 

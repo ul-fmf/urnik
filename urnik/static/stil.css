@@ -89,6 +89,26 @@ dt {
 nav {
     background-color: #555;
 }
+nav.old-semester {
+    background: repeating-linear-gradient( -45deg, #555, #555 10px, #666 10px, #666 20px);
+    color: #000;
+}
+#old-semester-note {
+    position: fixed;
+    padding: 5px 10px;
+    top: 65px;
+    right: 6px;
+    width: 150px;
+    z-index: 2;
+}
+.card i.close-icon {
+    position: absolute;
+    cursor: pointer;
+    font-size: 12pt;
+    top: 5px;
+    right: 5px;
+}
+@media only screen and (max-width: 600px) { #old-semester-note { top: 57px; } }
 
 #urnik-logo {
     white-space: nowrap;
@@ -943,3 +963,4 @@ table.highlight tr th {
 .cancel.btn:active {
     background-color: #f44336;
 }
+
