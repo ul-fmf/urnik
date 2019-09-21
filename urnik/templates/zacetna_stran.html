@@ -14,10 +14,12 @@
         <td>
           <ul>
             <li><a href="{% url 'kombiniran_pogled_form' semester_id=izbrani_semester_id %}"><i class="material-icons left">schedule</i>Kombiniran pogled</a></li>
+            {% if not ogled_starega_semestra %}
             <li><a href="{% url 'rezervacije' %}"><i class="material-icons left">border_color</i>Rezervacije učilnic</a></li>
             <li><a href="{% url 'proste' semester_id=izbrani_semester_id %}"><i class="material-icons left">event_available</i>Proste učilnice</a></li>
             {% if user.is_authenticated %}
               <li><a href="{% url 'nova_rezervacija' %}"><i class="material-icons left">assignment</i>Nova rezervacija</a></li>
+            {% endif %}
             {% endif %}
             <li><a href="{% url 'izbira_semestra' %}"><i class="material-icons left">history</i>Ogled starejših urnikov</a></li>
             <li><a href="{% url 'bugreport' %}"><i class="material-icons left">bug_report</i>Prijava napake</a></li>

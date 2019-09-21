@@ -27,7 +27,8 @@ def izbrani_semester(request):
 def ogled_starega_semestra(request):
     urejanje = request.session.get('urejanje', False)
     semester_id = izbrani_semester_id(request)
-    return not urejanje and semester_id is not None
+    return not urejanje and semester_id is not None and \
+        Semester.objects.filter(objavljen=True).latest('od').pk != semester_id
 
 def zacetna_stran(request, semester_id=None):
     ucilnice = Ucilnica.objects.objavljene()

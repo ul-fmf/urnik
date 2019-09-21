@@ -97,6 +97,7 @@
 <ul class="sidenav" id="side-menu"> <!-- side navigation -->
   <li><a href="{% url 'zacetna_stran' semester_id=izbrani_semester_id %}"><i class="material-icons left">home</i>Domov</a></li>
   <li><a href="{% url 'kombiniran_pogled_form' semester_id=izbrani_semester_id %}"><i class="material-icons left">schedule</i>Kombiniran pogled</a></li>
+  {% if not ogled_starega_semestra %}
   <li><a href="{% url 'rezervacije' %}"><i class="material-icons left">border_color</i>Rezervacije učilnic</a></li>
   <li><a href="{% url 'proste' semester_id=izbrani_semester_id %}"><i class="material-icons left">event_available</i>Proste učilnice</a></li>
   {% if user.is_authenticated %}
@@ -104,6 +105,7 @@
   {% endif %}
   {% if user.is_staff %}
     <li><a href="{% url 'preglej_rezervacije' %}"><i class="material-icons left">visibility</i>Preglej nove rezervacije</a></li>
+  {% endif %}
   {% endif %}
   <li><a href="javascript:window.print();"><i class="material-icons left">print</i>Natisni stran</a></li>
   {% if user.is_staff %}
@@ -127,12 +129,16 @@
     var search_urls = {
         "Meni: Urnik": "{% url 'zacetna_stran' semester_id=izbrani_semester_id %}",
         "Meni: Kombiniran pogled": "{% url 'kombiniran_pogled_form' semester_id=izbrani_semester_id %}",
+    {% if not ogled_starega_semestra %}
         "Meni: Rezervacije učilnic": "{% url 'rezervacije' %}",
     {% if user.is_authenticated %}
         "Meni: Nova rezervacija": "{% url 'nova_rezervacija' %}",
     {% endif %}
     {% if user.is_staff %}
         "Meni: Preglej nove rezervacije": "{% url 'preglej_rezervacije' %}",
+    {% endif %}
+    {% endif %}
+    {% if user.is_staff %}
         "Meni: Natisni vse": "{% url 'printall' semester_id=izbrani_semester_id %}",
     {% endif %}
         "Meni: Proste učilnice": "{% url 'proste' semester_id=izbrani_semester_id %}",
