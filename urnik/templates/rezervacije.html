@@ -33,10 +33,12 @@
                      data-position="left" data-tooltip="Še nepotrjena s strani referata"
                      title="Še nepotrjena s strani referata">help</i>
                 {% endif %}
-                {{ rezervacija.ucilnica }},
+                <a href="{% url 'urnik_ucilnice' rezervacija.ucilnica.pk %}">{{ rezervacija.ucilnica }}</a>,
                 {{ rezervacija.od }}–{{ rezervacija.do }},
                 <small>
-                  {{ rezervacija.osebe.all|join:", " }},
+                  {% for oseba in rezervacija.osebe.all %}
+                    <a href="{% url 'urnik_osebe' oseba.pk %}">{{ oseba }}</a>,
+                  {% endfor %}
                   {{ rezervacija.opomba }}
                 </small>
                 {% if user.is_staff and not rezervacija.potrjena and rezervacija.konflikti %}

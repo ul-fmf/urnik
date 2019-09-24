@@ -14,6 +14,9 @@
         <td>
           <ul>
             <li><a href="{% url 'kombiniran_pogled_form' semester_id=izbrani_semester_id %}"><i class="material-icons left">schedule</i>Kombiniran pogled</a></li>
+            {% if user.is_authenticated and user.oseba %}
+              <li><a href="{% url 'urnik_osebe' oseba_id=user.oseba.pk semester_id=izbrani_semester_id %}"><i class="material-icons left">person</i> Moj urnik</a></li>
+            {% endif %}
             {% if not ogled_starega_semestra %}
             <li><a href="{% url 'rezervacije' %}"><i class="material-icons left">border_color</i>Rezervacije učilnic</a></li>
             <li><a href="{% url 'proste' semester_id=izbrani_semester_id %}"><i class="material-icons left">event_available</i>Proste učilnice</a></li>

@@ -97,6 +97,9 @@
 <ul class="sidenav" id="side-menu"> <!-- side navigation -->
   <li><a href="{% url 'zacetna_stran' semester_id=izbrani_semester_id %}"><i class="material-icons left">home</i>Domov</a></li>
   <li><a href="{% url 'kombiniran_pogled_form' semester_id=izbrani_semester_id %}"><i class="material-icons left">schedule</i>Kombiniran pogled</a></li>
+  {% if user.is_authenticated and user.oseba %}
+    <li><a href="{% url 'urnik_osebe' user.oseba.pk %}"><i class="material-icons left">person</i> Moj urnik</a></li>
+  {% endif %}
   {% if not ogled_starega_semestra %}
   <li><a href="{% url 'rezervacije' %}"><i class="material-icons left">border_color</i>Rezervacije učilnic</a></li>
   <li><a href="{% url 'proste' semester_id=izbrani_semester_id %}"><i class="material-icons left">event_available</i>Proste učilnice</a></li>
@@ -135,6 +138,9 @@
     var search_urls = {
         "Meni: Urnik": "{% url 'zacetna_stran' semester_id=izbrani_semester_id %}",
         "Meni: Kombiniran pogled": "{% url 'kombiniran_pogled_form' semester_id=izbrani_semester_id %}",
+    {% if user.is_authenticated and user.oseba %}
+        "Meni: Moj urnik": "{% url 'urnik_osebe' user.oseba.pk %}",
+    {% endif %}
     {% if not ogled_starega_semestra %}
         "Meni: Rezervacije učilnic": "{% url 'rezervacije' %}",
     {% if user.is_authenticated %}
