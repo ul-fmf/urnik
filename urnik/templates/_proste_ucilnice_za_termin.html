@@ -6,12 +6,12 @@
       {% for stanje, ucilnica, razlog in termin.prikazane_ucilnice %}
         <span class="ucilnica ucilnica-id-{{ ucilnica.pk }} ucilnica-stanje-{{ stanje }}">
           <span class="ucilnica-ime">
-            <a href="{% url 'urnik_ucilnice' ucilnica.pk %}">
+            <a href="{% url 'urnik_ucilnice' ucilnica_id=ucilnica.pk semester_id=izbrani_semester_id %}">
               {{ ucilnica.kratko_ime }}</a></span>{% if not forloop.last %},{% endif %}
           <span class="hover-area"></span>
           <span class="ucilnica-tooltip">
             {% if stanje == 'prosta' %}
-              <a href="{% url 'urnik_ucilnice' ucilnica.pk %}">Učilnica {{ ucilnica.oznaka }}</a>
+              <a href="{% url 'urnik_ucilnice' ucilnica_id=ucilnica.pk semester_id=izbrani_semester_id %}">Učilnica {{ ucilnica.oznaka }}</a>
               je prosta v {{ termin.dan|dan_tozilnik }} ob {{ termin.ura }}ih.
               {% if user.is_authenticated %}
                 <a href="{% url 'nova_rezervacija_za_ucilnico' ucilnica.pk termin.ura teden|date:"Y-m-d"|default:"-" termin.dan %}"
@@ -19,21 +19,21 @@
                 Rezerviraj <i class="material-icons">open_in_new</i></a>
               {% endif %}
             {% elif stanje == 'rezervirana' %}
-              <a href="{% url 'urnik_ucilnice' ucilnica.pk %}">Učilnico {{ ucilnica.oznaka }}</a>
+              <a href="{% url 'urnik_ucilnice' ucilnica_id=ucilnica.pk semester_id=izbrani_semester_id %}">Učilnico {{ ucilnica.oznaka }}</a>
               je od {{ razlog.od }}ih do {{ razlog.do }}ih rezervirala oseba
               {% if razlog.osebe.all.0 %}
-                <a href="{% url 'urnik_osebe' razlog.osebe.all.0.pk %}">{{ razlog.osebe.all.0 }}</a>
+                <a href="{% url 'urnik_osebe' oseba_id=razlog.osebe.all.0.pk semester_id=izbrani_semester_id %}">{{ razlog.osebe.all.0 }}</a>
               {% else %}
                 neznan
               {% endif %}
               z razlogom: &quot;{{ razlog.opomba|default:"neznan" }}&quot;.
             {% elif stanje == 'zasedena' %}
-              <a href="{% url 'urnik_ucilnice' ucilnica.pk %}">Učilnica {{ ucilnica.oznaka }}</a>
+              <a href="{% url 'urnik_ucilnice' ucilnica_id=ucilnica.pk semester_id=izbrani_semester_id %}">Učilnica {{ ucilnica.oznaka }}</a>
               je zasedena ob {{ razlog.dan | dan_tozilnik_mnozina }} ob {{ razlog.ura }}ih
-              saj tam poteka predmet <a href="{% url 'urnik_predmeta' razlog.predmet.pk %}">
+              saj tam poteka predmet <a href="{% url 'urnik_predmeta' predmet_id=razlog.predmet.pk semester_id=izbrani_semester_id %}">
               {{ razlog.predmet }}</a>, ki ga izvaja
               {% if razlog.ucitelji.all.0 %}
-                <a href="{% url 'urnik_osebe' razlog.ucitelji.all.0.pk %}">{{ razlog.ucitelji.all.0 }}</a>.
+                <a href="{% url 'urnik_osebe' oseba_id=razlog.ucitelji.all.0.pk semester_id=izbrani_semester_id %}">{{ razlog.ucitelji.all.0 }}</a>.
               {% else %}
                 neznana oseba.
               {% endif %}

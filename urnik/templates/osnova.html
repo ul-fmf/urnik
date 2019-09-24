@@ -24,10 +24,10 @@
 
 <body>
 <div class="navbar-fixed">
-  <nav>
+  <nav class="{{ ogled_starega_semestra|yesno:"old-semester,current-semester" }}">
     <div class="nav-wrapper">
       <a href="#!" class="brand-logo center" id="urnik-logo"> <!-- top centred logo: absolute -->
-        <i class="large material-icons hide-on-med-and-down">{% if ogled_starega_semestra %}history{% else %}schedule{% endif %}</i>
+        <i class="large material-icons hide-on-med-and-down">{{ ogled_starega_semestra|yesno:"history,schedule" }}</i>
         {{ naslov|default:izbrani_semester.ime }}
         {% if ogled_starega_semestra and naslov %}
         <small>
@@ -95,19 +95,21 @@
   </nav>
 </div> <!-- navbar fixed -->
 <ul class="sidenav" id="side-menu"> <!-- side navigation -->
-  <li><a href="{% url 'zacetna_stran' %}"><i class="material-icons left">home</i>Domov</a></li>
-  <li><a href="{% url 'kombiniran_pogled_form' %}"><i class="material-icons left">schedule</i>Kombiniran pogled</a></li>
+  <li><a href="{% url 'zacetna_stran' semester_id=izbrani_semester_id %}"><i class="material-icons left">home</i>Domov</a></li>
+  <li><a href="{% url 'kombiniran_pogled_form' semester_id=izbrani_semester_id %}"><i class="material-icons left">schedule</i>Kombiniran pogled</a></li>
+  {% if not ogled_starega_semestra %}
   <li><a href="{% url 'rezervacije' %}"><i class="material-icons left">border_color</i>Rezervacije učilnic</a></li>
-  <li><a href="{% url 'proste' %}"><i class="material-icons left">event_available</i>Proste učilnice</a></li>
+  <li><a href="{% url 'proste' semester_id=izbrani_semester_id %}"><i class="material-icons left">event_available</i>Proste učilnice</a></li>
   {% if user.is_authenticated %}
     <li><a href="{% url 'nova_rezervacija' %}"><i class="material-icons left">assignment</i>Nova rezervacija</a></li>
   {% endif %}
   {% if user.is_staff %}
     <li><a href="{% url 'preglej_rezervacije' %}"><i class="material-icons left">visibility</i>Preglej nove rezervacije</a></li>
   {% endif %}
+  {% endif %}
   <li><a href="javascript:window.print();"><i class="material-icons left">print</i>Natisni stran</a></li>
   {% if user.is_staff %}
-    <li><a href="{% url 'printall' %}"><span class="tripple-icon side-icon">
+    <li><a href="{% url 'printall' semester_id=izbrani_semester_id %}"><span class="tripple-icon side-icon">
       <i class="material-icons">print</i>
       <i class="material-icons">print</i>
       <i class="material-icons">print</i>
@@ -117,6 +119,12 @@
   <li><a href="{% url 'bugreport' %}"><i class="material-icons left">bug_report</i>Prijava napake</a></li>
   <li><a href="{% url 'help' %}"><i class="material-icons left">help</i>Navodila in pomoč</a></li>
 </ul> <!-- side nav -->
+{% if ogled_starega_semestra %}
+  <div id="old-semester-note" class="card">
+    Gledate pretekel semester. <a href="{% url 'zacetna_stran' %}">Nazaj na trenutni semester.</a>
+    <i class="material-icons close-icon" onclick="$(this.parentNode).fadeOut(200);">close</i>
+  </div>
+{% endif %}
 
 {% block content %}{% endblock content %}
 
@@ -125,28 +133,32 @@
 <script>
     M.AutoInit();
     var search_urls = {
-        "Meni: Urnik": "{% url 'zacetna_stran' %}",
-        "Meni: Kombiniran pogled": "{% url 'kombiniran_pogled_form' %}",
+        "Meni: Urnik": "{% url 'zacetna_stran' semester_id=izbrani_semester_id %}",
+        "Meni: Kombiniran pogled": "{% url 'kombiniran_pogled_form' semester_id=izbrani_semester_id %}",
+    {% if not ogled_starega_semestra %}
         "Meni: Rezervacije učilnic": "{% url 'rezervacije' %}",
     {% if user.is_authenticated %}
         "Meni: Nova rezervacija": "{% url 'nova_rezervacija' %}",
     {% endif %}
     {% if user.is_staff %}
         "Meni: Preglej nove rezervacije": "{% url 'preglej_rezervacije' %}",
-        "Meni: Natisni vse": "{% url 'printall' %}",
     {% endif %}
-        "Meni: Proste učilnice": "{% url 'proste' %}",
+    {% endif %}
+    {% if user.is_staff %}
+        "Meni: Natisni vse": "{% url 'printall' semester_id=izbrani_semester_id %}",
+    {% endif %}
+        "Meni: Proste učilnice": "{% url 'proste' semester_id=izbrani_semester_id %}",
         "Meni: Natisni stran": "javascript:window.print();",
         "Meni: Ogled starejših urnikov": "{% url 'izbira_semestra' %}",
         "Meni: Prijava napake": "{% url 'bugreport' %}",
         "Meni: Navodila in pomoč": "{% url 'help' %}",
 
         {% for letnik in letniki_search %}
-            "{{ letnik }} ({{letnik.kratica}})": "{% url 'urnik_letnika' letnik.id %}",{% endfor %}
+            "{{ letnik }} ({{letnik.kratica}})": "{% url 'urnik_letnika' letnik_id=letnik.id semester_id=izbrani_semester_id %}",{% endfor %}
         {% for oseba in osebe_search %}
-            "{{ oseba.ime }} {{ oseba.priimek }}": "{% url 'urnik_osebe' oseba.id %}",{%  endfor %}
+            "{{ oseba.ime }} {{ oseba.priimek }}": "{% url 'urnik_osebe' oseba_id=oseba.id semester_id=izbrani_semester_id %}",{%  endfor %}
         {% for ucilnica in ucilnice_search %}
-            "Učilnica {{ ucilnica.oznaka }}": "{% url 'urnik_ucilnice' ucilnica.id %}",{% endfor %}
+            "Učilnica {{ ucilnica.oznaka }}": "{% url 'urnik_ucilnice' ucilnica_id=ucilnica.id semester_id=izbrani_semester_id %}",{% endfor %}
     };
 
     $(document).ready(function () {

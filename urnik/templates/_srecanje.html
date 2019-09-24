@@ -6,7 +6,7 @@
 {#    <div class="info-box"><i class="material-icons">info_outline</i></div> #}
     <span class="predmet">
       {% if srecanje.predmet %}
-        <a href="{% url 'urnik_predmeta' srecanje.predmet.id %}">
+        <a href="{% url 'urnik_predmeta' predmet_id=srecanje.predmet.id semester_id=izbrani_semester_id %}">
           {% if nacin == 'ogled' %}{{ srecanje.po_potrebi_okrajsano_ime_predmeta }}{% else %}{{ srecanje.predmet.kratica }}{% endif %}
         </a>
       {% endif %}
@@ -18,7 +18,7 @@
     {% if srecanje.trajanje > 1 %}
     <span class="letniki">
       {% for letnik in srecanje.predmet.letniki.all %}
-        <a href="{% url 'urnik_letnika' letnik.id %}">{{ letnik.kratica }}</a>{% if not forloop.last %}, {% endif %}
+        <a href="{% url 'urnik_letnika' letnik_id=letnik.id semester_id=izbrani_semester_id %}">{{ letnik.kratica }}</a>{% if not forloop.last %}, {% endif %}
       {% endfor %}
     </span>
     {% endif %}
@@ -26,13 +26,13 @@
 
   <div class="ucitelj">
     {% for ucitelj in srecanje.ucitelji.all %}
-      <a href="{% url 'urnik_osebe' ucitelj.id %}">{{ ucitelj.priimek }}</a>{% if not forloop.last %}, {% endif %}
+      <a href="{% url 'urnik_osebe' oseba_id=ucitelj.id semester_id=izbrani_semester_id %}">{{ ucitelj.priimek }}</a>{% if not forloop.last %}, {% endif %}
     {% endfor %}
   </div>
 
   {% if srecanje.ucilnica %}
     <div class="ucilnica">
-      <a href="{% url 'urnik_ucilnice' srecanje.ucilnica.id %}">{{ srecanje.ucilnica.kratko_ime }}</a>
+      <a href="{% url 'urnik_ucilnice' ucilnica_id=srecanje.ucilnica.id semester_id=izbrani_semester_id %}">{{ srecanje.ucilnica.kratko_ime }}</a>
     </div>
   {% endif %}
 

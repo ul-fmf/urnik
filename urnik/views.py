@@ -10,11 +10,13 @@ from urnik.iskanik_konfliktov import ProsteUcilnice, IskalnikKonfliktov
 from urnik.utils import teden_dneva
 from .models import *
 
+def izbrani_semester_id(request):
+    return request.resolver_match.kwargs.get('semester_id', None)
 
 def izbrani_semester(request):
     if request.session.get('urejanje', False):
         return Semester.objects.latest('od')
-    semester_id = request.session.get('semester_id')
+    semester_id = izbrani_semester_id(request)
     if semester_id:
         try:
             return Semester.objects.get(pk=semester_id)
@@ -24,19 +26,11 @@ def izbrani_semester(request):
 
 def ogled_starega_semestra(request):
     urejanje = request.session.get('urejanje', False)
-    semester_id = request.session.get('semester_id')
-    return not urejanje and semester_id is not None
+    semester_id = izbrani_semester_id(request)
+    return not urejanje and semester_id is not None and \
+        Semester.objects.filter(objavljen=True).latest('od').pk != semester_id
 
-def izberi_semester(request, semester_id=None):
-    if semester_id:
-        semester_id = get_object_or_404(Semester, id=semester_id)
-        request.session['semester_id'] = semester_id.id
-    else:
-        if 'semester_id' in request.session:
-            del request.session['semester_id']
-    return redirect(reverse('zacetna_stran'))
-
-def zacetna_stran(request):
+def zacetna_stran(request, semester_id=None):
     ucilnice = Ucilnica.objects.objavljene()
     return render(request, 'zacetna_stran.html', {
         'stolpci_smeri': [
@@ -54,7 +48,7 @@ def izbira_semestra(request):
     })
 
 
-def kombiniran_pogled_form(request):
+def kombiniran_pogled_form(request, semester_id=None):
     osebe = sorted(Oseba.objects.aktivni(), key=lambda oseba: oseba.vrstni_red())
     columns = 3
     length = len(osebe)
@@ -212,31 +206,31 @@ def urnik(request, srecanja, naslov, barve=None):
         })
 
 
-def urnik_osebe(request, oseba_id):
+def urnik_osebe(request, oseba_id, semester_id=None):
     oseba = get_object_or_404(Oseba, id=oseba_id)
     naslov = str(oseba)
     return urnik(request, oseba.vsa_srecanja(izbrani_semester(request)), naslov)
 
 
-def urnik_letnika(request, letnik_id):
+def urnik_letnika(request, letnik_id, semester_id=None):
     letnik = get_object_or_404(Letnik, id=letnik_id)
     naslov = str(letnik)
     return urnik(request, letnik.srecanja(izbrani_semester(request)).all(), naslov)
 
 
-def urnik_ucilnice(request, ucilnica_id):
+def urnik_ucilnice(request, ucilnica_id, semester_id=None):
     ucilnica = get_object_or_404(Ucilnica, id=ucilnica_id)
     naslov = 'Učilnica {}'.format(ucilnica.oznaka)
     return urnik(request, ucilnica.srecanja.filter(semester=izbrani_semester(request)), naslov, barve=[])
 
 
-def urnik_predmeta(request, predmet_id):
+def urnik_predmeta(request, predmet_id, semester_id=None):
     predmet = get_object_or_404(Predmet, id=predmet_id)
     naslov = str(predmet)
     return urnik(request, predmet.srecanja.filter(semester=izbrani_semester(request)), naslov)
 
 
-def kombiniran_pogled(request):
+def kombiniran_pogled(request, semester_id=None):
     letniki = Letnik.objects.filter(id__in=request.GET.getlist('letnik'))
     osebe = Oseba.objects.filter(id__in=request.GET.getlist('oseba'))
     ucilnice = Ucilnica.objects.filter(id__in=request.GET.getlist('ucilnica'))
@@ -249,7 +243,7 @@ def kombiniran_pogled(request):
     return urnik(request, srecanja, 'Kombiniran pogled', barve=list(letniki) + list(osebe) + list(ucilnice))
 
 
-def proste_ucilnice(request):
+def proste_ucilnice(request, semester_id=None):
     teden = request.GET.get('teden', None)
     try:
         teden = parse_date(teden)
@@ -315,13 +309,13 @@ def proste_ucilnice(request):
 
 
 @require_POST
-def proste_ucilnice_filter(request):
+def proste_ucilnice_filter(request, semester_id=None):
     tipi = [k for k in Ucilnica.OBJAVLJENI_TIPI if request.POST.get(k, '') == 'on']
     velikosti = [k for k, v in UcilnicaQuerySet.VELIKOST if request.POST.get(k, '') == 'on']
     q = QueryDict(request.POST.get('qstring', ''), mutable=True)
     q.setlist('tip', tipi)
     q.setlist('velikost', velikosti)
-    response = redirect('proste')
+    response = redirect(reverse('proste', kwargs={'semester_id': semester_id}))
     response['Location'] += "?" + q.urlencode()
     return response
 
@@ -389,7 +383,7 @@ def help_page(request):
     })
 
 
-def print_all(request):
+def print_all(request, semester_id=None):
     return render(request, 'print_all.html', {
         'naslov': 'Množično tiskanje',
         'oddelki': Letnik.ODDELEK,
@@ -397,13 +391,13 @@ def print_all(request):
     })
 
 
-def print_all_ucilnice(request, oddelek):
+def print_all_ucilnice(request, oddelek, semester_id=None):
     return render(request, 'print_all_list.html', {
-        'links': [reverse('urnik_ucilnice', args=[u.id]) for u in Ucilnica.objects.filter(tip=oddelek)]
+        'links': [reverse('urnik_ucilnice', kwargs={'ucilnica_id': u.id, 'semester_id': semester_id}) for u in Ucilnica.objects.filter(tip=oddelek)]
     })
 
 
-def print_all_smeri(request, oddelek):
+def print_all_smeri(request, oddelek, semester_id=None):
     return render(request, 'print_all_list.html', {
-        'links': [reverse('urnik_letnika', args=[l.id]) for l in Letnik.objects.filter(oddelek=oddelek)]
+        'links': [reverse('urnik_letnika', kwargs={'letnik_id': l.id, 'semester_id': semester_id}) for l in Letnik.objects.filter(oddelek=oddelek)]
     })

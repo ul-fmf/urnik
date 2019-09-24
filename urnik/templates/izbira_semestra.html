@@ -2,19 +2,17 @@
 {% load tags %}
 {% block content %}
 <div class="container">
-
-<p class="flow-text">
-  Izberite semester, za katerega si želite ogledati urnike:
-  <ul>
-    {% for semester in semestri %}
-    <li>
-      {% if forloop.counter == semestri|length %}
-      <a href="{% url 'izberi_trenutni_semester' %}">{{ semester }}</a> – trenutni semester
+  <p class="flow-text">Izberite semester, za katerega si želite ogledati urnike:</p>
+  <ul class="collection">
+    {% for semester in semestri.reverse %}
+    <li class="collection-item">
+      {% if forloop.first %}
+      <a href="{% url 'zacetna_stran' %}">{{ semester }}</a> &ndash; trenutni semester
       {% else %}
-      <a href="{% url 'izberi_semester' semester.pk %}">{{ semester }}</a>
+      <a href="{% url 'zacetna_stran' semester.pk %}">{{ semester }}</a>
       {% endif %}
     </li>
     {% endfor %}
   </ul>
-</p>
+</div>
 {% endblock content %}

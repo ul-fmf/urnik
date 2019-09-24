@@ -20,7 +20,7 @@
         <tr>
           <td>{{ moznost.1 }}</td>
           {% for oddelek in oddelki %}
-            <td><a href="{% url moznost.0 oddelek.0 %}" target="_blank">
+            <td><a href="{% url moznost.0 oddelek=oddelek.0 semester_id=izbrani_semester_id %}" target="_blank">
               <span class="tripple-icon left">
                 <i class="material-icons">print</i>
                 <i class="material-icons">print</i>

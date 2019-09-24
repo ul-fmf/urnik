@@ -1,7 +1,7 @@
 {% extends 'osnova.html' %}
 {% block content %}
 
-<form action="{% url 'kombiniran_pogled' %}" id="kombiniran-pogled-form">
+<form action="{% url 'kombiniran_pogled' semester_id=izbrani_semester_id %}" id="kombiniran-pogled-form">
 <div class="container">
 <div class="row">
   <div class="col m12">

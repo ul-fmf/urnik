@@ -50,7 +50,7 @@
   </div>
 
   <div class="card">
-    <form action="{% url 'proste_filter' %}" method="post">{% csrf_token %}
+    <form action="{% url 'proste_filter' semester_id=izbrani_semester_id %}" method="post">{% csrf_token %}
       <input type="hidden" name="qstring" value="{{ request.GET.urlencode }}">
       <div class="card-content">
         <span class="card-title">Omejite učilnice</span>
