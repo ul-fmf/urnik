@@ -590,7 +590,8 @@ class Rezervacija(models.Model):
 class RezervacijeModelMultipleChoiceField(ModelMultipleChoiceField):
     def __init__(self, *args, **kwargs):
         ModelMultipleChoiceField.__init__(self, *args, **kwargs)
-        self.choices = [self.iterator(self).choice(obj) for obj in sorted(self.queryset)]
+        it = self.iterator(self)
+        self.choices = [it.choice(obj) for obj in sorted(self.queryset)]
 
 
 class OsebeModelMultipleChoiceField(RezervacijeModelMultipleChoiceField):
