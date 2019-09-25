@@ -1,4 +1,5 @@
 import datetime
+import icu
 from collections import defaultdict
 from copy import deepcopy
 
@@ -17,6 +18,8 @@ ENOTA_VISINE = 1 / (MAX_URA - MIN_URA)
 DNEVI = ('ponedeljek', 'torek', 'sreda', 'četrtek', 'petek')
 ENOTA_SIRINE = 1 / len(DNEVI)
 DAYS_IN_WEEK = 7
+
+collator = icu.Collator.createInstance(icu.Locale(settings.LANGUAGE_CODE))
 
 
 class OsebaQuerySet(models.QuerySet):
@@ -54,8 +57,14 @@ class Oseba(models.Model):
         else:
             return self.priimek
 
+    def __lt__(self, other):
+        return self.vrstni_red() < other.vrstni_red()
+
     def vrstni_red(self):
-        return self.priimek.replace('Č', 'Cz').replace('Š', 'Sz').replace('Ž', 'Zz')
+        if self.ime:
+            return (collator.getSortKey(self.priimek), collator.getSortKey(self.ime))
+        else:
+            return (collator.getSortKey(self.priimek), )
 
     def vsa_srecanja(self, semester):
         return (self.srecanja.filter(semester=semester) | semester.srecanja.filter(predmet__slusatelji=self)).distinct()
@@ -166,12 +175,15 @@ class Ucilnica(models.Model):
         return self.oznaka
 
     def __lt__(self, other):
-        return self.oznaka < other.oznaka
+        return self.vrstni_red() < other.vrstni_red()
 
     def kratko_ime(self):
         if self.kratka_oznaka:
             return self.kratka_oznaka
         return self.oznaka
+
+    def vrstni_red(self):
+        return collator.getSortKey(self.oznaka)
 
 
 class Predmet(models.Model):
@@ -324,7 +336,7 @@ class TerminUrejanje(Termin):
             ucilnica = deepcopy(ucilnica)
             ucilnica.ustreznost = 'ustrezna'
             self.ucilnice.append(ucilnica)
-        self.ucilnice.sort(key=lambda ucilnica:ucilnica.oznaka)
+        self.ucilnice.sort()
 
         def prosta(zasedenost_ucilnic, ucilnica, dan, ura):
             return ucilnica not in zasedenost_ucilnic.get((dan, ura), [])
@@ -523,9 +535,9 @@ class RezervacijaQuerySet(models.QuerySet):
 
 
 class Rezervacija(models.Model):
-    ucilnice = models.ManyToManyField('urnik.Ucilnica', blank=False, help_text='Izberite učilnice, ki jih želite rezervirati',
+    ucilnice = models.ManyToManyField('urnik.Ucilnica', blank=False,
                                       limit_choices_to={'tip__in': Ucilnica.OBJAVLJENI_TIPI}, verbose_name='Učilnice')
-    osebe = models.ManyToManyField('urnik.Oseba', verbose_name='Osebe', help_text='Osebe, ki si lastijo to rezervacijo')
+    osebe = models.ManyToManyField('urnik.Oseba', verbose_name='Osebe')
     dan = models.DateField(verbose_name='Dan začetka', blank=False, null=False, help_text='Za kateri dan želite rezervirati')
     dan_konca = models.DateField(blank=True, null=True, verbose_name='Dan konca', help_text='Dan konca rezervacije; izpolnite le, če je drugačen od začetka')
     MOZNE_URE = tuple((u, str(u)+":00") for u in range(MIN_URA, MAX_URA+1))
@@ -576,22 +588,36 @@ class Rezervacija(models.Model):
 
 
 class RezervacijeModelMultipleChoiceField(ModelMultipleChoiceField):
+    def __init__(self, *args, **kwargs):
+        ModelMultipleChoiceField.__init__(self, *args, **kwargs)
+        self.choices = [self.iterator(self).choice(obj) for obj in sorted(self.queryset)]
+
+
+class OsebeModelMultipleChoiceField(RezervacijeModelMultipleChoiceField):
     def label_from_instance(self, obj):
         return obj.priimek_ime
+
+
+class UcilniceModelMultipleChoiceField(RezervacijeModelMultipleChoiceField):
+    def label_from_instance(self, obj):
+        return obj.oznaka
 
 
 class RezevacijeForm(ModelForm):
 
     PREKRIVANJA = 'prekrivanja'
 
-    osebe = RezervacijeModelMultipleChoiceField(queryset=Oseba.objects.all())
+    osebe = OsebeModelMultipleChoiceField(queryset=Oseba.objects.all(),
+                                          help_text='Osebe, ki si lastijo to rezervacijo')
+    ucilnice = UcilniceModelMultipleChoiceField(queryset=Ucilnica.objects.objavljene(),
+                                                help_text='Izberite učilnice, ki jih želite rezervirati',
+                                                widget=CheckboxSelectMultiple())
     use_required_attribute = False
 
     class Meta:
         model = Rezervacija
         fields = ['ucilnice', 'osebe', 'dan', 'dan_konca', 'od', 'do', 'opomba']
         widgets = {
-            'ucilnice': CheckboxSelectMultiple(),
             'dan': DateInput(attrs={'placeholder': 'npr. 15. 1. 2019', 'class': 'datepicker'}),
             'dan_konca': DateInput(attrs={'placeholder': 'ponavadi prazno, lahko tudi npr. 17. 1. 2019', 'class': 'datepicker'}),
             'opomba': TextInput(attrs={'placeholder': 'npr. izpit Analiza 1 FIN'}),

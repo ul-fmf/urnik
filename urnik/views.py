@@ -37,7 +37,7 @@ def zacetna_stran(request, semester_id=None):
             Letnik.objects.filter(oddelek=Letnik.MATEMATIKA),
             Letnik.objects.filter(oddelek=Letnik.FIZIKA),
         ],
-        'ucilnice': ucilnice,
+        'ucilnice': sorted(ucilnice),
     })
 
 def izbira_semestra(request):
@@ -49,7 +49,7 @@ def izbira_semestra(request):
 
 
 def kombiniran_pogled_form(request, semester_id=None):
-    osebe = sorted(Oseba.objects.aktivni(), key=lambda oseba: oseba.vrstni_red())
+    osebe = sorted(Oseba.objects.aktivni())
     columns = 3
     length = len(osebe)
     per_column = length // columns
@@ -60,7 +60,7 @@ def kombiniran_pogled_form(request, semester_id=None):
             Letnik.objects.filter(oddelek=Letnik.FIZIKA),
         ],
         'osebe': [osebe[i*per_column:(i+1)*per_column] for i in range(columns)],
-        'ucilnice': ucilnice,
+        'ucilnice': sorted(ucilnice),
         'naslov': 'Kombiniran pogled',
     })
 
@@ -93,7 +93,7 @@ def rezervacije(request):
                 })
                 if racunaj_konflikte:
                     rezervacije[-1]['konflikti'] = iskalnik.konflikti(ucilnica, dan, rezervacija.od, rezervacija.do, ignore=rezervacija)
-    rezervacije.sort(key=lambda r: (r['dan'], r['ucilnica'].oznaka, r['od']))
+    rezervacije.sort(key=lambda r: (r['dan'], r['ucilnica'], r['od']))
     return render(request, 'rezervacije.html', {
         'naslov': 'Rezervacije učilnic',
         'rezervacije': rezervacije,
@@ -304,7 +304,6 @@ def proste_ucilnice(request, semester_id=None):
         'mozne_velikosti_ucilnic': UcilnicaQuerySet.VELIKOST,
         'mozni_tipi_ucilnic': [u for u in Ucilnica.TIP if u[0] in Ucilnica.OBJAVLJENI_TIPI],
         'mozni_tedni': sorted(mozni_tedni),
-        'ustrezne_ucilnice': list(ucilnice),
     })
 
 
