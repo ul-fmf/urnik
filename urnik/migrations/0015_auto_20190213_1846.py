@@ -21,13 +21,7 @@ def forward(apps, schema_editor):
     except: fiz = default
 
     Rezervacija = apps.get_model('urnik', 'Rezervacija')
-
-    reservations = Rezervacija.objects.all()
-    # Sqlite crashes with to many variables
-    if settings.DATABASES['default']['ENGINE'] != 'django.db.backends.sqlite3':
-        reservations = reservations.prefetch_related('ucilnice')
-
-    for r in reservations:
+    for r in Rezervacija.objects.all():
         if any(u.tip in "MR" for u in r.ucilnice.all()):
             r.avtor_rezervacije = mat
         elif any(u.tip in "FP" for u in r.ucilnice.all()):
