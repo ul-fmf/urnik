@@ -1,0 +1,2 @@
+-r common.txt
+django-silk==3.0.1
