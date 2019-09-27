@@ -5,8 +5,8 @@ from . import views
 def search_data(request):
     return {
         'letniki_search': Letnik.objects.filter(oddelek__in=[Letnik.FIZIKA, Letnik.MATEMATIKA]),
-        'osebe_search': sorted(Oseba.objects.aktivni(), key=lambda oseba: oseba.vrstni_red()),
-        'ucilnice_search': Ucilnica.objects.objavljene(),
+        'osebe_search': sorted(Oseba.objects.aktivni()),
+        'ucilnice_search': sorted(Ucilnica.objects.objavljene()),
     }
 
 def izbrani_semester(request):
