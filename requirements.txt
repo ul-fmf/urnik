@@ -1,4 +1,4 @@
-Django==2.0.9
+Django==2.2.10
 django-silk==3.0.1
 django-auth-ldap==1.7.0
 Fabric3==1.14.post1
