@@ -234,13 +234,15 @@ def kombiniran_pogled(request, semester_id=None):
     letniki = Letnik.objects.filter(id__in=request.GET.getlist('letnik'))
     osebe = Oseba.objects.filter(id__in=request.GET.getlist('oseba'))
     ucilnice = Ucilnica.objects.filter(id__in=request.GET.getlist('ucilnica'))
+    predmeti = Predmet.objects.filter(id__in=request.GET.getlist('predmet'))
     srecanja_letnikov = izbrani_semester(request).srecanja.filter(predmet__letniki__in=letniki)
     srecanja_uciteljev = izbrani_semester(request).srecanja.filter(ucitelji__in=osebe)
     srecanja_slusateljev = izbrani_semester(request).srecanja.filter(predmet__slusatelji__in=osebe)
     srecanja_ucilnic = izbrani_semester(request).srecanja.filter(ucilnica__in=ucilnice)
+    srecanja_predmetov = izbrani_semester(request).srecanja.filter(predmet__in=predmeti)
     srecanja = (srecanja_letnikov | srecanja_uciteljev |
-                srecanja_slusateljev | srecanja_ucilnic).distinct()
-    return urnik(request, srecanja, 'Kombiniran pogled', barve=list(letniki) + list(osebe) + list(ucilnice))
+                srecanja_slusateljev | srecanja_ucilnic | srecanja_predmetov).distinct()
+    return urnik(request, srecanja, 'Kombiniran pogled', barve=list(letniki) + list(osebe) + list(ucilnice) + list(predmeti))
 
 
 def proste_ucilnice(request, semester_id=None):
