@@ -265,7 +265,7 @@ def proste_ucilnice(request, semester_id=None):
     except:
         teden = None
 
-    pokazi_zasedene = bool(request.GET.get('pz', False))
+    pokazi_zasedene = int(request.GET.get('pz', 0))
 
     ucilnice = request.GET.getlist('ucilnica')
     if ucilnice:
