@@ -137,7 +137,11 @@ def nova_rezervacija(request, ucilnica_id=None, ura=None, teden=None, dan_v_tedn
                 form.fields['dan'].initial = teden.strftime('%d. %m. %Y').lstrip('0').replace('. 0', '. ')
             except: pass
 
-    return render(request, 'nova_rezervacija.html', {'form': form, 'delno_izpolnjena': ucilnica_id is not None})
+    return render(request, 'nova_rezervacija.html', {
+        'naslov': 'Nova rezervacija',
+        'form': form,
+        'delno_izpolnjena': ucilnica_id is not None,
+    })
 
 
 @staff_member_required
@@ -153,7 +157,11 @@ def preglej_rezervacije(request):
     data = [{'rezervacija': r, 'konflikti': list(iskalnik.konflikti_z_rezervacijo(r))} for r in rezervacije]
     for x in data:
         x['st_konfliktov'] = sum(k.st_konfliktov for _, _, k in x['konflikti'])
-    return render(request, 'preglej_rezervacije.html', {'entries': data, 'filter': rezervacije_filter})
+    return render(request, 'preglej_rezervacije.html', {
+        'naslov': 'Pregled revervacij',
+        'entries': data,
+        'filter': rezervacije_filter
+    })
 
 
 @require_POST
