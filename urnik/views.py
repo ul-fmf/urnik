@@ -21,7 +21,10 @@ def izbrani_semester(request):
             return Semester.objects.get(pk=semester_id)
         except:
             pass
-    return Semester.objects.filter(objavljen=True).latest('od')
+    try:
+        return Semester.objects.filter(objavljen=True).latest('od')
+    except Semester.DoesNotExist:
+        raise ValueError("Za uporabo aplikacije dodajte v bazo vsaj en objavljen semester.")
 
 def ogled_starega_semestra(request):
     urejanje = request.session.get('urejanje', False)
