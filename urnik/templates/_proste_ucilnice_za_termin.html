@@ -29,7 +29,7 @@
               z razlogom: &quot;{{ razlog.opomba|default:"neznan" }}&quot;.
             {% elif stanje == 'zasedena' %}
               <a href="{% url 'urnik_ucilnice' ucilnica_id=ucilnica.pk semester_id=izbrani_semester_id %}">Učilnica {{ ucilnica.oznaka }}</a>
-              je zasedena ob {{ razlog.dan | dan_tozilnik_mnozina }} ob {{ razlog.ura }}ih
+              je zasedena ob {{ razlog.dan | dan_tozilnik_mnozina }} ob {{ razlog.ura }}ih,
               saj tam poteka predmet <a href="{% url 'urnik_predmeta' predmet_id=razlog.predmet.pk semester_id=izbrani_semester_id %}">
               {{ razlog.predmet }}</a>, ki ga izvaja
               {% if razlog.ucitelji.all.0 %}
