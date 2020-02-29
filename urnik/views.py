@@ -289,7 +289,7 @@ def proste_ucilnice(request, semester_id=None):
         proste.upostevaj_rezervacije_za_teden(teden)
         # teh semestrov bi moralo biti 0 ali 1
         for semester in Semester.objects.v_obdobju(teden, teden + datetime.timedelta(days=5)):
-            proste.dodaj_srecanja_semestra(semester)
+            proste.dodaj_srecanja_semestra(semester, teden)
     else:
         proste.dodaj_srecanja_semestra(semester)
 

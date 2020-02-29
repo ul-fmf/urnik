@@ -42,11 +42,12 @@ class ProsteUcilnice(object):
         self.zasedenost_ucilnic = defaultdict(dict)
         self.rezerviranost_ucilnic = defaultdict(dict)
 
-    def dodaj_srecanja_semestra(self, semester):
+    def dodaj_srecanja_semestra(self, semester, teden=None):
         for srecanje in semester.srecanja.select_related('ucilnica', 'predmet').prefetch_related('ucitelji'
                                        ).filter(ucilnica__in=[u.pk for u in self.ucilnice]).exclude(ura__isnull=True):
-            for i in range(srecanje.trajanje):
-                self.zasedenost_ucilnic[srecanje.dan, srecanje.ura + i][srecanje.ucilnica] = srecanje
+            if teden and semester.od <= teden + datetime.timedelta(days=srecanje.dan-1) <= semester.do:
+                for i in range(srecanje.trajanje):
+                    self.zasedenost_ucilnic[srecanje.dan, srecanje.ura + i][srecanje.ucilnica] = srecanje
 
     def upostevaj_rezervacije_za_teden(self, teden):
         self.upostevaj_rezervacije(Rezervacija.objects.v_tednu(teden))
