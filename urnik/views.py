@@ -1,5 +1,6 @@
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 from django.http import QueryDict
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -146,8 +147,10 @@ def nova_rezervacija(request, ucilnica_id=None, ura=None, teden=None, dan_v_tedn
     })
 
 
-@staff_member_required
+@login_required
 def preglej_rezervacije(request):
+    if not request.user.is_staff:
+        redirect('preglej_rezervacije_oseba', args=(request.user.pk,))
     rezervacije = Rezervacija.objects.prihajajoce()
     rezervacije_filter = request.GET.get('filter', 'nepotrjene')
     if rezervacije_filter != 'all':
@@ -160,9 +163,26 @@ def preglej_rezervacije(request):
     for x in data:
         x['st_konfliktov'] = sum(k.st_konfliktov for _, _, k in x['konflikti'])
     return render(request, 'preglej_rezervacije.html', {
-        'naslov': 'Pregled revervacij',
+        'naslov': 'Pregled rezervacij',
         'entries': data,
         'filter': rezervacije_filter
+    })
+
+
+@login_required
+def preglej_rezervacije_oseba(request, oseba_id):
+    oseba = get_object_or_404(Oseba, pk=oseba_id)
+    rezervacije = Rezervacija.objects.prihajajoce().filter(osebe__in=(oseba,))
+    iskalnik = IskalnikKonfliktov.za_rezervacije(rezervacije)
+    data = [{'rezervacija': r, 'konflikti': list(iskalnik.konflikti_z_rezervacijo(r))} for r in rezervacije]
+    for x in data:
+        x['st_konfliktov'] = sum(k.st_konfliktov for _, _, k in x['konflikti'])
+
+    return render(request, 'moje_rezervacije.html', {
+        'naslov': 'Moje rezervacije',
+        'oseba': oseba,
+        'entries': data,
+        'has_manage_perms': hasattr(request.user, 'oseba') and request.user.oseba == oseba
     })
 
 
@@ -176,9 +196,12 @@ def potrdi_rezervacijo(request):
 
 
 @require_POST
-@staff_member_required
+@login_required
 def izbrisi_rezervacijo(request):
-    get_object_or_404(Rezervacija, pk=request.POST['r-pk']).delete()
+    rezervacija = get_object_or_404(Rezervacija, pk=request.POST['r-pk'])
+    if not request.user.is_staff and request.user not in rezervacija.osebe.all():
+        raise PermissionDenied
+    rezervacija.delete()
     return redirect(request.POST.get('redirect') or reverse('preglej_rezervacije'))
 
 

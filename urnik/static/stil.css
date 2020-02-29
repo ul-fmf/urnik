@@ -958,6 +958,11 @@ table.highlight tr th {
 }
 .cancel.btn {
     background-color: #c62828;
+    white-space: nowrap;
+}
+.cancel.btn i.left {
+    margin-left: -10px;
+    margin-right: 5px;
 }
 .cancel.btn:hover,
 .cancel.btn:active {
