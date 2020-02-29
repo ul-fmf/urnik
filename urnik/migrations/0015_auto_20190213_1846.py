@@ -6,10 +6,14 @@ import django.db.models.deletion
 
 
 def forward(apps, schema_editor):
-    # We can't import the Person model directly as it may be a newer
+    # We can't import the User model directly as it may be a newer
     # version than this migration expects. We use the historical version.
     User = apps.get_model('auth', 'User')
-    default = User.objects.earliest('pk')
+    try: default = User.objects.earliest('pk')
+    except User.DoesNotExist:
+        default = User.objects.create_user('migration', 'migration', 'migration')
+        default.is_active = False
+        default.save()
     try: mat = User.objects.get(username='vardjan')
     except: mat = default
 
