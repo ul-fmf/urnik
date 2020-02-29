@@ -7,7 +7,6 @@ from django.utils.dateparse import parse_date
 from django.views.decorators.http import require_POST
 
 from urnik.iskanik_konfliktov import ProsteUcilnice, IskalnikKonfliktov
-from urnik.utils import teden_dneva
 from .models import *
 
 def izbrani_semester_id(request):
