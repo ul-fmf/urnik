@@ -7,7 +7,6 @@ from django.utils.dateparse import parse_date
 from django.views.decorators.http import require_POST
 
 from urnik.iskanik_konfliktov import ProsteUcilnice, IskalnikKonfliktov
-from urnik.utils import teden_dneva
 from .models import *
 
 def izbrani_semester_id(request):
@@ -22,7 +21,10 @@ def izbrani_semester(request):
             return Semester.objects.get(pk=semester_id)
         except:
             pass
-    return Semester.objects.filter(objavljen=True).latest('od')
+    try:
+        return Semester.objects.filter(objavljen=True).latest('od')
+    except Semester.DoesNotExist:
+        raise ValueError("Za uporabo aplikacije dodajte v bazo vsaj en objavljen semester.")
 
 def ogled_starega_semestra(request):
     urejanje = request.session.get('urejanje', False)
@@ -137,7 +139,11 @@ def nova_rezervacija(request, ucilnica_id=None, ura=None, teden=None, dan_v_tedn
                 form.fields['dan'].initial = teden.strftime('%d. %m. %Y').lstrip('0').replace('. 0', '. ')
             except: pass
 
-    return render(request, 'nova_rezervacija.html', {'form': form, 'delno_izpolnjena': ucilnica_id is not None})
+    return render(request, 'nova_rezervacija.html', {
+        'naslov': 'Nova rezervacija',
+        'form': form,
+        'delno_izpolnjena': ucilnica_id is not None,
+    })
 
 
 @staff_member_required
@@ -153,7 +159,11 @@ def preglej_rezervacije(request):
     data = [{'rezervacija': r, 'konflikti': list(iskalnik.konflikti_z_rezervacijo(r))} for r in rezervacije]
     for x in data:
         x['st_konfliktov'] = sum(k.st_konfliktov for _, _, k in x['konflikti'])
-    return render(request, 'preglej_rezervacije.html', {'entries': data, 'filter': rezervacije_filter})
+    return render(request, 'preglej_rezervacije.html', {
+        'naslov': 'Pregled revervacij',
+        'entries': data,
+        'filter': rezervacije_filter
+    })
 
 
 @require_POST
@@ -257,7 +267,7 @@ def proste_ucilnice(request, semester_id=None):
     except:
         teden = None
 
-    pokazi_zasedene = bool(request.GET.get('pz', False))
+    pokazi_zasedene = int(request.GET.get('pz', 0))
 
     ucilnice = request.GET.getlist('ucilnica')
     if ucilnice:
@@ -281,7 +291,7 @@ def proste_ucilnice(request, semester_id=None):
         proste.upostevaj_rezervacije_za_teden(teden)
         # teh semestrov bi moralo biti 0 ali 1
         for semester in Semester.objects.v_obdobju(teden, teden + datetime.timedelta(days=5)):
-            proste.dodaj_srecanja_semestra(semester)
+            proste.dodaj_srecanja_semestra(semester, teden)
     else:
         proste.dodaj_srecanja_semestra(semester)
 

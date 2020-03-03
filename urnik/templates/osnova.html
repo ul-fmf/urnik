@@ -165,6 +165,8 @@
             "{{ oseba.ime }} {{ oseba.priimek }}": "{% url 'urnik_osebe' oseba_id=oseba.id semester_id=izbrani_semester_id %}",{%  endfor %}
         {% for ucilnica in ucilnice_search %}
             "Učilnica {{ ucilnica.oznaka }}": "{% url 'urnik_ucilnice' ucilnica_id=ucilnica.id semester_id=izbrani_semester_id %}",{% endfor %}
+        {% for predmet in predmeti_search %}
+            "Predmet: {{ predmet.ime }}": "{% url 'urnik_predmeta' predmet_id=predmet.id semester_id=izbrani_semester_id %}",{% endfor %}
     };
 
     $(document).ready(function () {

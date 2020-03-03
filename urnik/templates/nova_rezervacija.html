@@ -12,6 +12,10 @@
         rezervacijo. <br>Če izberete več učilnic in več dni, boste za vsak dan od začeta do konca rezervirali vse
         učilnice za izbrane ure.
       </p>
+      <p>
+        Stalnih tedenskih rezervacij ni mogoče dodati s tem obrazcem. Če želite rezervacijo določenega termina za cel
+        semester, pišite sestavljavcem urnika in vam bodo dodali nov predmet &ldquo;Rezervacija&rdquo;.
+      </p>
     {% endif %}
     <form action="{% url 'nova_rezervacija' %}" method="post">
       {% csrf_token %}
