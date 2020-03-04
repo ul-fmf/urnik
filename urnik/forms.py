@@ -34,19 +34,24 @@ class RezevacijeForm(ModelForm):
     PREKRIVANJA = 'prekrivanja'
 
     osebe = OsebeModelMultipleChoiceField(queryset=Oseba.objects.all(),
-                                          help_text='Osebe, ki si lastijo to rezervacijo')
+                                          help_text='Osebe, ki si lastijo to rezervacijo. Te osebe bodo lahko rezervacijo '
+                                                    'spreminjale, prikazala pa se bo tudi na njihovem tedenskem urniku.')
     ucilnice = UcilniceModelMultipleChoiceField(queryset=Ucilnica.objects.objavljene(),
                                                 help_text='Izberite učilnice, ki jih želite rezervirati',
                                                 widget=CheckboxSelectMultiple())
+    predmeti = PredmetModelMultipleChoiceField(queryset=Predmet.objects.all(),
+                                               help_text='Predmeti, povezani s to rezervacijo. Lahko pustite prazno. '
+                                                         'Če izberete enega ali več predmetov, se bo rezervacija pokazala na tedenskem '
+                                                         'urniku predmeta in vseh letnikov, ki predmet imajo.')
     use_required_attribute = False
 
     class Meta:
         model = Rezervacija
-        fields = ['ucilnice', 'osebe', 'dan', 'dan_konca', 'od', 'do', 'opomba']
+        fields = ['ucilnice', 'osebe', 'dan', 'dan_konca', 'od', 'do', 'opomba', 'predmeti']
         widgets = {
             'dan': DateInput(attrs={'placeholder': 'npr. 15. 1. 2019', 'class': 'datepicker'}),
             'dan_konca': DateInput(attrs={'placeholder': 'ponavadi prazno, lahko tudi npr. 17. 1. 2019', 'class': 'datepicker'}),
-            'opomba': TextInput(attrs={'placeholder': 'npr. izpit Analiza 1 FIN'}),
+            'opomba': TextInput(attrs={'placeholder': 'npr. "sestanek raziskovalne skupine", ali pa "kolokvij ALG1"'}),
         }
 
     def __init__(self, *args, **kwargs):

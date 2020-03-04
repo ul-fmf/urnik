@@ -40,6 +40,9 @@
                     <a href="{% url 'urnik_osebe' oseba.pk %}">{{ oseba }}</a>,
                   {% endfor %}
                   {{ rezervacija.opomba }}
+                  {% if rezervacija.predmeti.all %}
+                    ({% for predmet in rezervacija.predmeti.all %}<a href="{% url 'urnik_predmeta' p.id %}">{{ p.opisno_ime }}</a>{% if forloop.last %}){% else %}, {% endif %}{% endfor %}
+                  {% endif %}
                 </small>
                 {% if user.is_staff and not rezervacija.potrjena and rezervacija.konflikti %}
                   <span class="right">({{ rezervacija.konflikti.st_konfliktov }})</span>

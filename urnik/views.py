@@ -153,7 +153,7 @@ def nova_rezervacija(request, ucilnica_id=None, ura=None, teden=None, dan_v_tedn
 def preglej_rezervacije(request):
     if not request.user.is_staff:
         redirect('preglej_rezervacije_oseba', args=(request.user.pk,))
-    rezervacije = Rezervacija.objects.prihajajoce()
+    rezervacije = Rezervacija.objects.prihajajoce().prefetch_related('predmet', 'predmet__letnik')
     rezervacije_filter = request.GET.get('filter', 'nepotrjene')
     if rezervacije_filter != 'all':
         rezervacije = rezervacije.filter(potrjena=False)
@@ -174,7 +174,7 @@ def preglej_rezervacije(request):
 @login_required
 def preglej_rezervacije_oseba(request, oseba_id):
     oseba = get_object_or_404(Oseba, pk=oseba_id)
-    rezervacije = Rezervacija.objects.prihajajoce().filter(osebe__in=(oseba,))
+    rezervacije = Rezervacija.objects.prihajajoce().filter(osebe__in=(oseba,)).prefetch_related('predmeti', 'predmeti__letnik')
     iskalnik = IskalnikKonfliktov.za_rezervacije(rezervacije)
     data = [{'rezervacija': r, 'konflikti': list(iskalnik.konflikti_z_rezervacijo(r))} for r in rezervacije]
     for x in data:

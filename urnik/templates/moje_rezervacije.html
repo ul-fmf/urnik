@@ -25,6 +25,7 @@
           <th style="width: 200px;">Osebe</th>
           <th>Učilnice</th>
           <th>Razlog</th>
+          <th>Predmeti</th>
           <th>Čas rezervacije</th>
           <th>Avtor rezervacije</th>
           {% if has_manage_perms %}
@@ -75,6 +76,13 @@
               </td>
               <td>{{ r.opomba }}
                 {{ k }}
+              </td>
+              <td>
+                {% if r.predmeti.all %}
+                  ({% for p in r.predmeti.all %}<a href="{% url 'urnik_predmeta' p.id %}">{{ p.opisno_ime }}</a>{% if forloop.last %}){% else %}, {% endif %}{% endfor %}
+                {% else %}
+                  /
+                {% endif %}
               </td>
               <td>{{ r.cas_rezervacije|date:"D, j. b, H:m" }}</td>
               <td>{{ r.avtor_rezervacije.get_full_name|default:r.avtor_rezervacije.username }}</td>
