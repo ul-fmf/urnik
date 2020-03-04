@@ -19,6 +19,9 @@
             {% endif %}
             {% if not ogled_starega_semestra %}
             <li><a href="{% url 'rezervacije' %}"><i class="material-icons left">border_color</i>Rezervacije učilnic</a></li>
+            {% if user.is_authenticated and user.oseba %}
+              <li><a href="{% url 'preglej_rezervacije_oseba' oseba_id=user.oseba.pk %}"><i class="material-icons left">airline_seat_recline_normal</i> Moje rezervacije</a></li>
+            {% endif %}
             <li><a href="{% url 'proste' semester_id=izbrani_semester_id %}"><i class="material-icons left">event_available</i>Proste učilnice</a></li>
             {% if user.is_authenticated %}
               <li><a href="{% url 'nova_rezervacija' %}"><i class="material-icons left">assignment</i>Nova rezervacija</a></li>

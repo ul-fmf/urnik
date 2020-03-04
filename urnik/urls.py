@@ -1,18 +1,3 @@
-"""urnik URL Configuration
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/1.10/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  url(r'^$', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  url(r'^$', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.conf.urls import url, include
-    2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
-"""
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
@@ -29,6 +14,7 @@ urlpatterns = [
     re_path(r'^nova-rezervacija/(?P<ucilnica_id>\d+)/(?P<ura>\d+)/(?P<teden>[0-9-]*)/(?P<dan_v_tednu>[0-6])/$',
             urnik.views.nova_rezervacija, name='nova_rezervacija_za_ucilnico'),
     path('preglej-rezervacije/', urnik.views.preglej_rezervacije, name='preglej_rezervacije'),
+    path('preglej-rezervacije/<int:oseba_id>/', urnik.views.preglej_rezervacije_oseba, name='preglej_rezervacije_oseba'),
     path('potrdi-rezervacijo/', urnik.views.potrdi_rezervacijo, name='potrdi_rezervacijo'),
     path('potrdi-vse-rezervacije/', urnik.views.potrdi_vse_rezervacije, name='potrdi_vse_rezervacije'),
     path('izbrisi-rezervacijo/', urnik.views.izbrisi_rezervacijo, name='izbrisi_rezervacijo'),

@@ -198,6 +198,9 @@ class Predmet(models.Model):
         default_related_name = 'predmeti'
         ordering = ('ime',)
 
+    def __str__(self):
+        return self.ime
+
     def __lt__(self, other):
         return self.vrstni_red() < other.vrstni_red()
 

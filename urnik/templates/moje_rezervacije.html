@@ -1,0 +1,138 @@
+{% extends 'osnova.html' %}
+{% load tags %}
+{% block content %}
+  <div class="container">
+    <p>
+      <span class="flow-text"></span>
+    </p>
+    {% if entries|length_is:0 %}
+      <p>Trenutno nimate aktivnih rezervacij. Če želite pogledati seznam vseh rezervacij, je na voljo
+      <a href="{% url 'rezervacije' %}">tukaj</a>.</p>
+    {% else %}
+      <p>Spodaj je na voljo seznam vaših aktivnih rezervacij. Rezervacije lahko prekličete, spremenite pa jih tako,
+      da jih prekličete in ponovno rezervirate z želenimi spremembami.</p>
+    {% endif %}
+    <p>Nove rezervacije najlažje naredite prek <a href="{% url 'proste' %}">iskalnika prostih učilnic</a>,
+      lahko pa uporabite tudi obrazec za <a href="{% url 'nova_rezervacija' %}">novo rezervacijo</a>.</p>
+  {% if entries %}
+      <table id="nepotrjene-rezervacije">
+        <thead>
+        <tr>
+          <th>Referat</th>
+          <th>Konflikti</th>
+          <th style="width: 100px;">Datum</th>
+          <th style="width: 70px;">Od&ndash;do</th>
+          <th style="width: 200px;">Osebe</th>
+          <th>Učilnice</th>
+          <th>Razlog</th>
+          <th>Čas rezervacije</th>
+          <th>Avtor rezervacije</th>
+          {% if has_manage_perms %}
+            <th></th>
+          {% endif %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for e in entries %}
+          {% with r=e.rezervacija %}
+            <tr>
+              <td>
+                {% if r.potrjena %}
+                  <i class="material-icons green-text" data-position="left"
+                     data-tooltip="Potrjena s strani referata"
+                     title="Potrjena s strani referata">check</i>
+                {% else %}
+                  <i class="material-icons grey-text" data-position="left"
+                     data-tooltip="Še nepotrjena s strani referata"
+                     title="Še nepotrjena s strani referata">help</i>
+                {% endif %}
+              </td>
+              <td>
+                {% if e.konflikti %}
+                  <i class="material-icons orange-text">warning</i>
+                  <span class="st-konfliktov">({{ e.st_konfliktov }})</span>
+                {% else %}
+                  <i class="material-icons green-text">check</i>
+                {% endif %}
+              </td>
+              <td>
+                {% if r.dan_konca %}
+                  {{ r.dan|date:"D, j. b" }} &ndash; {{ r.dan_konca|date:"D, j. b" }}
+                {% else %}
+                  {{ r.dan|date:"D, j. b" }}
+                {% endif %}
+              </td>
+              <td>{{ r.od }}&ndash;{{ r.do }}</td>
+              <td>
+                {% for o in r.osebe.all %}
+                  <a href="{% url 'urnik_osebe' o.pk %}">{{ o }}</a>{% if not forloop.last %},{% endif %}
+                {% endfor %}
+              </td>
+              <td>
+                {% for u in r.ucilnice.all %}
+                  <a href="{% url 'urnik_ucilnice' u.pk %}">{{ u }}</a>{% if not forloop.last %},{% endif %}
+                {% endfor %}
+              </td>
+              <td>{{ r.opomba }}
+                {{ k }}
+              </td>
+              <td>{{ r.cas_rezervacije|date:"D, j. b, H:m" }}</td>
+              <td>{{ r.avtor_rezervacije.get_full_name|default:r.avtor_rezervacije.username }}</td>
+              {% if has_manage_perms %}
+                <td>
+                  <form action="{% url 'izbrisi_rezervacijo' %}" method="post"
+                        onsubmit="return window.confirm('Ste prepričani, da želite preklicati to ' +
+                            'rezervacijo?\nV primeru izbrisa bi bilo dobro obvestiti morebitne druge osebe na rezervaciji.');">
+                    {% csrf_token %}
+                    <input type="hidden" name="r-pk" value="{{ r.pk }}">
+                    <input type="hidden" value="{% url_with_get %}" name="redirect">
+                    <button type="submit" name="confirm" class="btn cancel">
+                      <i class="material-icons left">delete</i>Prekliči
+                    </button>
+                  </form>
+                </td>
+              {% endif %}
+            </tr>
+            {% if e.konflikti %}
+              <tr class="konflikti">
+                <td colspan="42"><!-- large enough :) -->
+                  <dl>
+                    {% for u, d, konflikti in e.konflikti %}
+                      <dt>Konflikti za učilnico {{ u }} dne {{ d|date:"D, j. b" }}:</dt>
+                      <dd>
+                        <ul>
+                          {% for rez in konflikti.rezervacije %}
+                            <li>
+                              Rezervacija
+                              {% if not rez.osebe %}
+                                neznane osebe
+                              {% elif rez.osebe.all|length_is:1 %}
+                                osebe {{ rez.osebe.all.0 }}
+                              {% else %}
+                                oseb {{ rez.osebe.all|join:", " }}
+                              {% endif %}
+                              od {{ rez.od }} do {{ rez.do }}
+                              z razlogom &raquo;{{ rez.opomba }}&laquo;.
+                            </li>
+                          {% endfor %}
+                          {% for s in konflikti.srecanja %}
+                            <li>
+                              V {{ s.ucilnica }} poteka predmet
+                              {{ s.predmet }}
+                              od {{ s.od }} do {{ s.do }}.
+                            </li>
+                          {% endfor %}
+                        </ul>
+                      </dd>
+                    {% endfor %}
+                  </dl>
+                </td>
+              </tr>
+            {% endif %}
+          {% endwith %}
+        {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+  </div>
+{% endblock %}
