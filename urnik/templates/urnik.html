@@ -3,7 +3,7 @@
 {% block urnik_content %}
 
 {% if nacin == 'ogled' %}
-  <div id="urnik" class="{% if not barve %}cel{% endif %}">
+  <div id="urnik" class="{% if not legenda %}cel{% endif %}">
     {% dnevi %}
     {% ure %}
     <div id="srecanja" class="poravnaj-na-termine">
@@ -12,7 +12,7 @@
       {% endfor %}
     </div>
   </div>
-  {% if barve %}
+  {% if legenda %}
     <div class='right-panel' id='informacije'>
       <ul class="collapsible" data-collapsible="expandable">
         <li class="active">
@@ -20,8 +20,8 @@
             <i class="material-icons">line_style</i>Legenda
           </div>
           <div class="collapsible-body">
-            {% for barva in barve %}
-              <div class="legenda srecanje ustrezna" style="{% pobarvaj forloop.counter0 %}">{{ barva }}</div>
+            {% for l in legenda %}
+              <div class="legenda srecanje ustrezna" style="{% pobarvaj forloop.counter0 %}">{{ l }}</div>
             {% endfor %}
           </div>
         </li>

@@ -214,8 +214,8 @@ def potrdi_vse_rezervacije(request):
     return redirect(request.POST.get('redirect') or reverse('preglej_rezervacije'))
 
 
-def urnik(request, srecanja, naslov, barve=None):
-    legenda = barve
+def urnik(request, srecanja, naslov, legenda=None):
+    barve = legenda
     if barve is None:
         barve = Predmet.objects.filter(srecanja__in=srecanja).distinct()
     if request.user.is_staff and request.session.get('urejanje', False):
@@ -230,14 +230,14 @@ def urnik(request, srecanja, naslov, barve=None):
             'odlozena_srecanja': izbrani_semester(request).srecanja.odlozena(),
             'prekrivanja_po_tipih': izbrani_semester(request).srecanja.prekrivanja(),
             'next': next_url,
-            'barve': barve,
+            'legenda': legenda,
         })
     else:
         return render(request, 'urnik.html', {
             'nacin': 'ogled',
             'naslov': naslov,
             'srecanja': srecanja.urnik(barve=barve),
-            'barve': legenda,
+            'legenda': legenda,
         })
 
 
@@ -256,7 +256,7 @@ def urnik_letnika(request, letnik_id, semester_id=None):
 def urnik_ucilnice(request, ucilnica_id, semester_id=None):
     ucilnica = get_object_or_404(Ucilnica, id=ucilnica_id)
     naslov = 'Učilnica {}'.format(ucilnica.oznaka)
-    return urnik(request, ucilnica.srecanja.filter(semester=izbrani_semester(request)), naslov, barve=[])
+    return urnik(request, ucilnica.srecanja.filter(semester=izbrani_semester(request)), naslov, legenda=[])
 
 
 def urnik_predmeta(request, predmet_id, semester_id=None):
@@ -277,7 +277,7 @@ def kombiniran_pogled(request, semester_id=None):
     srecanja_predmetov = izbrani_semester(request).srecanja.filter(predmet__in=predmeti)
     srecanja = (srecanja_letnikov | srecanja_uciteljev |
                 srecanja_slusateljev | srecanja_ucilnic | srecanja_predmetov).distinct()
-    return urnik(request, srecanja, 'Kombiniran pogled', barve=list(letniki) + list(osebe) + list(ucilnice) + list(predmeti))
+    return urnik(request, srecanja, 'Kombiniran pogled', legenda=list(letniki) + list(osebe) + list(ucilnice) + list(predmeti))
 
 
 def proste_ucilnice(request, semester_id=None):
