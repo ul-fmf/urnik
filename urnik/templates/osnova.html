@@ -125,12 +125,14 @@
   <li><a href="{% url 'bugreport' %}"><i class="material-icons left">bug_report</i>Prijava napake</a></li>
   <li><a href="{% url 'help' %}"><i class="material-icons left">help</i>Navodila in pomoč</a></li>
 </ul> <!-- side nav -->
+{% block notification %}
 {% if ogled_starega_semestra %}
-  <div id="old-semester-note" class="card">
+  <div id="old-semester-note" class="card global-note">
     Gledate pretekel semester. <a href="{% url 'zacetna_stran' %}">Nazaj na trenutni semester.</a>
     <i class="material-icons close-icon" onclick="$(this.parentNode).fadeOut(200);">close</i>
   </div>
 {% endif %}
+{% endblock %}
 
 {% block content %}{% endblock content %}
 

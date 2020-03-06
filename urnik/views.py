@@ -4,12 +4,12 @@ from django.core.exceptions import PermissionDenied
 from django.http import QueryDict
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.utils.dateparse import parse_date
 from django.views.decorators.http import require_POST
 
 from urnik.iskanik_konfliktov import ProsteUcilnice, IskalnikKonfliktov
 from .forms import KombiniranPogledForm, RezevacijeForm
 from .models import *
+from .utils import normaliziraj_teden
 
 
 def izbrani_semester_id(request):
@@ -214,84 +214,108 @@ def potrdi_vse_rezervacije(request):
     return redirect(request.POST.get('redirect') or reverse('preglej_rezervacije'))
 
 
-def urnik(request, srecanja, naslov, legenda=None):
+def urnik(request, srecanja, rezervacije, naslov, teden=None, legenda=None):
     barve = legenda
     if barve is None:
         barve = Predmet.objects.filter(srecanja__in=srecanja).distinct()
+    semester = izbrani_semester(request)
+    teden_v_napacnem_semestru = False
     if request.user.is_staff and request.session.get('urejanje', False):
-        if request.META['QUERY_STRING']:
-            next_url = '{}?{}'.format(request.path, request.META['QUERY_STRING'])
-        else:
-            next_url = request.path
+        next_url = request.get_full_path()
         return render(request, 'urnik.html', {
             'nacin': 'urejanje',
             'naslov': naslov,
             'srecanja': srecanja.urnik(barve=barve),
-            'odlozena_srecanja': izbrani_semester(request).srecanja.odlozena(),
-            'prekrivanja_po_tipih': izbrani_semester(request).srecanja.prekrivanja(),
+            'odlozena_srecanja': semester.srecanja.odlozena(),
+            'prekrivanja_po_tipih': semester.srecanja.prekrivanja(),
             'next': next_url,
             'legenda': legenda,
         })
     else:
+        WEEK = datetime.timedelta(days=7)
+        mozni_tedni = set(semester.tedni())
+        trenuten_teden = teden_dneva(teden or datetime.date.today())
+        for t in range(-2, 8):
+            mozni_tedni.add((trenuten_teden[0] + t*WEEK,
+                             trenuten_teden[1] + t*WEEK))
+        if teden:
+            semestri = Semester.objects.v_obdobju(teden, teden + WEEK)
+            teden_v_napacnem_semestru = any(s != semester for s in semestri)
+
         return render(request, 'urnik.html', {
             'nacin': 'ogled',
             'naslov': naslov,
             'srecanja': srecanja.urnik(barve=barve),
             'legenda': legenda,
+            'izbran_teden': teden,
+            'mozni_tedni': sorted(mozni_tedni),
+            'teden_v_napacnem_semestru': teden_v_napacnem_semestru,
         })
 
 
 def urnik_osebe(request, oseba_id, semester_id=None):
+    teden = normaliziraj_teden(request.GET.get('teden', None))
     oseba = get_object_or_404(Oseba, id=oseba_id)
+    rezervacije = [] if not teden else oseba.rezervacije.v_tednu(teden)
     naslov = str(oseba)
-    return urnik(request, oseba.vsa_srecanja(izbrani_semester(request)), naslov)
+    return urnik(request, oseba.vsa_srecanja(izbrani_semester(request)), rezervacije, naslov, teden)
 
 
 def urnik_letnika(request, letnik_id, semester_id=None):
+    teden = normaliziraj_teden(request.GET.get('teden', None))
     letnik = get_object_or_404(Letnik, id=letnik_id)
+    rezervacije = [] if not teden else Rezervacija.objects.filter(predmeti__letniki=letnik).v_tednu(teden)
     naslov = str(letnik)
-    return urnik(request, letnik.srecanja(izbrani_semester(request)).all(), naslov)
+    return urnik(request, letnik.srecanja(izbrani_semester(request)).all(), rezervacije, naslov, teden)
 
 
 def urnik_ucilnice(request, ucilnica_id, semester_id=None):
+    teden = normaliziraj_teden(request.GET.get('teden', None))
     ucilnica = get_object_or_404(Ucilnica, id=ucilnica_id)
+    rezervacije = [] if not teden else ucilnica.rezervacije.v_tednu(teden)
     naslov = 'Učilnica {}'.format(ucilnica.oznaka)
-    return urnik(request, ucilnica.srecanja.filter(semester=izbrani_semester(request)), naslov, legenda=[])
+    return urnik(request, ucilnica.srecanja.filter(semester=izbrani_semester(request)), rezervacije, naslov, teden, legenda=[])
 
 
 def urnik_predmeta(request, predmet_id, semester_id=None):
+    teden = normaliziraj_teden(request.GET.get('teden', None))
     predmet = get_object_or_404(Predmet, id=predmet_id)
+    rezervacije = [] if not teden else predmet.rezervacije.v_tednu(teden)
     naslov = str(predmet)
-    return urnik(request, predmet.srecanja.filter(semester=izbrani_semester(request)), naslov)
+    return urnik(request, predmet.srecanja.filter(semester=izbrani_semester(request)), rezervacije, naslov, teden)
 
 
 def kombiniran_pogled(request, semester_id=None):
+    teden = normaliziraj_teden(request.GET.get('teden', None))
     letniki = Letnik.objects.filter(id__in=request.GET.getlist('letnik'))
     osebe = Oseba.objects.filter(id__in=request.GET.getlist('oseba'))
     ucilnice = Ucilnica.objects.filter(id__in=request.GET.getlist('ucilnica'))
     predmeti = Predmet.objects.filter(id__in=request.GET.getlist('predmet'))
-    srecanja_letnikov = izbrani_semester(request).srecanja.filter(predmet__letniki__in=letniki)
-    srecanja_uciteljev = izbrani_semester(request).srecanja.filter(ucitelji__in=osebe)
-    srecanja_slusateljev = izbrani_semester(request).srecanja.filter(predmet__slusatelji__in=osebe)
-    srecanja_ucilnic = izbrani_semester(request).srecanja.filter(ucilnica__in=ucilnice)
-    srecanja_predmetov = izbrani_semester(request).srecanja.filter(predmet__in=predmeti)
+    semester = izbrani_semester(request)
+
+    srecanja_letnikov = semester.srecanja.filter(predmet__letniki__in=letniki)
+    srecanja_uciteljev = semester.srecanja.filter(ucitelji__in=osebe)
+    srecanja_slusateljev = semester.srecanja.filter(predmet__slusatelji__in=osebe)
+    srecanja_ucilnic = semester.srecanja.filter(ucilnica__in=ucilnice)
+    srecanja_predmetov = semester.srecanja.filter(predmet__in=predmeti)
     srecanja = (srecanja_letnikov | srecanja_uciteljev |
                 srecanja_slusateljev | srecanja_ucilnic | srecanja_predmetov).distinct()
-    return urnik(request, srecanja, 'Kombiniran pogled', legenda=list(letniki) + list(osebe) + list(ucilnice) + list(predmeti))
+    rezervacije = []
+
+    if teden:
+        srecanja = [s for s in srecanja if semester.od <= teden + datetime.timedelta(days=s.dan-1) <= semester.do]
+
+        rezervacije_letnikov = Rezervacija.objects.filter(predmeti__letniki=letniki).v_tednu(teden)
+        rezervacije_ucilnic = Rezervacija.objects.filter(ucilnice__in=ucilnice).v_tednu(teden)
+        rezervacije_oseb = Rezervacija.objects.filter(osebe__in=osebe).v_tednu(teden)
+        rezervacije_predmetov = Rezervacija.objects.filter(predmeti__in=predmeti).v_tednu(teden)
+        rezervacije = (rezervacije_letnikov | rezervacije_ucilnic | rezervacije_oseb | rezervacije_predmetov).distinct()
+
+    return urnik(request, srecanja, rezervacije, naslov='Kombiniran pogled', teden=teden, legenda=list(letniki) + list(osebe) + list(ucilnice) + list(predmeti))
 
 
 def proste_ucilnice(request, semester_id=None):
-    teden = request.GET.get('teden', None)
-    try:
-        teden = parse_date(teden)
-        weekday = teden.weekday()
-        if weekday <= 5:
-            teden -= datetime.timedelta(days=weekday)
-        else:
-            teden += datetime.timedelta(days=7-weekday)
-    except:
-        teden = None
-
+    teden = normaliziraj_teden(request.GET.get('teden', None))
     pokazi_zasedene = int(request.GET.get('pz', 0))
 
     ucilnice = request.GET.getlist('ucilnica')

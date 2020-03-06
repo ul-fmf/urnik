@@ -224,14 +224,19 @@ class Semester(models.Model):
         return novi_semester
 
     def prihodnji_tedni(self):
+        return self._tedni_od(datetime.date.today())
+
+    def tedni(self):
+        return self._tedni_od(self.od)
+
+    def _tedni_od(self, prvi_dan):
         razlika = datetime.timedelta(weeks=1)
         tedni = set()
-        danes = datetime.date.today()
-        dan = danes
+        dan = prvi_dan
         while dan < self.do:
             tedni.add(teden_dneva(dan))
             dan += razlika
-        if self.do >= danes:
+        if self.do >= prvi_dan:
             tedni.add(teden_dneva(self.do))
         return tedni
 

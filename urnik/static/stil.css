@@ -96,7 +96,7 @@ nav.old-semester {
     background: repeating-linear-gradient( -45deg, #555, #555 10px, #666 10px, #666 20px);
     color: #000;
 }
-#old-semester-note {
+.global-note {
     position: fixed;
     padding: 5px 10px;
     top: 65px;
@@ -111,7 +111,8 @@ nav.old-semester {
     top: 5px;
     right: 5px;
 }
-@media only screen and (max-width: 600px) { #old-semester-note { top: 57px; } }
+@media only screen and (max-width: 600px) { .global-note { top: 57px; } }
+#weird-week-note { width: 250px; }
 
 #urnik-logo {
     white-space: nowrap;
@@ -258,9 +259,9 @@ nav.old-semester {
 #urnik {
     position: absolute;
     left: 2.5%;
-    top: 2.5%;
+    top: 5.5%;
     width: 78%;
-    height: 95%;
+    height: 92%;
     background: white;
 }
 
@@ -734,11 +735,6 @@ nav.old-semester {
     width: 100%;
 }
 
-#proste-ucilnice-panel .card .card-action a:not(.btn) {
-    color: #039be5;
-    text-transform: none;
-}
-
 #proste-ucilnice-panel .card .card-action #teden-dropdown-btn {
     padding: 0 1rem;
     width: 100%;
@@ -755,17 +751,19 @@ nav.old-semester {
     text-overflow: ellipsis;
 }
 
-#proste-ucilnice-panel .card .card-action #teden-dropdown li {
+#teden-dropdown > li {
     min-height: 30px;
     overflow: hidden;
     white-space: nowrap;
 }
 
-#proste-ucilnice-panel .card .card-action #teden-dropdown li a {
-    padding: 6px 0px 6px 15px;
+#teden-dropdown > li > a {
+    padding: 6px 15px 6px 15px;
     margin: 0;
     color: #333;
     font-size: 11pt;
+    text-align: right;
+    text-transform: none;
 }
 
 #proste-ucilnice-panel input[type="range"] {
@@ -975,3 +973,17 @@ table.highlight tr th {
     background-color: #f44336;
 }
 
+.tedenski-pogled {
+    margin-top: 5px;
+    text-align: center;
+    z-index: 1;
+    position: relative;
+}
+.tedenski-pogled .btn {
+    height: 28px;
+    line-height: 28px;
+}
+.tedenski-pogled #teden-dropdown-btn {
+    min-width: 230px;
+    margin: 0px 10px;
+}

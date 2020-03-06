@@ -1,26 +1,3 @@
-{% load tags %}
-<a class="teden-dropdown-button btn" id="teden-dropdown-btn" href="#" data-target='teden-dropdown'>
-<span>
-  {% if not izbran_teden %}
-    Splošen teden
-  {% else %}
-    {{ izbran_teden | fmt_teden }}
-  {% endif %}
-</span>
-<i class="material-icons right">arrow_drop_down</i>
-</a>
-<ul id='teden-dropdown' class='dropdown-content'>
-  {% if izbran_teden %}
-    <li><a href="{% url_with_get teden=None %}">Splošen teden</a></li>
-  {% endif %}
-  {% for mozen_teden in mozni_tedni %}
-    {% if mozen_teden.0|date:"Y-m-d" != teden %}
-      <li><a href="{% url_with_get teden=mozen_teden.0|date:"Y-m-d" pr="1" %}">{{ mozen_teden.0 | fmt_teden }}</a></li>
-    {% endif %}
-  {% endfor %}
-</ul>
-
-{% block footer %}
 <script>
   $(document).ready(function () {
       $('.teden-dropdown-button').dropdown({
@@ -36,4 +13,3 @@
       );
   });
 </script>
-{% endblock %}
