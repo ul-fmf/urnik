@@ -21,7 +21,7 @@ def forward(apps, schema_editor):
     except: fiz = default
 
     Rezervacija = apps.get_model('urnik', 'Rezervacija')
-    for r in Rezervacija.objects.all().prefetch_related('ucilnice'):
+    for r in Rezervacija.objects.all():
         if any(u.tip in "MR" for u in r.ucilnice.all()):
             r.avtor_rezervacije = mat
         elif any(u.tip in "FP" for u in r.ucilnice.all()):
