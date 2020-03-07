@@ -5,7 +5,6 @@ from copy import deepcopy
 from django.conf import settings
 from django.db import models
 from urnik.utils import teden_dneva
-from .layout import nastavi_sirine_srecanj, nastavi_barve
 
 MIN_URA, MAX_URA = 7, 20
 ENOTA_VISINE = 1 / (MAX_URA - MIN_URA)
@@ -279,8 +278,8 @@ class SrecanjeQuerySet(models.QuerySet):
             for opis_tipa, prekrivanja_tipa in prekrivanja_po_tipih.items()
         }
 
-    def urnik(self, barve=[]):
-        self = self.neodlozena(
+    def za_urnik(self):
+        return self.neodlozena(
         ).order_by(
             'dan', 'ura', 'trajanje'
         ).distinct(
@@ -289,9 +288,6 @@ class SrecanjeQuerySet(models.QuerySet):
         ).prefetch_related(
             'predmet__letniki', 'ucitelji', 'predmet__slusatelji'
         )
-        nastavi_sirine_srecanj(self)
-        nastavi_barve(self, barve)
-        return self
 
 
 class Termin(object):
@@ -441,12 +437,6 @@ class Srecanje(models.Model):
     def lahko_odlozim(self):
         return self.dan and self.ura
 
-    def po_potrebi_okrajsano_ime_predmeta(self):
-        if hasattr(self, 'sirina') and ((self.sirina >= 0.5 and len(self.predmet.ime) < 45 and self.trajanje > 1) or self.sirina == 1):
-            return self.predmet.ime
-        else:
-            return self.predmet.kratica
-
     def povezana_srecanja(self):
         srecanja = self.semester.srecanja
         letniki_poslusajo = srecanja.filter(predmet__letniki__in=self.predmet.letniki.all())
@@ -456,22 +446,11 @@ class Srecanje(models.Model):
             pk=self.pk
         ).distinct()
 
-    def style(self):
-        if self.dan and self.ura and hasattr(self, 'sirina'):
-            left = (self.dan - 1 + self.zamik) * ENOTA_SIRINE
-            top = (self.ura - MIN_URA) * ENOTA_VISINE
-            height = self.trajanje * ENOTA_VISINE
-            width = self.sirina * ENOTA_SIRINE
-            return 'left: {:.2%}; width: {:.2%}; top: {:.2%}; height: {:.2%};'.format(
-                left, width, top, height)
-        else:
-            return ''
-
-    def css_classes(self):
-        classes = []
-        if hasattr(self, 'leftmost') and self.leftmost: classes.append('leftmost')
-        if hasattr(self, 'rightmost') and self.rightmost: classes.append('rightmost')
-        return ' '.join(classes)
+    def povezani_objekti(self):
+        return (set(self.ucitelji.all()) |
+                {self.ucilnica, self.predmet} |
+                (set(self.predmet.letniki.all()) if self.predmet else set()) |
+                (set(self.predmet.slusatelji.all()) if self.predmet else set()))
 
     def prosti_termini(self, tip, oddelek):
         ustrezne, alternative = Ucilnica.objects.ustrezne(tip=tip, oddelek=oddelek)
@@ -525,6 +504,9 @@ class RezervacijaQuerySet(models.QuerySet):
     def prihajajoce(self):
         return self.filter(dan__gte=datetime.date.today()) | self.filter(dan_konca__gte=datetime.date.today())
 
+    def za_urnik(self):
+        return self.prefetch_related('osebe', 'ucilnice', 'predmeti', 'predmeti__letniki', 'predmeti__slusatelji')
+
 
 class Rezervacija(models.Model):
     ucilnice = models.ManyToManyField('urnik.Ucilnica', blank=False,
@@ -550,6 +532,10 @@ class Rezervacija(models.Model):
     @property
     def konec(self):
         return self.dan_konca or self.dan
+
+    @property
+    def trajanje(self):
+        return self.do - self.od
 
     def __str__(self):
         if self.dan_konca:
@@ -579,3 +565,13 @@ class Rezervacija(models.Model):
     def se_po_urah_prekriva(self, od, do):
         return self.od < do and od < self.do
 
+    @property
+    def letniki(self):
+        return Letnik.objects.filter(predmeti__in=self.predmeti.all())
+
+    @property
+    def slusatelji(self):
+        return Oseba.objects.filter(predmeti__in=self.predmeti.all())
+
+    def povezani_objekti(self):
+        return (set(self.ucilnice.all()) | set(self.osebe.all()) | set(self.predmeti.all()) | set(self.letniki) | set(self.slusatelji))

@@ -1,40 +1,68 @@
 {% load tags %}
-<div class="srecanje-absolute-box {{ srecanje.css_classes }}" style="{{ srecanje.style }}">
-<div class="srecanje" style="{% pobarvajvec srecanje.barve %}">
-  <div class="main-box">
-{# TODO: info box, ko bo potreben #}
-{#    <div class="info-box"><i class="material-icons">info_outline</i></div> #}
-    <span class="predmet">
-      {% if srecanje.predmet %}
-        <a href="{% url 'urnik_predmeta' predmet_id=srecanje.predmet.id semester_id=izbrani_semester_id %}">
-          {% if nacin == 'ogled' %}{{ srecanje.po_potrebi_okrajsano_ime_predmeta }}{% else %}{{ srecanje.predmet.kratica }}{% endif %}
-        </a>
-      {% endif %}
-      <span class="tip">
-       {{ srecanje.tip }}{{ srecanje.oznaka }}{{ srecanje.barva }}
+<div class="srecanje-absolute-box {{ termin.css_classes }}" style="{{ termin.style }}">
+<div class="srecanje" style="{% pobarvajvec termin.kategorije %}">
+  {% if termin.je_srecanje %}{% with termin.model as srecanje %}
+    <div class="main-box">
+      {# TODO: info box, ko bo potreben #}
+      {#    <div class="info-box"><i class="material-icons">info_outline</i></div> #}
+      <span class="predmet">
+        {% if srecanje.predmet %}
+          <a href="{% url 'urnik_predmeta' predmet_id=srecanje.predmet.id semester_id=izbrani_semester_id %}">
+            {% if nacin == 'ogled' %}{{ termin.ime_za_prikaz }}{% else %}{{ srecanje.predmet.kratica }}{% endif %}
+          </a>
+        {% endif %}
+        <span class="tip">
+          {{ srecanje.tip }}{{ srecanje.oznaka }}{{ srecanje.barva }}
+        </span>
       </span>
-    </span>
-    <br>
-    {% if srecanje.trajanje > 1 %}
-    <span class="letniki">
-      {% for letnik in srecanje.predmet.letniki.all %}
-        <a href="{% url 'urnik_letnika' letnik_id=letnik.id semester_id=izbrani_semester_id %}">{{ letnik.kratica }}</a>{% if not forloop.last %}, {% endif %}
-      {% endfor %}
-    </span>
-    {% endif %}
-  </div>
-
-  <div class="ucitelj">
-    {% for ucitelj in srecanje.ucitelji.all %}
-      <a href="{% url 'urnik_osebe' oseba_id=ucitelj.id semester_id=izbrani_semester_id %}">{{ ucitelj.priimek }}</a>{% if not forloop.last %}, {% endif %}
-    {% endfor %}
-  </div>
-
-  {% if srecanje.ucilnica %}
-    <div class="ucilnica">
-      <a href="{% url 'urnik_ucilnice' ucilnica_id=srecanje.ucilnica.id semester_id=izbrani_semester_id %}">{{ srecanje.ucilnica.kratko_ime }}</a>
+      <br>
+      {% if termin.trajanje > 1 %}
+        <span class="letniki">
+          {% for letnik in srecanje.predmet.letniki.all %}
+            <a href="{% url 'urnik_letnika' letnik_id=letnik.id semester_id=izbrani_semester_id %}">{{ letnik.kratica }}</a>{% if not forloop.last %}, {% endif %}
+          {% endfor %}
+        </span>
+      {% endif %}
     </div>
-  {% endif %}
+
+    <div class="ucitelj">
+      {% for ucitelj in srecanje.ucitelji.all %}
+        <a href="{% url 'urnik_osebe' oseba_id=ucitelj.id semester_id=izbrani_semester_id %}">{{ ucitelj.priimek }}</a>{% if not forloop.last %}, {% endif %}
+      {% endfor %}
+    </div>
+
+    {% if srecanje.ucilnica %}
+      <div class="ucilnica">
+        <a href="{% url 'urnik_ucilnice' ucilnica_id=srecanje.ucilnica.id semester_id=izbrani_semester_id %}">{{ srecanje.ucilnica.kratko_ime }}</a>
+      </div>
+    {% endif %}
+  {% endwith %}{% else %}{% with termin.model as rezervacija %} {# end srečanje, begin rezervacija #}
+    <div class="main-box">
+      <span class="predmet">
+        <a href="{% url 'rezervacije' %}#rezervacija-{{ rezervacija.id }}">{{ termin.ime_za_prikaz }}</a>
+      </span>
+      <br>
+      {% if termin.trajanje > 1 %}
+        <span class="letniki">
+          {% for letnik in rezervacija.letniki %}
+            <a href="{% url 'urnik_letnika' letnik_id=letnik.id semester_id=izbrani_semester_id %}">{{ letnik.kratica }}</a>{% if not forloop.last %}, {% endif %}
+          {% endfor %}
+        </span>
+      {% endif %}
+    </div>
+
+    <div class="ucitelj">
+      {% for oseba in rezervacija.osebe.all %}
+        <a href="{% url 'urnik_osebe' oseba_id=oseba.id semester_id=izbrani_semester_id %}">{{ oseba.priimek }}</a>{% if not forloop.last %}, {% endif %}
+      {% endfor %}
+    </div>
+
+    <div class="ucilnica">
+      {% for ucilnica in rezervacija.ucilnice.all %}
+        <a href="{% url 'urnik_ucilnice' ucilnica_id=ucilnica.id semester_id=izbrani_semester_id %}">{{ ucilnica.kratko_ime }}</a>{% if not forloop.last %}, {% endif %}
+      {% endfor %}
+    </div>
+  {% endwith %}{% endif %}
 
   {% if nacin == 'urejanje' or nacin == 'odlozisce' %}
     <div class="urejanje">

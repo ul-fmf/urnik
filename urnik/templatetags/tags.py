@@ -49,10 +49,10 @@ def pobarvaj(barva):
 @register.simple_tag()
 def pobarvajvec(barve):
     if barve:
-        barve = ', '.join(
+        gradient = ', '.join(
             ('{0} {1:.2%}, {0} {2:.2%}'.format(BARVE[barva % len(BARVE)], i / len(barve), (i + 1) / len(barve))
                 for i, barva in enumerate(barve)))
-        return "background: repeating-linear-gradient(135deg, {});".format(barve)
+        return "background: repeating-linear-gradient(135deg, {});".format(gradient)
     return ''
 
 

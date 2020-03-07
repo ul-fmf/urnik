@@ -892,6 +892,13 @@ table.highlight tr th {
 #rezervacije-list .collapsible-body {
     padding-top: 0;
 }
+#rezervacije-list li.collection-item {
+    position: relative;
+}
+#rezervacije-list span.anchor {  /* offset fot anchors to work correctly due to fixed header */
+    position: absolute;
+    top: -68px;
+}
 
 .rezervacije-form > li {
     margin-right: 30px;

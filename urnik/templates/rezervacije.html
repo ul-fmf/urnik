@@ -27,7 +27,7 @@
                   <strong>{{ rezervacija.dan|date:"l, j. F" }}</strong>
                 </li>
               {% endifchanged %}
-              <li class="collection-item">
+              <li class="collection-item"><span class="anchor" id="rezervacija-{{ rezervacija.id }}"></span>
                 {% if not rezervacija.potrjena %}
                   <i class="material-icons grey-text left tooltipped"
                      data-position="left" data-tooltip="Še nepotrjena s strani referata"
