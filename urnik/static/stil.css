@@ -446,6 +446,10 @@ nav.old-semester {
     color: #039be5;
 }
 
+.urejanje button {
+    cursor: pointer;
+}
+
 .srecanje-absolute-box .srecanje .main-box .info-box i {
     font-size: 12pt;
     color: #555;

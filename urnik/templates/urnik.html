@@ -25,14 +25,13 @@
 {% endblock %}
 
 {% block urnik_content %}
-
 {% if nacin == 'ogled' %}
   <div id="urnik" class="{% if not legenda %}cel{% endif %}">
     {% dnevi %}
     {% ure %}
     <div id="srecanja" class="poravnaj-na-termine">
       {% for termin in termini %}
-        {% include '_srecanje.html' with nacin='ogled' %}
+        {% include '_tedenski_termin.html' with nacin='ogled'%}
       {% endfor %}
     </div>
   </div>
@@ -44,8 +43,8 @@
             <i class="material-icons">line_style</i>Legenda
           </div>
           <div class="collapsible-body">
-            {% for l in legenda %}
-              <div class="legenda srecanje ustrezna" style="{% pobarvaj forloop.counter0 %}">{{ l }}</div>
+            {% for el in legenda %}
+              <div class="legenda srecanje ustrezna" style="{% pobarvaj forloop.counter0 %}">{{ el }}</div>
             {% endfor %}
           </div>
         </li>
@@ -58,8 +57,8 @@
     {% dnevi %}
     {% ure %}
     <div id="srecanja" class="poravnaj-na-termine">
-      {% for srecanje in srecanja %}
-        {% include '_srecanje.html' with nacin='urejanje' %}
+      {% for termin in termini %}
+        {% include '_tedenski_termin.html' with nacin='urejanje' %}
       {% endfor %}
       {% for termin in prosti_termini.values %}
         {% include '_prosti_termin.html' %}
@@ -75,7 +74,9 @@
           </div>
           <div class="collapsible-body">
             {% for srecanje in odlozena_srecanja %}
-              {% include '_srecanje.html' with nacin='odlozisce' %}
+              <div class="srecanje-absolute-box leftmost rightmost"><div class="srecanje">
+                {% include '_srecanje.html' with nacin='odlozisce' srecanje=srecanje %}
+              </div></div>
             {% endfor %}
           </div>
         </li>
@@ -87,7 +88,9 @@
             <i class="material-icons">open_with</i> Premikanje srečanja
           </div>
           <div class="collapsible-body">
-            {% include '_srecanje.html' with nacin='odlozisce' srecanje=premaknjeno_srecanje %}
+            <div class="srecanje-absolute-box leftmost rightmost"><div class="srecanje">
+              {% include '_srecanje.html' with nacin='odlozisce' srecanje=premaknjeno_srecanje %}
+            </div></div>
             <form method="post" action="{% url 'odlozi_srecanje' premaknjeno_srecanje.id %}">
               {% csrf_token %}
               <input type="hidden" name="next" value="{{ next }}">
