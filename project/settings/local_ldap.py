@@ -45,6 +45,9 @@ LOGGING = {
 import ldap
 from django_auth_ldap.config import LDAPSearch
 
+AUTHENTICATION_BACKENDS += (
+    'django_auth_ldap.backend.LDAPBackend',
+)
 
 with open('ldap_password.txt') as f:
     AUTH_LDAP_BIND_PASSWORD = f.read().strip()
