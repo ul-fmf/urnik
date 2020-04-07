@@ -25,8 +25,6 @@ INSTALLED_APPS += [
     'silk',
 ]
 
-AUTHENTICATION_BACKENDS = AUTHENTICATION_BACKENDS[1:]
-
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
