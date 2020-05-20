@@ -201,7 +201,7 @@
             this.value = "";
         });
         $(document).keypress(function (event) {
-            if ($(event.target).is('input, textarea')) {
+            if ($(event.target).is('input, textarea') || (event.target.id && event.target.id.startsWith("select-options-"))) {
                 return;
             }
             if (event.key === 'Escape') {

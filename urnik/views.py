@@ -8,10 +8,13 @@ from django.utils.dateparse import parse_date
 from django.views.decorators.http import require_POST
 
 from urnik.iskanik_konfliktov import ProsteUcilnice, IskalnikKonfliktov
+from .forms import KombiniranPogledForm, RezevacijeForm
 from .models import *
+
 
 def izbrani_semester_id(request):
     return request.resolver_match.kwargs.get('semester_id', None)
+
 
 def izbrani_semester(request):
     if request.session.get('urejanje', False):
@@ -27,11 +30,13 @@ def izbrani_semester(request):
     except Semester.DoesNotExist:
         raise ValueError("Za uporabo aplikacije dodajte v bazo vsaj en objavljen semester.")
 
+
 def ogled_starega_semestra(request):
     urejanje = request.session.get('urejanje', False)
     semester_id = izbrani_semester_id(request)
     return not urejanje and semester_id is not None and \
         Semester.objects.filter(objavljen=True).latest('od').pk != semester_id
+
 
 def zacetna_stran(request, semester_id=None):
     return render(request, 'zacetna_stran.html', {
@@ -42,6 +47,7 @@ def zacetna_stran(request, semester_id=None):
         'ucilnice': Ucilnica.objects.objavljene(),
     })
 
+
 def izbira_semestra(request):
     semestri = Semester.objects.filter(objavljen=True)
     return render(request, 'izbira_semestra.html', {
@@ -51,17 +57,14 @@ def izbira_semestra(request):
 
 
 def kombiniran_pogled_form(request, semester_id=None):
-    osebe = Oseba.objects.aktivni()
-    columns = 3
-    length = len(osebe)
-    per_column = length // columns
     ucilnice = Ucilnica.objects.objavljene()
+    form = KombiniranPogledForm()
     return render(request, 'kombiniran_pogled.html', {
         'stolpci_smeri': [
             Letnik.objects.filter(oddelek=Letnik.MATEMATIKA),
             Letnik.objects.filter(oddelek=Letnik.FIZIKA),
         ],
-        'osebe': [osebe[i*per_column:(i+1)*per_column] for i in range(columns)],
+        'form': form,
         'ucilnice': ucilnice,
         'naslov': 'Kombiniran pogled',
     })
