@@ -54,15 +54,6 @@ class Oseba(models.Model):
         else:
             return self.priimek
 
-    def __lt__(self, other):
-        return self.vrstni_red() < other.vrstni_red()
-
-    def vrstni_red(self):
-        if self.ime:
-            return (self.priimek, self.ime)
-        else:
-            return (self.priimek, )
-
     def vsa_srecanja(self, semester):
         return (self.srecanja.filter(semester=semester) | semester.srecanja.filter(predmet__slusatelji=self)).distinct()
 
@@ -171,15 +162,9 @@ class Ucilnica(models.Model):
     def __str__(self):
         return self.oznaka
 
-    def __lt__(self, other):
-        return self.vrstni_red() < other.vrstni_red()
-
     def kratko_ime(self):
         if self.kratka_oznaka:
             return self.kratka_oznaka
-        return self.oznaka
-
-    def vrstni_red(self):
         return self.oznaka
 
 
@@ -196,12 +181,6 @@ class Predmet(models.Model):
         ordering = ('ime',)
 
     def __str__(self):
-        return self.ime
-
-    def __lt__(self, other):
-        return self.vrstni_red() < other.vrstni_red()
-
-    def vrstni_red(self):
         return self.ime
 
     def kratice_letnikov(self):
@@ -594,7 +573,7 @@ class RezervacijeModelMultipleChoiceField(ModelMultipleChoiceField):
     def __init__(self, *args, **kwargs):
         ModelMultipleChoiceField.__init__(self, *args, **kwargs)
         it = self.iterator(self)
-        self.choices = [it.choice(obj) for obj in sorted(self.queryset)]
+        self.choices = [it.choice(obj) for obj in self.queryset]
 
 
 class OsebeModelMultipleChoiceField(RezervacijeModelMultipleChoiceField):
