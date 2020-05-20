@@ -17,7 +17,7 @@ class TedenskiUrnikTermin(Termin):
         self.zamik = None
         self.leftmost = False
         self.rightmost = False
-        self.kategorije: Set[int] = set()  # hrani indekse različnih kategorij iz legende, ki jim srečanje pripada
+        self.kategorije = set()  # hrani indekse različnih kategorij iz legende, ki jim srečanje pripada
 
     def __str__(self):
         return "Termin {} v dnevu {}, {}-{}, kategorije: {}".format(self.tip, self.dan, self.ura, self.ura+self.trajanje, self.kategorije)
@@ -78,7 +78,7 @@ class TedenskiUrnik:
     Predstavlja mrežo petih dni in uztreznih ur.
     """
     def __init__(self):
-        self._termini: List[TedenskiUrnikTermin] = []
+        self._termini = []
 
     def dodaj_srecanja(self, srecanja):
         self._termini.extend(TedenskiUrnikTermin.iz_srecanja(s) for s in srecanja)
