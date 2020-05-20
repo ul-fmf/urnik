@@ -239,11 +239,12 @@ def urnik(request, srecanja, rezervacije, naslov, teden=None, legenda=None):
         })
     else:
         WEEK = datetime.timedelta(days=7)
-        mozni_tedni = set(semester.tedni())
-        trenuten_teden = teden_dneva(teden or datetime.date.today())
+        trenuten_teden = teden_dneva(datetime.date.today())
+        mozni_tedni = set(t for t in semester.tedni() if t >= trenuten_teden)
+        izbran_teden = teden_dneva(teden or datetime.date.today())
         for t in range(-2, 8):
-            mozni_tedni.add((trenuten_teden[0] + t*WEEK,
-                             trenuten_teden[1] + t*WEEK))
+            mozni_tedni.add((izbran_teden[0] + t*WEEK,
+                             izbran_teden[1] + t*WEEK))
         if teden:
             semestri = Semester.objects.v_obdobju(teden, teden + WEEK)
             teden_v_napacnem_semestru = any(s != semester for s in semestri)
@@ -254,6 +255,7 @@ def urnik(request, srecanja, rezervacije, naslov, teden=None, legenda=None):
             'termini': tedenski_urnik.termini(kategorije),
             'legenda': legenda,
             'izbran_teden': teden,
+            'trenuten_teden': trenuten_teden[0],
             'mozni_tedni': sorted(mozni_tedni),
             'teden_v_napacnem_semestru': teden_v_napacnem_semestru,
         })

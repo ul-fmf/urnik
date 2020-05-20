@@ -989,12 +989,16 @@ table.highlight tr th {
     text-align: center;
     z-index: 1;
     position: relative;
+    white-space: nowrap;
 }
 .tedenski-pogled .btn {
     height: 28px;
     line-height: 28px;
 }
 .tedenski-pogled #teden-dropdown-btn {
-    min-width: 230px;
+    min-width: 300px;
     margin: 0px 10px;
+}
+.tedenski-pogled #teden-dropdown > li.izbran > a {
+    color: #999;
 }

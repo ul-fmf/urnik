@@ -14,7 +14,11 @@
     <li><a href="{% url_with_get teden=None %}">Splošen teden</a></li>
   {% endif %}
   {% for mozen_teden in mozni_tedni %}
-    {% if mozen_teden.0|date:"Y-m-d" != teden %}
+    {% if mozen_teden.0 == izbran_teden %}
+      <li class="izbran"><a href="{% url_with_get teden=mozen_teden.0|date:"Y-m-d" %}">{{ mozen_teden.0 | fmt_teden }} (izbran)</a></li>
+    {% elif mozen_teden.0 == trenuten_teden %}
+      <li><a href="{% url_with_get teden=mozen_teden.0|date:"Y-m-d" %}"><b>{{ mozen_teden.0 | fmt_teden }} (trenuten)</b></a></li>
+    {% else %}
       <li><a href="{% url_with_get teden=mozen_teden.0|date:"Y-m-d" %}">{{ mozen_teden.0 | fmt_teden }}</a></li>
     {% endif %}
   {% endfor %}
