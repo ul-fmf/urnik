@@ -1,18 +1,41 @@
 {% extends 'urnik_osnova.html' %}
 {% load tags %}
-{% block urnik_content %}
+{% block content %}
+  <div class="tedenski-pogled">
+    <a class="btn{% if not izbran_teden %} disabled{% endif %}"
+       href="{% if izbran_teden %}{% url_with_get teden=izbran_teden|plus_days:-7 %}{% else %}#{% endif %}"><i class="material-icons">navigate_before</i></a>
+    {% include "_tedni_dropdown.html" with mozni_tedni=mozni_tedni izbran_teden=izbran_teden %}
+    <a class="btn{% if not izbran_teden %} disabled{% endif %}"
+       href="{% if izbran_teden %}{% url_with_get teden=izbran_teden|plus_days:7 %}{% else %}#{% endif %}"><i class="material-icons">navigate_next</i></a>
+{#    {% now "Y-m-d" as danes %}#}
+{#    <a class="btn" href="{% url_with_get teden=danes %}">Danes</a>#}
+  </div>
+  {{ block.super }}
+{% endblock %}
 
+{% block notification %}
+  {{ block.super }}
+  {% if teden_v_napacnem_semestru %}
+    <div id="weird-week-note" class="card global-note">
+      Trenuten teden je izven izbranega semestra. Izberite <a href="{% url 'izbira_semestra' %}">drug semester</a>
+      ali pa izberite teden znoraj semestra.
+      <i class="material-icons close-icon" onclick="$(this.parentNode).fadeOut(200);">close</i>
+    </div>
+  {% endif %}
+{% endblock %}
+
+{% block urnik_content %}
 {% if nacin == 'ogled' %}
-  <div id="urnik" class="{% if not barve %}cel{% endif %}">
+  <div id="urnik" class="{% if not legenda %}cel{% endif %}">
     {% dnevi %}
     {% ure %}
     <div id="srecanja" class="poravnaj-na-termine">
-      {% for srecanje in srecanja %}
-        {% include '_srecanje.html' with nacin='ogled' %}
+      {% for termin in termini %}
+        {% include '_tedenski_termin.html' with nacin='ogled'%}
       {% endfor %}
     </div>
   </div>
-  {% if barve %}
+  {% if legenda %}
     <div class='right-panel' id='informacije'>
       <ul class="collapsible" data-collapsible="expandable">
         <li class="active">
@@ -20,8 +43,8 @@
             <i class="material-icons">line_style</i>Legenda
           </div>
           <div class="collapsible-body">
-            {% for barva in barve %}
-              <div class="legenda srecanje ustrezna" style="{% pobarvaj forloop.counter0 %}">{{ barva }}</div>
+            {% for el in legenda %}
+              <div class="legenda srecanje ustrezna" style="{% pobarvaj forloop.counter0 %}">{{ el }}</div>
             {% endfor %}
           </div>
         </li>
@@ -34,8 +57,8 @@
     {% dnevi %}
     {% ure %}
     <div id="srecanja" class="poravnaj-na-termine">
-      {% for srecanje in srecanja %}
-        {% include '_srecanje.html' with nacin='urejanje' %}
+      {% for termin in termini %}
+        {% include '_tedenski_termin.html' with nacin='urejanje' %}
       {% endfor %}
       {% for termin in prosti_termini.values %}
         {% include '_prosti_termin.html' %}
@@ -51,7 +74,9 @@
           </div>
           <div class="collapsible-body">
             {% for srecanje in odlozena_srecanja %}
-              {% include '_srecanje.html' with nacin='odlozisce' %}
+              <div class="srecanje-absolute-box leftmost rightmost"><div class="srecanje">
+                {% include '_srecanje.html' with nacin='odlozisce' srecanje=srecanje %}
+              </div></div>
             {% endfor %}
           </div>
         </li>
@@ -63,7 +88,9 @@
             <i class="material-icons">open_with</i> Premikanje srečanja
           </div>
           <div class="collapsible-body">
-            {% include '_srecanje.html' with nacin='odlozisce' srecanje=premaknjeno_srecanje %}
+            <div class="srecanje-absolute-box leftmost rightmost"><div class="srecanje">
+              {% include '_srecanje.html' with nacin='odlozisce' srecanje=premaknjeno_srecanje %}
+            </div></div>
             <form method="post" action="{% url 'odlozi_srecanje' premaknjeno_srecanje.id %}">
               {% csrf_token %}
               <input type="hidden" name="next" value="{{ next }}">
@@ -113,3 +140,8 @@
 {% endif %}
 
 {% endblock urnik_content %}
+
+{% block footer %}
+  {{ block.super }}
+  {% include "_tedni_dropdown_footer.html" %}
+{% endblock %}

@@ -26,26 +26,7 @@
       Če ni na izbiro, za ta teden še nihče ni naredil rezervacije.
     </div>
     <div class="card-action">
-      <a class="teden-dropdown-button btn" id="teden-dropdown-btn" href="#" data-target='teden-dropdown'>
-        <span>
-          {% if not teden %}
-            Splošen teden
-          {% else %}
-            {{ teden | fmt_teden }}
-          {% endif %}
-        </span>
-        <i class="material-icons right">arrow_drop_down</i>
-      </a>
-      <ul id='teden-dropdown' class='dropdown-content'>
-        {% if teden %}
-          <li><a href="{% url_with_get teden=None %}">Splošen teden</a></li>
-        {% endif %}
-        {% for mozen_teden in mozni_tedni %}
-          {% if mozen_teden.0|date:"Y-m-d" != teden %}
-            <li><a href="{% url_with_get teden=mozen_teden.0|date:"Y-m-d" pr="1" %}">{{ mozen_teden.0 | fmt_teden }}</a></li>
-          {% endif %}
-        {% endfor %}
-      </ul>
+      {% include "_tedni_dropdown.html" with mozni_tedni=mozni_tedni izbran_teden=teden %}
     </div>
   </div>
 
@@ -97,19 +78,6 @@
 {% endblock urnik_content %}
 
 {% block footer %}
-  <script>
-      $(document).ready(function () {
-          $('.teden-dropdown-button').dropdown({
-                  inDuration: 300,
-                  outDuration: 225,
-                  constrainWidth: true, // Does not change width of dropdown to that of the activator
-                  hover: false, // Activate on hover
-                  gutter: 0, // Spacing from edge
-                  coverTrigger: false, // Displays dropdown below the button
-                  alignment: 'left', // Displays dropdown with edge aligned to the left of button
-                  stopPropagation: false // Stops event propagation
-              }
-          );
-      });
-  </script>
-{% endblock footer %}
+  {{ block.super }}
+  {% include "_tedni_dropdown_footer.html" %}
+{% endblock %}

@@ -45,7 +45,7 @@ class ProsteUcilnice(object):
     def dodaj_srecanja_semestra(self, semester, teden=None):
         for srecanje in semester.srecanja.select_related('ucilnica', 'predmet').prefetch_related('ucitelji'
                                        ).filter(ucilnica__in=[u.pk for u in self.ucilnice]).exclude(ura__isnull=True):
-            if teden and semester.od <= teden + datetime.timedelta(days=srecanje.dan-1) <= semester.do:
+            if teden is None or semester.od <= teden + datetime.timedelta(days=srecanje.dan-1) <= semester.do:
                 for i in range(srecanje.trajanje):
                     self.zasedenost_ucilnic[srecanje.dan, srecanje.ura + i][srecanje.ucilnica] = srecanje
 

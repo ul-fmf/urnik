@@ -1,0 +1,27 @@
+{% load tags %}
+<a class="teden-dropdown-button btn" id="teden-dropdown-btn" href="#" data-target='teden-dropdown'>
+<span>
+  {% if not izbran_teden %}
+    Splošen teden
+  {% else %}
+    {{ izbran_teden | fmt_teden }}
+  {% endif %}
+</span>
+<i class="material-icons right">arrow_drop_down</i>
+</a>
+<ul id='teden-dropdown' class='dropdown-content'>
+  {% if izbran_teden %}
+    <li><a href="{% url_with_get teden=None %}">Splošen teden</a></li>
+  {% endif %}
+  {% for mozen_teden in mozni_tedni %}
+    {% if mozen_teden.0 == izbran_teden %}
+      <li class="izbran"><a href="{% url_with_get teden=mozen_teden.0|date:"Y-m-d" %}">{{ mozen_teden.0 | fmt_teden }} (izbran)</a></li>
+    {% elif mozen_teden.0 == trenuten_teden %}
+      <li><a href="{% url_with_get teden=mozen_teden.0|date:"Y-m-d" %}"><b>{{ mozen_teden.0 | fmt_teden }} (trenuten)</b></a></li>
+    {% else %}
+      <li><a href="{% url_with_get teden=mozen_teden.0|date:"Y-m-d" %}">{{ mozen_teden.0 | fmt_teden }}</a></li>
+    {% endif %}
+  {% endfor %}
+</ul>
+
+{# For the dropdown to work, the _tedni_dropdown_footer.html file must be included in the page footer. #}

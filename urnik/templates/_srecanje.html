@@ -1,111 +1,77 @@
-{% load tags %}
-<div class="srecanje-absolute-box {{ srecanje.css_classes }}" style="{{ srecanje.style }}">
-<div class="srecanje" style="{% pobarvajvec srecanje.barve %}">
-  <div class="main-box">
-{# TODO: info box, ko bo potreben #}
-{#    <div class="info-box"><i class="material-icons">info_outline</i></div> #}
-    <span class="predmet">
-      {% if srecanje.predmet %}
-        <a href="{% url 'urnik_predmeta' predmet_id=srecanje.predmet.id semester_id=izbrani_semester_id %}">
-          {% if nacin == 'ogled' %}{{ srecanje.po_potrebi_okrajsano_ime_predmeta }}{% else %}{{ srecanje.predmet.kratica }}{% endif %}
-        </a>
-      {% endif %}
-      <span class="tip">
-       {{ srecanje.tip }}{{ srecanje.oznaka }}{{ srecanje.barva }}
-      </span>
+ <div class="main-box">
+  {# TODO: info box, ko bo potreben #}
+  {#    <div class="info-box"><i class="material-icons">info_outline</i></div> #}
+  <span class="predmet">
+    {% if srecanje.predmet %}
+      <a href="{% url 'urnik_predmeta' predmet_id=srecanje.predmet.id semester_id=izbrani_semester_id %}">
+        {{ ime_srecanja|default:srecanje.predmet.kratica }}
+      </a>
+    {% endif %}
+    <span class="tip">
+      {{ srecanje.tip }}{{ srecanje.oznaka }}{{ srecanje.barva }}
     </span>
-    <br>
-    {% if srecanje.trajanje > 1 %}
+  </span>
+  <br>
+  {% if termin.trajanje > 1 %}
     <span class="letniki">
       {% for letnik in srecanje.predmet.letniki.all %}
         <a href="{% url 'urnik_letnika' letnik_id=letnik.id semester_id=izbrani_semester_id %}">{{ letnik.kratica }}</a>{% if not forloop.last %}, {% endif %}
       {% endfor %}
     </span>
-    {% endif %}
-  </div>
-
-  <div class="ucitelj">
-    {% for ucitelj in srecanje.ucitelji.all %}
-      <a href="{% url 'urnik_osebe' oseba_id=ucitelj.id semester_id=izbrani_semester_id %}">{{ ucitelj.priimek }}</a>{% if not forloop.last %}, {% endif %}
-    {% endfor %}
-  </div>
-
-  {% if srecanje.ucilnica %}
-    <div class="ucilnica">
-      <a href="{% url 'urnik_ucilnice' ucilnica_id=srecanje.ucilnica.id semester_id=izbrani_semester_id %}">{{ srecanje.ucilnica.kratko_ime }}</a>
-    </div>
   {% endif %}
+</div>
 
-  {% if nacin == 'urejanje' or nacin == 'odlozisce' %}
-    <div class="urejanje">
-      {% if srecanje.lahko_skrajsam %}
-        <form method="post" action="{% url 'nastavi_trajanje_srecanja' srecanje.id %}">
-          {% csrf_token %}
-          <input type="hidden" name="trajanje" value="{{ srecanje.trajanje|add:-1 }}">
-          <button>
-            <i class="tiny material-icons">file_upload</i> skrajšaj
-          </button>
-        </form>
-      {% endif %}
-      {% if srecanje.lahko_podaljsam %}
-        <form method="post" action="{% url 'nastavi_trajanje_srecanja' srecanje.id %}">
-          {% csrf_token %}
-          <input type="hidden" name="trajanje" value="{{ srecanje.trajanje|add:1 }}">
-          <button>
-            <i class="tiny material-icons">file_download</i> podaljšaj
-          </button>
-        </form>
-      {% endif %}
-      <a href="{% url 'admin:urnik_srecanje_change' srecanje.id %}?next={{ next }}">
-        <i class="tiny material-icons">edit</i> uredi
-      </a>
-      <form method="post" action="{% url 'podvoji_srecanje' srecanje.id %}">
+<div class="ucitelj">
+  {% for ucitelj in srecanje.ucitelji.all %}
+    <a href="{% url 'urnik_osebe' oseba_id=ucitelj.id semester_id=izbrani_semester_id %}">{{ ucitelj.priimek }}</a>{% if not forloop.last %}, {% endif %}
+  {% endfor %}
+</div>
+
+{% if srecanje.ucilnica %}
+  <div class="ucilnica">
+    <a href="{% url 'urnik_ucilnice' ucilnica_id=srecanje.ucilnica.id semester_id=izbrani_semester_id %}">{{ srecanje.ucilnica.kratko_ime }}</a>
+  </div>
+{% endif %}
+
+{% if nacin == 'urejanje' or nacin == 'odlozisce' %}
+  <div class="urejanje">
+    {% if srecanje.lahko_skrajsam %}
+      <form method="post" action="{% url 'nastavi_trajanje_srecanja' srecanje.id %}">
         {% csrf_token %}
-        <button>
-          <i class="tiny material-icons">content_copy</i> podvoji
-        </button>
+        <input type="hidden" name="trajanje" value="{{ srecanje.trajanje|add:-1 }}">
+        <button><i class="tiny material-icons">file_upload</i> skrajšaj</button>
       </form>
-      <a href="{% url 'admin:urnik_srecanje_delete' srecanje.id %}?next={{ next }}">
-        <i class="tiny material-icons">delete</i> pobriši
-      </a>
-      {% if srecanje.lahko_odlozim %}
-        <form method="post" action="{% url 'odlozi_srecanje' srecanje.id %}">
-          {% csrf_token %}
-          <button>
-            <i class="tiny material-icons">move_to_inbox</i> odloži
-          </button>
-        </form>
-      {% endif %}
-      <div class="premakni_srecanje">
-        <a href="">
-          <i class="tiny material-icons">open_with</i> premakni
-        </a>
-        <div class="mozne_ucilnice">
-          <a href="{% url 'premakni_srecanje' srecanje.id %}?tip=velika">
-            <i class="tiny material-icons">group</i>
-            velika (&gt;60)
-          </a>
-          <a href="{% url 'premakni_srecanje' srecanje.id %}?tip=obicajna">
-            <i class="tiny material-icons">person</i>
-            običajna (30-50)
-          </a>
-          <a href="{% url 'premakni_srecanje' srecanje.id %}?tip=majhna">
-            <i class="tiny material-icons">person_outline</i>
-            majhna (&lt;30)
-          </a>
-          <a href="{% url 'premakni_srecanje' srecanje.id %}?tip=racunalniska">
-            <i class="tiny material-icons">computer</i>
-            računalniška
-          </a>
-          {% if 'fizika' in user.groups.all|join:"," %}
-            <a href="{% url 'premakni_srecanje' srecanje.id %}?tip=praktikum">
-              <i class="tiny material-icons">build</i>
-              praktikum
-            </a>
-          {% endif %}
-        </div>
+    {% endif %}
+    {% if srecanje.lahko_podaljsam %}
+      <form method="post" action="{% url 'nastavi_trajanje_srecanja' srecanje.id %}">
+        {% csrf_token %}
+        <input type="hidden" name="trajanje" value="{{ srecanje.trajanje|add:1 }}">
+        <button><i class="tiny material-icons">file_download</i> podaljšaj</button>
+      </form>
+    {% endif %}
+    <a href="{% url 'admin:urnik_srecanje_change' srecanje.id %}?next={{ next }}"><i class="tiny material-icons">edit</i> uredi</a>
+    <form method="post" action="{% url 'podvoji_srecanje' srecanje.id %}">
+      {% csrf_token %}
+      <button><i class="tiny material-icons">content_copy</i> podvoji</button>
+    </form>
+    <a href="{% url 'admin:urnik_srecanje_delete' srecanje.id %}?next={{ next }}"><i class="tiny material-icons">delete</i> pobriši</a>
+    {% if srecanje.lahko_odlozim %}
+      <form method="post" action="{% url 'odlozi_srecanje' srecanje.id %}">
+        {% csrf_token %}
+        <button><i class="tiny material-icons">move_to_inbox</i> odloži</button>
+      </form>
+    {% endif %}
+    <div class="premakni_srecanje">
+      <a href=""><i class="tiny material-icons">open_with</i> premakni</a>
+      <div class="mozne_ucilnice">
+        <a href="{% url 'premakni_srecanje' srecanje.id %}?tip=velika"><i class="tiny material-icons">group</i> velika (&gt;60)</a>
+        <a href="{% url 'premakni_srecanje' srecanje.id %}?tip=obicajna"><i class="tiny material-icons">person</i> običajna (30-50)</a>
+        <a href="{% url 'premakni_srecanje' srecanje.id %}?tip=majhna"><i class="tiny material-icons">person_outline</i> majhna (&lt;30)</a>
+        <a href="{% url 'premakni_srecanje' srecanje.id %}?tip=racunalniska"><i class="tiny material-icons">computer</i> računalniška</a>
+        {% if 'fizika' in user.groups.all|join:"," %}
+          <a href="{% url 'premakni_srecanje' srecanje.id %}?tip=praktikum"><i class="tiny material-icons">build</i> praktikum</a>
+        {% endif %}
       </div>
     </div>
-  {% endif %}
-</div>
-</div>
+  </div>
+{% endif %}

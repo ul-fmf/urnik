@@ -49,10 +49,10 @@ def pobarvaj(barva):
 @register.simple_tag()
 def pobarvajvec(barve):
     if barve:
-        barve = ', '.join(
+        gradient = ', '.join(
             ('{0} {1:.2%}, {0} {2:.2%}'.format(BARVE[barva % len(BARVE)], i / len(barve), (i + 1) / len(barve))
                 for i, barva in enumerate(barve)))
-        return "background: repeating-linear-gradient(135deg, {});".format(barve)
+        return "background: repeating-linear-gradient(135deg, {});".format(gradient)
     return ''
 
 
@@ -80,7 +80,8 @@ def fmt_teden(start_date):
     if isinstance(start_date, str):
         start_date = parse_date(start_date)
     end_date = start_date + timedelta(days=6)
-    return mark_safe(defaultfilters.date(start_date, "j. b") + " &ndash; " + defaultfilters.date(end_date, "j. b Y"))
+    date_fmt = defaultfilters.date
+    return mark_safe(date_fmt(start_date, "d. b") + " &ndash; " + date_fmt(end_date, "d. b Y"))
 
 
 DNEVI_TOZILNIK = ["ponedeljek", "torek", "sredo", "četrtek", "petek", "soboto", "nedeljo"]
@@ -93,3 +94,8 @@ DNEVI_TOZILNIK_MNOZINA = ["ponedeljkih", "torkih", "sredah", "četrtkih", "petki
 @register.filter()
 def dan_tozilnik_mnozina(day):
     return DNEVI_TOZILNIK_MNOZINA[int(day)-1]
+
+
+@register.filter
+def plus_days(value, days):
+    return value + timedelta(days=days)
