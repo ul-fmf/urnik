@@ -1,5 +1,4 @@
 import datetime
-import icu
 from collections import defaultdict
 from copy import deepcopy
 
@@ -18,8 +17,6 @@ ENOTA_VISINE = 1 / (MAX_URA - MIN_URA)
 DNEVI = ('ponedeljek', 'torek', 'sreda', 'četrtek', 'petek')
 ENOTA_SIRINE = 1 / len(DNEVI)
 DAYS_IN_WEEK = 7
-
-collator = icu.Collator.createInstance(icu.Locale(settings.LANGUAGE_CODE))
 
 
 class OsebaQuerySet(models.QuerySet):
@@ -56,15 +53,6 @@ class Oseba(models.Model):
             return '{} {}'.format(self.ime, self.priimek)
         else:
             return self.priimek
-
-    def __lt__(self, other):
-        return self.vrstni_red() < other.vrstni_red()
-
-    def vrstni_red(self):
-        if self.ime:
-            return (collator.getSortKey(self.priimek), collator.getSortKey(self.ime))
-        else:
-            return (collator.getSortKey(self.priimek), )
 
     def vsa_srecanja(self, semester):
         return (self.srecanja.filter(semester=semester) | semester.srecanja.filter(predmet__slusatelji=self)).distinct()
@@ -173,17 +161,14 @@ class Ucilnica(models.Model):
 
     def __str__(self):
         return self.oznaka
-
+    
     def __lt__(self, other):
-        return self.vrstni_red() < other.vrstni_red()
+        return self.oznaka < other.oznaka
 
     def kratko_ime(self):
         if self.kratka_oznaka:
             return self.kratka_oznaka
         return self.oznaka
-
-    def vrstni_red(self):
-        return collator.getSortKey(self.oznaka)
 
 
 class Predmet(models.Model):
@@ -200,12 +185,6 @@ class Predmet(models.Model):
 
     def __str__(self):
         return self.ime
-
-    def __lt__(self, other):
-        return self.vrstni_red() < other.vrstni_red()
-
-    def vrstni_red(self):
-        return collator.getSortKey(self.ime)
 
     def kratice_letnikov(self):
         return ', '.join(letnik.kratica for letnik in self.letniki.all())
@@ -597,7 +576,7 @@ class RezervacijeModelMultipleChoiceField(ModelMultipleChoiceField):
     def __init__(self, *args, **kwargs):
         ModelMultipleChoiceField.__init__(self, *args, **kwargs)
         it = self.iterator(self)
-        self.choices = [it.choice(obj) for obj in sorted(self.queryset)]
+        self.choices = [it.choice(obj) for obj in self.queryset]
 
 
 class OsebeModelMultipleChoiceField(RezervacijeModelMultipleChoiceField):

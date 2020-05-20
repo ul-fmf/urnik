@@ -34,13 +34,12 @@ def ogled_starega_semestra(request):
         Semester.objects.filter(objavljen=True).latest('od').pk != semester_id
 
 def zacetna_stran(request, semester_id=None):
-    ucilnice = Ucilnica.objects.objavljene()
     return render(request, 'zacetna_stran.html', {
         'stolpci_smeri': [
             Letnik.objects.filter(oddelek=Letnik.MATEMATIKA),
             Letnik.objects.filter(oddelek=Letnik.FIZIKA),
         ],
-        'ucilnice': sorted(ucilnice),
+        'ucilnice': Ucilnica.objects.objavljene(),
     })
 
 def izbira_semestra(request):
@@ -52,7 +51,7 @@ def izbira_semestra(request):
 
 
 def kombiniran_pogled_form(request, semester_id=None):
-    osebe = sorted(Oseba.objects.aktivni())
+    osebe = Oseba.objects.aktivni()
     columns = 3
     length = len(osebe)
     per_column = length // columns
@@ -63,7 +62,7 @@ def kombiniran_pogled_form(request, semester_id=None):
             Letnik.objects.filter(oddelek=Letnik.FIZIKA),
         ],
         'osebe': [osebe[i*per_column:(i+1)*per_column] for i in range(columns)],
-        'ucilnice': sorted(ucilnice),
+        'ucilnice': ucilnice,
         'naslov': 'Kombiniran pogled',
     })
 
