@@ -5,6 +5,9 @@ html {
 input[type="checkbox"] + span:not(.lever) {
     padding-left: 25px;
 }
+input::placeholder {
+    color: #999;
+}
 
 .container {
     margin-bottom: 20px;
@@ -844,6 +847,12 @@ table.highlight tr th {
 #kombiniran-pogled-form table tbody tr:first-child td {
     padding-top: 4px;
 }
+#kombiniran-pogled-form table.select tbody tr td .select-wrapper > ul > li {
+    min-height: 30px;
+}
+#kombiniran-pogled-form table.select tbody tr td .select-wrapper > ul > li > span {
+    padding: 5px 10px;
+}
 
 /* printall */
 .printall-table {
@@ -895,9 +904,6 @@ table.highlight tr th {
     font-size: 1rem;
     font-weight: bold;
     color: #333;
-}
-.rezervacije-form input::placeholder {
-    color: #999;
 }
 .rezervacije-form #id_ucilnice {
     margin-top: 10px;

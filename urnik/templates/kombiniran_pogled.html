@@ -7,7 +7,7 @@
   <div class="col m12">
     <p id="kombiniran-pogled-text">
       <input type="submit" value="Prikaži kombiniran pogled" class="btn">
-      <span class="flow-text">Tukaj lahko pogledate urnike za več letnikov, oseb ali učilnic hkrati.</span>
+      <span class="flow-text">Tukaj lahko pogledate urnike za več letnikov, učilnic, oseb ali predmetov hkrati.</span>
     </p>
   </div>
 </div>
@@ -38,7 +38,7 @@
       {% endfor %}
     </div>  <!-- smeri -->
   {% endfor %}
-  <div class="col s6 m2">
+  <div class="col s6 m3">
     <table class="highlight">
       <thead>
       <tr>
@@ -67,35 +67,44 @@
       </tbody>
     </table>
   </div> <!-- ucilnice -->
-  {% for column in osebe %}
-    <div class="col s6 m2">
-      <table class="highlight">
-        <thead>
-        <tr>
-          <th>Oseba
-            {% if forloop.counter0 > 0 %}
-              (nadalj.)
-            {% endif %}
-          </th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for oseba in column %}
-          <tr>
-            <td>
-              <label for="oseba-{{ oseba.id }}">
-                <input type="checkbox" name="oseba" autocomplete="off" value="{{ oseba.id }}"
-                       id="oseba-{{ oseba.id }}">
-                <span>{{ oseba.ime }} <strong>{{ oseba.priimek }}</strong></span>
-              </label>
-            </td>
-          </tr>
-        {% endfor %}
-        </tbody>
-      </table>
-    </div>  <!-- osebe -->
-  {% endfor %}
+  <div class="col s12 m5">
+    <table class="highlight select" id="osebe">
+      <thead><tr><th>Oseba</th></tr></thead>
+      <tbody><tr><td>{{ form.oseba }}</td></tr></tbody>
+    </table>
+    <br>
+    <table class="highlight select" id="predmeti">
+      <thead><tr><th>Predmet</th></tr></thead>
+      <tbody><tr><td>{{ form.predmet }}</td></tr></tbody>
+    </table>
+    <br>
+    <table class="highlight">
+      <thead><tr><th>Kratka navodila</th></tr></thead>
+      <tbody><tr><td>
+        Za izbiro oseb lahko kliknete na spustni meni in začnete tipkati prve črke priimka. Izbiro lahko zamenjate s
+        puščicami gor ali dol in potrdite s tipko Enter. Če želite izbrati še eno osebo, ponovno pritisnete
+        Enter, izberete osebo in spet potrdite s tipko Enter. Predmete izbirate na enak način. Bolj podrobna
+        navodila so na voljo na strani <a href="{% url 'help' %}">Navodila in pomoč</a>.
+      </td></tr></tbody>
+    </table>
+  </div>
 </div> <!-- row -->
 </div> <!-- container -->
 </form>
 {% endblock content %}
+
+
+{% block footer %}
+  <script>
+      $(document).ready(function () {
+          $('select').formSelect({
+              'dropdownOptions': {
+                  'constrainWidth': true,
+                  'coverTrigger': false,
+              }
+          });
+          $('#osebe .select-dropdown').attr('placeholder', 'Izberite osebe');
+          $('#predmeti .select-dropdown').attr('placeholder', 'Izberite predmete');
+      });
+  </script>
+{% endblock %}
