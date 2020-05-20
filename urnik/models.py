@@ -1,5 +1,4 @@
 import datetime
-import icu
 from collections import defaultdict
 from copy import deepcopy
 
@@ -18,8 +17,6 @@ ENOTA_VISINE = 1 / (MAX_URA - MIN_URA)
 DNEVI = ('ponedeljek', 'torek', 'sreda', 'četrtek', 'petek')
 ENOTA_SIRINE = 1 / len(DNEVI)
 DAYS_IN_WEEK = 7
-
-collator = icu.Collator.createInstance(icu.Locale(settings.LANGUAGE_CODE))
 
 
 class OsebaQuerySet(models.QuerySet):
@@ -62,9 +59,9 @@ class Oseba(models.Model):
 
     def vrstni_red(self):
         if self.ime:
-            return (collator.getSortKey(self.priimek), collator.getSortKey(self.ime))
+            return (self.priimek, self.ime)
         else:
-            return (collator.getSortKey(self.priimek), )
+            return (self.priimek, )
 
     def vsa_srecanja(self, semester):
         return (self.srecanja.filter(semester=semester) | semester.srecanja.filter(predmet__slusatelji=self)).distinct()
@@ -183,7 +180,7 @@ class Ucilnica(models.Model):
         return self.oznaka
 
     def vrstni_red(self):
-        return collator.getSortKey(self.oznaka)
+        return self.oznaka
 
 
 class Predmet(models.Model):
@@ -205,7 +202,7 @@ class Predmet(models.Model):
         return self.vrstni_red() < other.vrstni_red()
 
     def vrstni_red(self):
-        return collator.getSortKey(self.ime)
+        return self.ime
 
     def kratice_letnikov(self):
         return ', '.join(letnik.kratica for letnik in self.letniki.all())
