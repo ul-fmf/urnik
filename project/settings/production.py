@@ -35,7 +35,7 @@ AUTHENTICATION_BACKENDS += (
     'django_auth_ldap.backend.LDAPBackend',
 )
 
-with open('/srv/boterdev/etc/ldap_password.txt') as f:
+with open('/srv/urnik/etc/ldap_password.txt') as f:
     AUTH_LDAP_BIND_PASSWORD = f.read().strip()
 
 AUTH_LDAP_SERVER_URI = 'ldap://dcv1fmf.fmf.uni-lj.si:3268,ldap://dcv2fmf.fmf.uni-lj.si:3268'
