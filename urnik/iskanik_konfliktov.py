@@ -28,7 +28,7 @@ class ProsteUcilniceTermin(Termin):
         if pokazi_zasedene:
             vse.extend([('rezervirana', u, r) for u, r in self.rezervirane])
             vse.extend([('zasedena', u, r) for u, r in self.zasedene])
-        self.prikazane_ucilnice = sorted(vse, key=lambda x: x[1].oznaka)
+        self.prikazane_ucilnice = sorted(vse, key=lambda x: x[1])
 
     def hue(self):
         h = self.HUE_PRAZEN if self.proste else self.HUE_POLN

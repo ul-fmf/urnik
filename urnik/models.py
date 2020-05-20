@@ -161,6 +161,9 @@ class Ucilnica(models.Model):
 
     def __str__(self):
         return self.oznaka
+    
+    def __lt__(self, other):
+        return self.oznaka < other.oznaka
 
     def kratko_ime(self):
         if self.kratka_oznaka:
