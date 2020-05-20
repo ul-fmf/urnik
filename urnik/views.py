@@ -155,7 +155,7 @@ def nova_rezervacija(request, ucilnica_id=None, ura=None, teden=None, dan_v_tedn
 def preglej_rezervacije(request):
     if not request.user.is_staff:
         redirect('preglej_rezervacije_oseba', request.user.pk)
-    rezervacije = Rezervacija.objects.prihajajoce().prefetch_related('predmeti', 'predmeti__letnik')
+    rezervacije = Rezervacija.objects.prihajajoce().prefetch_related('predmeti', 'predmeti__letniki')
     rezervacije_filter = request.GET.get('filter', 'nepotrjene')
     if rezervacije_filter != 'all':
         rezervacije = rezervacije.filter(potrjena=False)
