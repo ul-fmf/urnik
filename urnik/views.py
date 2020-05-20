@@ -264,7 +264,9 @@ def urnik_osebe(request, oseba_id, semester_id=None):
     oseba = get_object_or_404(Oseba, id=oseba_id)
     rezervacije = Rezervacija.objects.none() if not teden else oseba.rezervacije.v_tednu(teden)
     naslov = str(oseba)
-    return urnik(request, oseba.vsa_srecanja(izbrani_semester(request)), rezervacije, naslov, teden)
+    semester = izbrani_semester(request)
+    srecanja = oseba.vsa_srecanja(semester).v_tednu_semestra(teden, semester)
+    return urnik(request, srecanja, rezervacije, naslov, teden)
 
 
 def urnik_letnika(request, letnik_id, semester_id=None):
@@ -272,7 +274,9 @@ def urnik_letnika(request, letnik_id, semester_id=None):
     letnik = get_object_or_404(Letnik, id=letnik_id)
     rezervacije = Rezervacija.objects.none() if not teden else Rezervacija.objects.filter(predmeti__letniki=letnik).v_tednu(teden)
     naslov = str(letnik)
-    return urnik(request, letnik.srecanja(izbrani_semester(request)).all(), rezervacije, naslov, teden)
+    semester = izbrani_semester(request)
+    srecanja = letnik.srecanja(semester).all().v_tednu_semestra(teden, semester)
+    return urnik(request, srecanja, rezervacije, naslov, teden)
 
 
 def urnik_ucilnice(request, ucilnica_id, semester_id=None):
@@ -280,7 +284,9 @@ def urnik_ucilnice(request, ucilnica_id, semester_id=None):
     ucilnica = get_object_or_404(Ucilnica, id=ucilnica_id)
     rezervacije = Rezervacija.objects.none() if not teden else ucilnica.rezervacije.v_tednu(teden)
     naslov = 'Učilnica {}'.format(ucilnica.oznaka)
-    return urnik(request, ucilnica.srecanja.filter(semester=izbrani_semester(request)), rezervacije, naslov, teden, legenda=[])
+    semester = izbrani_semester(request)
+    srecanja = ucilnica.srecanja.filter(semester=semester).v_tednu_semestra(teden, semester)
+    return urnik(request, srecanja, rezervacije, naslov, teden, legenda=[])
 
 
 def urnik_predmeta(request, predmet_id, semester_id=None):
@@ -288,7 +294,9 @@ def urnik_predmeta(request, predmet_id, semester_id=None):
     predmet = get_object_or_404(Predmet, id=predmet_id)
     rezervacije = Rezervacija.objects.none() if not teden else predmet.rezervacije.v_tednu(teden)
     naslov = str(predmet)
-    return urnik(request, predmet.srecanja.filter(semester=izbrani_semester(request)), rezervacije, naslov, teden)
+    semester = izbrani_semester(request)
+    srecanja = predmet.srecanja.filter(semester=semester).v_tednu_semestra(teden, semester)
+    return urnik(request, srecanja, rezervacije, naslov, teden)
 
 
 def kombiniran_pogled(request, semester_id=None):
@@ -308,12 +316,11 @@ def kombiniran_pogled(request, semester_id=None):
     rezervacije = Rezervacija.objects.none()
 
     if teden:
-        veljavni_dnevi = [dan for dan in range(1, 6) if semester.od <= teden + datetime.timedelta(days=dan-1) <= semester.do]
-        srecanja_letnikov = srecanja_letnikov.filter(dan__in=veljavni_dnevi)
-        srecanja_uciteljev = srecanja_uciteljev.filter(dan__in=veljavni_dnevi)
-        srecanja_slusateljev = srecanja_slusateljev.filter(dan__in=veljavni_dnevi)
-        srecanja_ucilnic = srecanja_ucilnic.filter(dan__in=veljavni_dnevi)
-        srecanja_predmetov = srecanja_predmetov.filter(dan__in=veljavni_dnevi)
+        srecanja_letnikov = srecanja_letnikov.v_tednu_semestra(teden, semester)
+        srecanja_uciteljev = srecanja_uciteljev.v_tednu_semestra(teden, semester)
+        srecanja_slusateljev = srecanja_slusateljev.v_tednu_semestra(teden, semester)
+        srecanja_ucilnic = srecanja_ucilnic.v_tednu_semestra(teden, semester)
+        srecanja_predmetov = srecanja_predmetov.v_tednu_semestra(teden, semester)
 
         rezervacije_letnikov = Rezervacija.objects.filter(predmeti__letniki__in=letniki).v_tednu(teden)
         rezervacije_ucilnic = Rezervacija.objects.filter(ucilnice__in=ucilnice).v_tednu(teden)

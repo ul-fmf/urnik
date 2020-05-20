@@ -278,6 +278,12 @@ class SrecanjeQuerySet(models.QuerySet):
             for opis_tipa, prekrivanja_tipa in prekrivanja_po_tipih.items()
         }
 
+    def v_tednu_semestra(self, teden, semester):
+        if teden is None:
+            return self
+        veljavni_dnevi = [dan for dan in range(0, 5) if semester.od <= teden + datetime.timedelta(days=dan) <= semester.do]
+        return self.filter(dan__in=veljavni_dnevi)
+
     def za_urnik(self):
         return self.neodlozena(
         ).order_by(
