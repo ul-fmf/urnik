@@ -1,6 +1,7 @@
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.db.models import Prefetch
 from django.http import QueryDict
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -73,24 +74,23 @@ def kombiniran_pogled_form(request, semester_id=None):
 
 def rezervacije(request):
     queryset = Rezervacija.objects.prihajajoce().prefetch_related(
-        'ucilnice',
-        'osebe',
-        'ucilnice__srecanja__ucitelji',
-        'ucilnice__srecanja__predmet',
+        Prefetch('ucilnice', to_attr='seznam_ucilnic'),
+        Prefetch('osebe', to_attr='seznam_oseb'),
+        Prefetch('predmeti', queryset=Predmet.objects.prefetch_related('letniki'), to_attr='seznam_predmetov'),
     )
     racunaj_konflikte = request.user.is_staff
-
     if racunaj_konflikte:
         iskalnik = IskalnikKonfliktov.za_rezervacije(queryset)
 
     rezervacije = []
     for rezervacija in queryset:
-        for ucilnica in rezervacija.ucilnice.all():
+        for ucilnica in rezervacija.seznam_ucilnic:
             for dan in rezervacija.prihajajoci_dnevi():
                 rezervacije.append({
                     'id': rezervacija.id,
                     'ucilnica': ucilnica,
-                    'osebe': rezervacija.osebe,
+                    'osebe': rezervacija.seznam_oseb,
+                    'predmeti': rezervacija.seznam_predmetov,
                     'od': rezervacija.od,
                     'do': rezervacija.do,
                     'opomba': rezervacija.opomba,
@@ -155,17 +155,20 @@ def nova_rezervacija(request, ucilnica_id=None, ura=None, teden=None, dan_v_tedn
 def preglej_rezervacije(request):
     if not request.user.is_staff:
         redirect('preglej_rezervacije_oseba', request.user.pk)
-    rezervacije = Rezervacija.objects.prihajajoce().prefetch_related('predmeti', 'predmeti__letniki')
+    rezervacije = Rezervacija.objects.prihajajoce().select_related('avtor_rezervacije')
     rezervacije_filter = request.GET.get('filter', 'nepotrjene')
     if rezervacije_filter != 'all':
         rezervacije = rezervacije.filter(potrjena=False)
     rezervacije = rezervacije.prefetch_related(
-        'ucilnice', 'osebe').order_by('dan', 'od', 'pk')
-
+        Prefetch('ucilnice', to_attr='seznam_ucilnic'),
+        Prefetch('osebe', to_attr='seznam_oseb'),
+        Prefetch('predmeti', queryset=Predmet.objects.prefetch_related('letniki'), to_attr='seznam_predmetov'),
+    ).order_by('dan', 'od', 'pk')
     iskalnik = IskalnikKonfliktov.za_rezervacije(rezervacije)
     data = [{'rezervacija': r, 'konflikti': list(iskalnik.konflikti_z_rezervacijo(r))} for r in rezervacije]
     for x in data:
         x['st_konfliktov'] = sum(k.st_konfliktov for _, _, k in x['konflikti'])
+
     return render(request, 'preglej_rezervacije.html', {
         'naslov': 'Pregled rezervacij',
         'entries': data,
@@ -176,7 +179,13 @@ def preglej_rezervacije(request):
 @login_required
 def preglej_rezervacije_oseba(request, oseba_id):
     oseba = get_object_or_404(Oseba, pk=oseba_id)
-    rezervacije = Rezervacija.objects.prihajajoce().filter(osebe__in=(oseba,)).prefetch_related('predmeti', 'predmeti__letnik')
+    rezervacije = Rezervacija.objects.prihajajoce().filter(osebe=oseba).select_related(
+        'avtor_rezervacije'
+    ).prefetch_related(
+        Prefetch('predmeti', queryset=Predmet.objects.prefetch_related('letniki'), to_attr='seznam_predmetov'),
+        Prefetch('osebe', to_attr='seznam_oseb'),
+        Prefetch('ucilnice', to_attr='seznam_ucilnic'),
+    )
     iskalnik = IskalnikKonfliktov.za_rezervacije(rezervacije)
     data = [{'rezervacija': r, 'konflikti': list(iskalnik.konflikti_z_rezervacijo(r))} for r in rezervacije]
     for x in data:

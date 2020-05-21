@@ -108,13 +108,15 @@ class IskalnikKonfliktov(object):
                 self.zasedenost_ucilnic[s.ucilnica_id, d].append(s)
 
     def dodaj_rezervacije(self, rezervacije):
+        """Queryset rezervacije mora biti prefetchan tako, da obstaja atribut seznam_ucilnic"""
         for r in rezervacije:
-            for u in r.ucilnice.all():
+            for u in r.seznam_ucilnic:
                 for d in r.dnevi_med(self.min_datum, self.max_datum):
                     self.rezerviranost_ucilnic[u.pk, d].append(r)
 
     @staticmethod
     def za_rezervacije(rezervacije: RezervacijaQuerySet):
+        """Queryset rezervacije mora biti prefetchan tako, da obstaja atribut seznam_ucilnic"""
         min_datum = datetime.date.max
         max_datum = datetime.date.min
         ucilnice = set()
@@ -123,7 +125,7 @@ class IskalnikKonfliktov(object):
                 min_datum = r.zacetek
             if r.konec > max_datum:
                 max_datum = r.konec
-            ucilnice.update(r.ucilnice.all())
+            ucilnice.update(r.seznam_ucilnic)
 
         iskalnik = IskalnikKonfliktov(ucilnice, min_datum, max_datum)
         iskalnik.dodaj_srecanja()
@@ -131,7 +133,7 @@ class IskalnikKonfliktov(object):
         return iskalnik
 
     def konflikti_z_rezervacijo(self, r: Rezervacija):
-        for u in r.ucilnice.all():
+        for u in r.seznam_ucilnic:
             for d in r.dnevi():
                 k = self.konflikti(u, d, r.od, r.do, r)
                 if k:
@@ -141,7 +143,7 @@ class IskalnikKonfliktov(object):
         """Vrne konflikte z dejavnostjo, ki bi v ucilnici `ucilnica` potekala dne `datum` od ure `od` do `do`."""
         konflikti = Konflikt()
         if ucilnica not in self.ucilnice:
-            raise ValueError("Struktura iskanja ni bila pripravljena za iskanje konfliktov v učinici {}".format(ucilnica))
+            raise ValueError("Struktura iskanja ni bila pripravljena za iskanje konfliktov v učilnici {}".format(ucilnica))
         if not (self.min_datum <= datum <= self.max_datum):
             raise ValueError("Struktura iskanja ni bila pripravljena za iskanje konfliktov dne {}".format(datum))
 
