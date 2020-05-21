@@ -36,12 +36,12 @@
                 <a href="{% url 'urnik_ucilnice' rezervacija.ucilnica.pk %}">{{ rezervacija.ucilnica }}</a>,
                 {{ rezervacija.od }}–{{ rezervacija.do }},
                 <small>
-                  {% for oseba in rezervacija.osebe.all %}
+                  {% for oseba in rezervacija.osebe %}
                     <a href="{% url 'urnik_osebe' oseba.pk %}">{{ oseba }}</a>,
                   {% endfor %}
                   {{ rezervacija.opomba }}
-                  {% if rezervacija.predmeti.all %}
-                    ({% for predmet in rezervacija.predmeti.all %}<a href="{% url 'urnik_predmeta' p.id %}">{{ p.opisno_ime }}</a>{% if forloop.last %}){% else %}, {% endif %}{% endfor %}
+                  {% if rezervacija.predmeti %}
+                    ({% for p in rezervacija.predmeti %}<a href="{% url 'urnik_predmeta' p.id %}">{{ p.opisno_ime }}</a>{% if forloop.last %}){% else %}, {% endif %}{% endfor %}
                   {% endif %}
                 </small>
                 {% if user.is_staff and not rezervacija.potrjena and rezervacija.konflikti %}
@@ -54,13 +54,13 @@
                   {% for rez in rezervacija.konflikti.rezervacije %}
                     <li><b>Konflikt:</b>
                       Učilnico {{ rezervacija.ucilnica }} je od {{ rez.od }} do {{ rez.do }}
-                      rezervirala oseba {{ rez.osebe.all.0|default:"neznan" }}
+                      rezervirala oseba {{ rez.osebe.0|default:"neznan" }}
                       z razlogom &raquo;{{ rez.opomba }}&laquo;.
                     </li>
                   {% endfor %}
                   {% for s in rezervacija.konflikti.srecanja %}
                     <li>
-                      V učilnici {{ s.ucilnica }} od {{ s.od }} do {{ s.do }} poteka predmet {{ s.predmet }}.
+                      V učilnici {{ rezervacija.ucilnica }} od {{ s.od }} do {{ s.do }} poteka predmet {{ s.predmet }}.
                     </li>
                   {% endfor %}
                 </ul></li>
