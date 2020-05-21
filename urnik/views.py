@@ -203,7 +203,8 @@ def potrdi_rezervacijo(request):
 @login_required
 def izbrisi_rezervacijo(request):
     rezervacija = get_object_or_404(Rezervacija, pk=request.POST['r-pk'])
-    if not request.user.is_staff and request.user not in rezervacija.osebe.all():
+    if not (request.user.is_staff or (
+            hasattr(request.user, 'oseba') and request.user.oseba in rezervacija.osebe.all())):
         raise PermissionDenied
     rezervacija.delete()
     return redirect(request.POST.get('redirect') or reverse('preglej_rezervacije'))
