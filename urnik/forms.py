@@ -40,6 +40,7 @@ class RezevacijeForm(ModelForm):
                                                 help_text='Izberite učilnice, ki jih želite rezervirati',
                                                 widget=CheckboxSelectMultiple())
     predmeti = PredmetModelMultipleChoiceField(queryset=Predmet.objects.all(),
+                                               required=False,
                                                help_text='Predmeti, povezani s to rezervacijo. Lahko pustite prazno. '
                                                          'Če izberete enega ali več predmetov, se bo rezervacija pokazala na tedenskem '
                                                          'urniku predmeta in vseh letnikov, ki predmet imajo.')
