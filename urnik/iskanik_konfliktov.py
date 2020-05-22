@@ -133,6 +133,8 @@ class IskalnikKonfliktov(object):
         return iskalnik
 
     def konflikti_z_rezervacijo(self, r: Rezervacija):
+        if not hasattr(r, 'seznam_ucilnic'):
+            r.seznam_ucilnic = r.ucilnice.all()
         for u in r.seznam_ucilnic:
             for d in r.dnevi():
                 k = self.konflikti(u, d, r.od, r.do, r)

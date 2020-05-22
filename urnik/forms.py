@@ -3,6 +3,7 @@ import datetime
 from django.core.exceptions import ValidationError
 from django.forms import ModelForm, ModelMultipleChoiceField, forms, CheckboxSelectMultiple, DateInput, TextInput, \
     BooleanField
+from django.db.models import Prefetch
 from django.template import defaultfilters
 
 from urnik.models import Oseba, Predmet, Ucilnica, Rezervacija
@@ -103,7 +104,7 @@ class RezevacijeForm(ModelForm):
         do = cleaned.get('do')
         iskalnik = IskalnikKonfliktov(ucilnice, dan, konec)
         iskalnik.dodaj_srecanja()
-        iskalnik.dodaj_rezervacije(Rezervacija.objects.prihajajoce())
+        iskalnik.dodaj_rezervacije(Rezervacija.objects.prihajajoce().prefetch_related(Prefetch('ucilnice', to_attr='seznam_ucilnic')))
 
         date_format = lambda d: defaultfilters.date(d, "D, j. b")
         for u in ucilnice:
