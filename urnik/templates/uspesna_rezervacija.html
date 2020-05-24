@@ -20,7 +20,7 @@
     <p>
       Naredite <a href="{% url 'nova_rezervacija' %}">še eno rezervacijo</a>,
       {% if request.user.oseba %}
-        pojdite na <a href="{% url 'preglej_rezervacije_oseba' request.user.oseba %}">svoje rezervacije</a>,
+        pojdite na <a href="{% url 'preglej_rezervacije_oseba' oseba_id=request.user.oseba.pk %}">svoje rezervacije</a>,
       {% endif %}
       poglejte <a href="{% url 'rezervacije' %}">vse rezervacije</a>,
       iščite <a href="{% url 'proste' %}">proste učilnice</a>
