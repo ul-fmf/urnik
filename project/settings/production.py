@@ -27,10 +27,6 @@ DATABASES = {
     },
 }
 
-
-import ldap
-from django_auth_ldap.config import LDAPSearch
-
 AUTHENTICATION_BACKENDS += (
     'django_auth_ldap.backend.LDAPBackend',
 )
