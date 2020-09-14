@@ -41,6 +41,8 @@ class TedenskiUrnikTermin(Termin):
 
     def ime_za_prikaz(self):
         if self.tip == TedenskiUrnikTermin.SRECANJE:
+            if self.model.predmet is None:
+                return ''
             if (self.sirina >= 0.5 and len(self.model.predmet.ime) < 45 and self.trajanje > 1) or self.sirina == 1:
                 return self.model.predmet.ime
             else:
