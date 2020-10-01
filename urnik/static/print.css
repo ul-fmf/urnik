@@ -49,6 +49,14 @@ nav div.nav-wrapper ul.left, nav div.nav-wrapper ul.right, #side-menu, a.button-
     display: none;
 }
 
+.tedenski-pogled {
+    display: none;
+}
+
+.urnik-wrapper {
+    top: 30px;
+}
+
 /* ce je stranski meni odprt */
 #side-menu, #sidenav-overlay, div.drag-target {
     display: none;
