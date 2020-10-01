@@ -28,7 +28,7 @@ def izbrani_semester(request):
         except:
             pass
     try:
-        return Semester.objects.filter(objavljen=True).latest('od')
+        return Semester.najblizji_semester(now())
     except Semester.DoesNotExist:
         raise ValueError("Za uporabo aplikacije dodajte v bazo vsaj en objavljen semester.")
 
