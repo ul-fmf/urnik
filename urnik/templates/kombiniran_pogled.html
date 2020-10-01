@@ -52,15 +52,7 @@
             <label for="ucilnica-{{ ucilnica.id }}">
               <input type="checkbox" name="ucilnica" value="{{ ucilnica.id }}" id="ucilnica-{{ ucilnica.id }}">
               <span>{{ ucilnica.oznaka }}</span>
-            </label>
-            <small>
-              {% if ucilnica.tip == ucilnica.RACUNALNISKA %}
-                <i class="tiny material-icons">computer</i>
-              {% elif ucilnica.tip == ucilnica.PRAKTIKUM %}
-                <i class="tiny material-icons">build</i>
-              {% endif %}
-              ({{ ucilnica.velikost|default:'?' }} mest)
-            </small>
+            {% include "_kapaciteta_ucilnice.html" with ucilnica=ucilnica %}
           </td>
         </tr>
       {% endfor %}

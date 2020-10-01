@@ -1,0 +1,12 @@
+<small>
+    {% if ucilnica.tip == ucilnica.RACUNALNISKA %}
+    <i class="tiny material-icons">computer</i>
+    {% elif ucilnica.tip == ucilnica.PRAKTIKUM %}
+    <i class="tiny material-icons">build</i>
+    {% endif %}
+    {% if ucilnica.korona_velikost %}
+    ({{ ucilnica.velikost|default:'?' }}/{{ ucilnica.korona_velikost }}<i class="tiniest material-icons">coronavirus</i> mest)
+    {% else %}
+    ({{ ucilnica.velikost|default:'?' }} mest)
+    {% endif %}
+</small>
