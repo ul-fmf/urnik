@@ -72,14 +72,7 @@
         <tr>
           <td class="padded">
             <a href="{% url 'urnik_ucilnice' ucilnica_id=ucilnica.id semester_id=izbrani_semester_id %}">{{ ucilnica.oznaka }}</a>
-            <small>
-              {% if ucilnica.tip == ucilnica.RACUNALNISKA %}
-                <i class="tiny material-icons">computer</i>
-              {% elif ucilnica.tip == ucilnica.PRAKTIKUM %}
-                <i class="tiny material-icons">build</i>
-              {% endif %}
-              ({{ ucilnica.velikost|default:'?' }} mest)
-            </small>
+            {% include "_kapaciteta_ucilnice.html" with ucilnica=ucilnica %}
           </td>
         </tr>
       {% endfor %}
