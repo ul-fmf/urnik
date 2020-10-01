@@ -4,6 +4,8 @@ from copy import deepcopy
 
 from django.conf import settings
 from django.db import models
+from django.utils.timezone import now
+
 from urnik.utils import teden_dneva
 
 MIN_URA, MAX_URA = 7, 20
@@ -196,6 +198,9 @@ class SemesterQuerySet(models.QuerySet):
     def v_obdobju(self, od, do):
         return self.filter(do__gte=od, od__lte=do)
 
+    def vsebuje_dan(self, dan):
+        return self.filter(od__lte=dan, do__gte=dan)
+
 
 class Semester(models.Model):
     ime = models.CharField(max_length=192)
@@ -239,6 +244,42 @@ class Semester(models.Model):
         if self.do >= prvi_dan:
             tedni.add(teden_dneva(self.do))
         return tedni
+
+    @classmethod
+    def najblizji_semester(cls, danes=None, samo_objavljeni=True):
+        if danes is None:
+            danes = now()
+        semestri = Semester.objects.all()
+        if samo_objavljeni:
+            semestri = semestri.filter(objavljen=True)
+
+        # Ali smo v veljavnem semestru
+        try:
+            return semestri.vsebuje_dan(danes).latest('od')
+        except Semester.DoesNotExist:
+            pass
+
+        prej = semestri.filter(do__lt=danes)
+        potem = semestri.filter(od__gt=danes)
+        try:
+            prejsnji = prej.latest('do')
+            razlika_prejsnji = (danes.date() - prejsnji.do).total_seconds()
+        except Semester.DoesNotExist:
+            prejsnji = None
+            razlika_prejsnji = float('inf')
+        try:
+            kasnejsi = potem.earliest('od')
+            razlika_kasnejsi = (kasnejsi.od - danes.date()).total_seconds()
+        except Semester.DoesNotExist:
+            kasnejsi = None
+            razlika_kasnejsi = float('inf')
+
+        if razlika_prejsnji < razlika_kasnejsi:
+            # Je zagotovo Semester, ker float('inf') < float('inf') ~> False
+            return prejsnji
+        if kasnejsi:
+            return kasnejsi
+        return semestri.latest('od')
 
 
 class SrecanjeQuerySet(models.QuerySet):
