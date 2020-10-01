@@ -69,6 +69,11 @@ class UcilnicaAdmin(admin.ModelAdmin):
         'korona_velikost',
         'tip',
     )
+    list_editable = (
+        'velikost',
+        'korona_velikost',
+        'tip',
+    )
     list_filter = (
         'tip',
     )
