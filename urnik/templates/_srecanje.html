@@ -23,13 +23,19 @@
 
 <div class="ucitelj">
   {% for ucitelj in srecanje.ucitelji.all %}
-    <a href="{% url 'urnik_osebe' oseba_id=ucitelj.id semester_id=izbrani_semester_id %}">{{ ucitelj.priimek }}</a>{% if not forloop.last %}, {% endif %}
+    <a href="{% url 'urnik_osebe' oseba_id=ucitelj.id semester_id=izbrani_semester_id %}"
+		   title="{{ ucitelj.ime }} {{ ucitelj.priimek }}">
+			{{ ucitelj.priimek }}
+		</a>{% if not forloop.last %}, {% endif %}
   {% endfor %}
 </div>
 
 {% if srecanje.ucilnica %}
   <div class="ucilnica">
-    <a href="{% url 'urnik_ucilnice' ucilnica_id=srecanje.ucilnica.id semester_id=izbrani_semester_id %}">{{ srecanje.ucilnica.kratko_ime }}</a>
+    <a href="{% url 'urnik_ucilnice' ucilnica_id=srecanje.ucilnica.id semester_id=izbrani_semester_id %}"
+			 title="{{ srecanje.ucilnica.oznaka }}">
+			{{ srecanje.ucilnica.kratko_ime }}
+		</a>
   </div>
 {% endif %}
 
