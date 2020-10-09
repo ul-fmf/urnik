@@ -114,6 +114,8 @@ def nova_rezervacija(request, ucilnica_id=None, ura=None, teden=None, dan_v_tedn
         if form.is_valid():
             rezervacija = form.save(commit=False)
             rezervacija.avtor_rezervacije = request.user
+            # Če je oseba rezervirala samo navidezne učilnice, ne potrebuje potrditve.
+            rezervacija.potrjena = all(u.dovoli_veckratno_rezervacijo for u in rezervacija.ucilnice)
             rezervacija.save()
             form.save_m2m()
             return render(request, 'uspesna_rezervacija.html', {'rezervacija': rezervacija})

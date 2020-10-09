@@ -108,6 +108,8 @@ class RezevacijeForm(ModelForm):
 
         date_format = lambda d: defaultfilters.date(d, "D, j. b")
         for u in ucilnice:
+            if u.dovoli_veckratno_rezervacijo:
+                continue
             d = dan
             while d <= konec:
                 konflikti = iskalnik.konflikti(u, d, od, do)
