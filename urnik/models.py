@@ -149,6 +149,7 @@ class Ucilnica(models.Model):
     kratka_oznaka = models.CharField(max_length=10, blank=True)
     velikost = models.PositiveSmallIntegerField(blank=True, null=True)
     korona_velikost = models.PositiveSmallIntegerField(blank=True, null=True)
+    dovoli_veckratno_rezervacijo = models.BooleanField(default=False)
     objects = UcilnicaQuerySet.as_manager()
 
     class Meta:
