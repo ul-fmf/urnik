@@ -262,25 +262,18 @@ class Semester(models.Model):
 
         prej = semestri.filter(do__lt=danes)
         potem = semestri.filter(od__gt=danes)
+        
         try:
             prejsnji = prej.latest('do')
-            razlika_prejsnji = (danes.date() - prejsnji.do).total_seconds()
         except Semester.DoesNotExist:
             prejsnji = None
-            razlika_prejsnji = float('inf')
+            
         try:
             kasnejsi = potem.earliest('od')
-            razlika_kasnejsi = (kasnejsi.od - danes.date()).total_seconds()
         except Semester.DoesNotExist:
             kasnejsi = None
-            razlika_kasnejsi = float('inf')
-
-        if razlika_prejsnji < razlika_kasnejsi:
-            # Je zagotovo Semester, ker float('inf') < float('inf') ~> False
-            return prejsnji
-        if kasnejsi:
-            return kasnejsi
-        return semestri.latest('od')
+        
+        return kasnejsi or prejsnji or semestri.latest('od')
 
 
 class SrecanjeQuerySet(models.QuerySet):
