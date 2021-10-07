@@ -317,7 +317,7 @@ class SrecanjeQuerySet(models.QuerySet):
     def v_tednu_semestra(self, teden, semester):
         if teden is None:
             return self
-        veljavni_dnevi = [dan for dan in range(1, 6) if semester.od <= teden + datetime.timedelta(days=dan) <= semester.do]
+        veljavni_dnevi = [dan for dan in range(1, 6) if semester.od <= teden + datetime.timedelta(days=dan-1) <= semester.do]
         return self.filter(dan__in=veljavni_dnevi)
 
     def za_urnik(self):
