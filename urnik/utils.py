@@ -17,7 +17,7 @@ def normaliziraj_teden(dan):
     try:
         dan = parse_date(dan)
         weekday = dan.weekday()
-        if weekday <= 5:
+        if weekday <= 4:
             dan -= datetime.timedelta(days=weekday)
         else:
             dan += datetime.timedelta(days=7 - weekday)
