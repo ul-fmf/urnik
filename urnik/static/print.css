@@ -58,6 +58,6 @@ nav div.nav-wrapper ul.left, nav div.nav-wrapper ul.right, #side-menu, a.button-
 }
 
 /* ce je stranski meni odprt */
-#side-menu, #sidenav-overlay, div.drag-target {
-    display: none;
+#side-menu, .sidenav-overlay, div.drag-target {
+    display: none !IMPORTANT;
 }
